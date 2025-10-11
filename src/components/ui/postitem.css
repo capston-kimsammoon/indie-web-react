@@ -23,6 +23,9 @@
   font-weight: 600;
   color: #2f2f2f;
   margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .post-text > div:nth-child(2) {
@@ -59,7 +62,7 @@
 .meta > div:nth-child(3) {
   font-size: 12px;
   font-weight: 400;
-  color: #b0b0b0;
+  color: #1c8591;
 }
 
 .comment-count {
