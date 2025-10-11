@@ -20,7 +20,6 @@ const TabRow = styled.div`
   display: flex;
   justify-content: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineGray};
-  margin-bottom: 0.5rem;
 `;
 
 const TabButton = styled.button`
