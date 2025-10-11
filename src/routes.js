@@ -26,9 +26,13 @@ import MyReviewListPage from './pages/review/MyReviewListPage';
 import PickDetailPage from './pages/pick/PickDetailPage';
 import AllReview from './pages/review/AllReview';
 
-
 const routes = [
-  { path: '/home', element: <HomePage /> },
+  // ✅ 홈 화면: 주소창에 /home 없이 / 로 표시
+  { path: '/', element: <HomePage /> },
+
+  // ✅ 기존 /home 주소로 들어오면 / 로 자동 리다이렉트
+  { path: '/home', element: <Navigate to="/" replace /> },
+
   { path: '/alarm', element: <NotificationPage /> },
   { path: '/calendar', element: <CalendarPage /> },
   { path: '/performance', element: <PerformanceListPage /> },
@@ -45,17 +49,15 @@ const routes = [
   { path: '/freeboard/:id', element: <Bulletindetail /> },
   { path: '/map', element: <MapPage /> },
   { path: '/venue', element: <ListVenue /> },
-  { path: '/venue/reviews', element: <AllReview />},
+  { path: '/venue/reviews/all', element: <AllReview /> },
   { path: '/venue/:id', element: <DetailVenue /> },
-  { path: '/login/success', element: <LoginSuccess/> }, 
-  { path: '/venue/:id/review', element: <VenueReviewListPage/> },
-  { path: '/venue/:id/review/write', element: <ReviewWritePage/>},
+  { path: '/login/success', element: <LoginSuccess /> }, 
+  { path: '/venue/:id/review', element: <VenueReviewListPage /> },
+  { path: '/venue/:id/review/write', element: <ReviewWritePage /> },
   { path: '/stamps', element: <StampsPage /> },
   { path: '/stamp', element: <Navigate to="/stamps" replace /> },
   { path: '/venue/my/review', element: <MyReviewListPage /> },
-  { path: '/pick/:id', element: <PickDetailPage /> }
-  
-  
+  { path: '/pick/:id', element: <PickDetailPage /> },
 ];
 
 export default routes;

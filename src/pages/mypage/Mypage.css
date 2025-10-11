@@ -111,7 +111,7 @@
 
 /* 퀵메뉴 */
 .quick__grid {
-  margin-top: 52px;
+  margin-top: 40px;
   margin-bottom: 32px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -188,9 +188,14 @@
 
 .logout {
   width: 100%;
+  position: fixed;
+  bottom: 92px;
+  left: 0; 
+  right: 0;
   display: flex;
+  position: fixed;
   justify-content: center;
-  margin-top: 60px;
+  padding: 0; 
 }
 
 .logout__button {
@@ -200,7 +205,6 @@
   color: #B0B0B0;
   font-size: 14px;
   line-height: 1;
-  padding: 8px 12px;
   border-radius: 4px;
   text-decoration: underline;
 }

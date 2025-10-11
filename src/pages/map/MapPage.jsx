@@ -122,7 +122,7 @@ const MapPage = () => {
       <MapTime />
       <Divider />
 
-      <ScrollableContainer>
+      <ScrollableList>
         <MapGrid
           data={venues}
           selectedCardId={selectedCardId}
@@ -133,7 +133,7 @@ const MapPage = () => {
           }}
           onSelectVenue={setSelectedVenue}
         />
-      </ScrollableContainer>
+      </ScrollableList>
     </PageWrapper>
   );
 };
@@ -146,4 +146,20 @@ const PageWrapper = styled.div`
   flex-direction: column;
   overflow-x: hidden;  
   overflow-y: auto;
+`;
+
+const ScrollableList = styled.div`
+  margin-bottom: 110px;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 `;

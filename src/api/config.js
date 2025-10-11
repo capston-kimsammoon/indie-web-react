@@ -1,5 +1,12 @@
-// 서버 URL 한 번만 정의
-// //일단 각자 로컬 주소를 넣어서 테스해보세요
-export const baseUrl = '';
-export const authBaseUrl =
-  process.env.REACT_APP_AUTH_BASE_URL || 'http://localhost:8000'
+// .env(Vercel)에서 값을 읽고, 끝 슬래시는 제거
+const apiBase = (process.env.REACT_APP_API_BASE_URL || "/").replace(/\/$/, "");
+const authBase = (process.env.REACT_APP_AUTH_BASE_URL || apiBase).replace(/\/$/, "");
+
+// 주 사용 엔드포인트
+export const apiBaseUrl  = apiBase || "/";
+export const authBaseUrl = authBase || "/";
+
+// 과거 호환
+export const baseUrl = apiBaseUrl;
+
+export default { apiBaseUrl, authBaseUrl, baseUrl };

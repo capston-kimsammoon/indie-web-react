@@ -104,7 +104,7 @@ const EmptyMessage = styled.div`
   padding: 16px 16px;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
-  color: ${({ theme }) => theme.colors.themePink};
+  color: ${({ theme }) => theme.colors.darkGray};
   display: flex;
   justify-content: center; 
   align-items: center;  

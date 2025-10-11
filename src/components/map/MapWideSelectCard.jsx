@@ -6,7 +6,7 @@ import MapWideCard from './MapWideCard';
 
 const Wrapper = styled.div`
   display: flex;
-  width: calc(100% - 16px);
+  width: calc(100% - 8px);
   justify-content: center;
   border-radius: 10px;
   box-sizing: border-box;

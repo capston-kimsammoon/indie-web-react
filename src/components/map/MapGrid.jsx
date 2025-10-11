@@ -1,5 +1,4 @@
 // src/components/map/MapGrid.jsx
-
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
@@ -115,8 +114,9 @@ const MapGrid = ({
                       style={{
                         overflow: 'hidden',
                         width: '100%',
-                        padding: '0 8px',
+                        padding: '0 4px',
                         marginTop: '12px',
+                        boxSizing: 'border-box',
                       }}>
                       <MapWideSelectCard
                         title={firstUpcoming?.title ?? '공연 없음'}
@@ -165,30 +165,40 @@ export default MapGrid;
 const Container = styled.div`
   width: 100%;
   position: relative;
-  padding-bottom: 132px;
+  padding: 0 2px 140px 2px; //116
   z-index: 1;
+  overflow-x: hidden;
+  touch-action: pan-y;
 `;
 
 const Row = styled.div`
   display: flex;
-  justify-content: space-between;
+  gap: 6px;
   margin-top: 8px;
+  touch-action: pan-y; 
+  user-select: none;
 `;
 
 const CardContainer = styled.div`
-  width: 30%;
+  flex: 1; /* width: 30% 대신 flex 사용 */
+  max-width: calc(33.333% - 5.33px); /* gap 8px 분배 고려 */
+  margin: 0 8px;
   display: flex;
   justify-content: center;
-  margin: 0 8px;
   flex-direction: column;
   caret-color: transparent;
+  min-width: 0;
+  flex-shrink: 0;
+  touch-action: pan-y;
+  user-select: none;
 `;
 
 const CardWrapper = styled.div`
   width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  padding: 8px;
+  padding: 6px; /* 8px → 6px로 줄임 */
   border-radius: 10px;
   cursor: pointer;
   box-sizing: border-box;
@@ -203,6 +213,8 @@ const Poster = styled.img`
   aspect-ratio: 3 / 4;
   border-radius: 10px;
   object-fit: cover;
+  display: block; 
+  flex-shrink: 0; 
 `;
 
 const Venue = styled.div`

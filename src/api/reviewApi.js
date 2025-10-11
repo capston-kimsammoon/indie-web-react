@@ -56,7 +56,7 @@ export async function fetchAllReviews({ page = 1, size = 10, order = 'desc' } = 
 
  // const url = resolveUrl(`/venue/reviews?${qs}`);
   try {
-   const res = await http.get('/venue/reviews', {
+   const res = await http.get('/venue/reviews/all', {
      params: { page, size, order: order === 'asc' ? 'asc' : 'desc' },
      validateStatus: () => true,
    });
