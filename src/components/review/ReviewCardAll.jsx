@@ -93,17 +93,6 @@ const BodyText = styled.p.withConfig({
   margin: 0;
   padding-right: 32px; 
   box-sizing: border-box;
-
-  ${({ variant }) =>
-    variant === 'compact' &&
-    css`
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: normal;
-    `}
 `;
 
 const MetaBar = styled.div`
