@@ -7,6 +7,7 @@
   justify-content: space-between;
   cursor: pointer;
   box-sizing: border-box;
+  box-shadow: none !important;
 }
 
 .post-text {
@@ -25,6 +26,7 @@
   margin-right: 40px;
   margin-bottom: 8px;
   overflow: hidden;
+  -webkit-line-clamp: 2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -76,8 +78,8 @@
 }
 
 .thumbnail {
-  width: 80px;
-  height: 80px;
+  width: 76px;
+  height: 76px;
   object-fit: cover;
   border-radius: 6px;
   border: 1px solid #e4e4e4;
