@@ -3,8 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Bell, BellOff, Heart } from 'lucide-react';
 import Searchbar from '../../components/ui/searchbar';
 import styled from 'styled-components';
-
-
 import PostItem from '../../components/ui/postitem';
 import Header from '../../components/layout/Header';
 
@@ -212,7 +210,7 @@ function Search() {
   };
 
   return (
-    <div className="search-page">
+    <PageWrapper>
       <Header title="검색" showBack initialSearchTab={tab} showSearch={false} />
       <div style={{ height: '30px' }} />
 
@@ -236,29 +234,7 @@ function Search() {
         </TabButton>
       </TabRow>
 
-      {/* 최근 검색어 */}
-      {!keyword && (
-        <div className="recent">
-          <h4>최근 검색어</h4>
-          <div className="recent-list">
-            {recent.slice(0, 4).map((word, idx) => (
-              <div key={idx} className="recent-chip" onClick={() => handleSearch(word)}>
-                {word}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setRecent((prev) => prev.filter((w) => w !== word));
-                  }}
-                  className="close-btn"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
+      <ScrollableList>
       {/* 공연 */}
       {keyword && tab === '공연' && (
         <div className="search-section">
@@ -329,40 +305,81 @@ function Search() {
 
       {/* 아티스트 */}
       {keyword && tab === '아티스트' && (
-        <div className="artist-list">
-          {artists.length > 0 ? artists.map((artist) => (
-            <div className="artist-item" key={artist.id} onClick={() => navigate(`/artist/${artist.id}`)}>
-              <div className="artist-info">
-                <img className="artist-img" src={artist.profile_url || '/no-image.png'} alt={artist.name} />
-                <span className="artist-name">{artist.name}</span>
+        <div className="search-section">
+          <div className="section">
+            {artists.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {artists.map((artist) => (
+                  <div 
+                    key={artist.id} 
+                    onClick={() => navigate(`/artist/${artist.id}`)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px 16px',
+                      borderBottom: '1px solid #f0f0f2',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <img
+                      src={artist.profile_url || artist.image_url || '/default_profile.png'}
+                      alt={artist.name}
+                      style={{
+                        width: '44px',
+                        height: '44px',
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                        border: '1px solid #E4E4E4',
+                      }}
+                      onError={(e) => {
+                        if (!e.currentTarget.src.endsWith('/default_profile.png')) {
+                          e.currentTarget.src = '/default_profile.png';
+                        }
+                      }}
+                    />
+                    <span style={{
+                      fontSize: '16px',
+                      fontWeight: 500,
+                      color: '#1c1c1e',
+                    }}>
+                      {artist.name}
+                    </span>
+                  </div>
+                ))}
               </div>
-              <div className="artist-buttons">
-                <div
-                  className={`notify ${alarmState[artist.id] ? 'on' : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleToggleAlarm(artist.id);
-                  }}
-                >
-                  공연알림 {alarmState[artist.id] ? <Bell size={16} /> : <BellOff size={16} />}
-                </div>
-                <Heart
-                  className={`heart ${likedState[artist.id] ? 'on' : ''}`}
-                  size={20}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleToggleLike(artist.id);
-                  }}
-                />
-              </div>
-            </div>
-          )) : <p><strong>{keyword}</strong>와(과) 일치하는 아티스트가 없습니다.</p>}
+            ) : (
+              <p><strong>{keyword}</strong>와(과) 일치하는 아티스트가 없습니다.</p>
+            )}
+          </div>
         </div>
       )}
-
-      
-    </div>
+      </ScrollableList>
+    </PageWrapper>
   );
 }
 
 export default Search;
+
+const PageWrapper = styled.div`
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ScrollableList = styled.div`
+  padding-bottom: 109px;
+  flex-grow: 1;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none; 
+  }
+
+  -ms-overflow-style: none; 
+  scrollbar-width: none;
+
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+`;
