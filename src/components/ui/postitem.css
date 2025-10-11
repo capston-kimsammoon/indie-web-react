@@ -14,6 +14,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-width: 0;
+  margin-right: 8px;
 }
 
 .post-text > div:first-child {
