@@ -19,24 +19,23 @@
 }
 
 .post-text > div:first-child {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: #2f2f2f;
   margin-bottom: 8px;
 }
 
 .post-text > div:nth-child(2) {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
   color: #2f2f2f;
   margin-bottom: 8px;
 }
 
 .post-text > div:nth-child(3) {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   color: #B0B0B0;
-  margin-bottom: 8px;
 }
 
 .meta {
