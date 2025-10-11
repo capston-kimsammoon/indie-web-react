@@ -121,6 +121,9 @@ function MyPage() {
             로그인 / 회원가입
           </button>
           <p className="guest__message">로그인 후 이용 가능합니다.</p>
+          <div className="footer-actions">
+            <button className="logout__button" onClick={handleLogout}>로그아웃</button>
+          </div>
         </div>
       ) : (
         <ScrollableList>
@@ -216,9 +219,7 @@ function MyPage() {
 
           {/* ✅ 하단 고정된 로그아웃/탈퇴하기 영역 */}
           <div className="footer-actions">
-            <button className="logout__button" onClick={handleLogout}>
-              로그아웃
-            </button>
+            <button className="logout__button" onClick={handleLogout}>로그아웃</button>
             <span style={{ color: '#B0B0B0', fontSize: '12px' }}> | </span>
             <div className="withdraw">탈퇴하기</div>
           </div>
