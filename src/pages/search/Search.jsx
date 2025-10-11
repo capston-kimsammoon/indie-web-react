@@ -3,10 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Bell, BellOff, Heart } from 'lucide-react';
 import Searchbar from '../../components/ui/searchbar';
 import styled from 'styled-components';
-
-import './Search.css';
 import PostItem from '../../components/ui/postitem';
 import Header from '../../components/layout/Header';
+import ArtistListCard from '../../components/artist/ArtistListCard';
 
 // API Import
 import {  searchPerformance, searchVenue, searchArtist } from '../../api/searchApi';
@@ -130,10 +129,13 @@ function Search() {
         const uniqueConcerts = Array.from(new Map((res.performances || []).map(p => [p.id, p])).values());
         setConcerts(uniqueConcerts);
       } else if (currentTab === '공연장') {
-        const res = await searchVenue({ keyword: searchKeyword, page: 1, size: 10 });
-        const uniqueVenues = Array.from(new Map((res.venues || []).map(v => [v.id, v])).values());
-        setVenues(uniqueVenues);
-      } else if (currentTab === '아티스트') {
+  const res = await searchVenue({ keyword: searchKeyword, page: 1, size: 10 });
+  console.log('venue API 응답:', res); // ✅ 이 로그 추가
+  console.log('응답 타입:', Array.isArray(res), typeof res); // 타입 확인
+  
+  const uniqueVenues = Array.from(new Map((res.venues || []).map(v => [v.id, v])).values());
+  setVenues(uniqueVenues);
+} else if (currentTab === '아티스트') {
         const artistRes = await searchArtist({ keyword: searchKeyword, page: 1, size: 10 });
         setArtists(artistRes);
 
@@ -162,8 +164,8 @@ function Search() {
   const handleSearch = (newKeyword) => {
     setKeyword(newKeyword);
     setRecent((prev) => [newKeyword, ...prev.filter((w) => w !== newKeyword)].slice(0, 10));
-    navigate(`/search?keyword=${newKeyword}`, { state: { initialTab: '공연' } });
-    fetchSearchResults(newKeyword, '공연'); // ✅ 항상 공연 탭으로 검색
+    navigate(`/search?keyword=${newKeyword}`, { state: { initialTab: tab } }); 
+    fetchSearchResults(newKeyword, tab); 
   };
 
   // ✅ 탭 변경 시 현재 keyword로 검색
@@ -272,35 +274,50 @@ function Search() {
       {keyword && tab === '아티스트' && (
         <div className="search-section">
           <div className="section">
-            <div className="artist-list">
-              {artists.length > 0 ? artists.map((artist) => (
-                <div className="artist-item" key={artist.id} onClick={() => navigate(`/artist/${artist.id}`)}>
-                  <div className="artist-info">
-                    <img className="artist-img" src={artist.profile_url || '/no-image.png'} alt={artist.name} />
-                    <span className="artist-name">{artist.name}</span>
-                  </div>
-                  <div className="artist-buttons">
-                    <div
-                      className={`notify ${alarmState[artist.id] ? 'on' : ''}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleAlarm(artist.id);
+            {artists.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {artists.map((artist) => (
+                  <div 
+                    key={artist.id} 
+                    onClick={() => navigate(`/artist/${artist.id}`)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px 16px',
+                      borderBottom: '1px solid #f0f0f2',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <img
+                      src={artist.profile_url || artist.image_url || '/default_profile.png'}
+                      alt={artist.name}
+                      style={{
+                        width: '44px',
+                        height: '44px',
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                        border: '1px solid #E4E4E4',
                       }}
-                    >
-                      공연알림 {alarmState[artist.id] ? <Bell size={16} /> : <BellOff size={16} />}
-                    </div>
-                    <Heart
-                      className={`heart ${likedState[artist.id] ? 'on' : ''}`}
-                      size={20}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleLike(artist.id);
+                      onError={(e) => {
+                        if (!e.currentTarget.src.endsWith('/default_profile.png')) {
+                          e.currentTarget.src = '/default_profile.png';
+                        }
                       }}
                     />
+                    <span style={{
+                      fontSize: '16px',
+                      fontWeight: 500,
+                      color: '#1c1c1e',
+                    }}>
+                      {artist.name}
+                    </span>
                   </div>
-                </div>
-              )) : <p><strong>{keyword}</strong>와(과) 일치하는 아티스트가 없습니다.</p>}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p><strong>{keyword}</strong>와(과) 일치하는 아티스트가 없습니다.</p>
+            )}
           </div>
         </div>
       )}
