@@ -34,21 +34,21 @@ function PostItem({ post, onClick }) {
   return (
     <li className="post-item" onClick={onClick}>
       <div className="post-text">
-        <h3>{post.title || '제목 없음'}</h3>
-        {!!post.dateText && <p className="date">{post.dateText}</p>}
-        {!!post.content && <p>{post.content}</p>}
+        <div>{post.title || '제목 없음'}</div>
+        {!!post.dateText && <div className="date">{post.dateText}</div>}
+        {!!post.content && <div>{post.content}</div>}
 
         <div className="meta">
           {typeof post.commentCount === 'number' && (
-            <span className="comment-count">
+            <div className="comment-count">
               <MessageCirclePlus size={16} />
               {post.commentCount}
-            </span>
+            </div>
           )}
           {(post.created_at || post.date) && (
-            <span>{formatDate(post.created_at ?? post.date)}</span>
+            <div>{formatDate(post.created_at ?? post.date)}</div>
           )}
-          {!!post.author && <span>{post.author}</span>}
+          {!!post.author && <div>{post.author}</div>}
         </div>
       </div>
 
