@@ -211,7 +211,7 @@ function Search() {
   return (
     <PageWrapper>
       <Header title="검색" showBack initialSearchTab={tab} showSearch={false} />
-      <div style={{ height: '30px' }} />
+      <div style={{ height: '22px' }} />
 
       <Searchbar value={keyword} onChange={(e) => setKeyword(e.target.value)} onSearch={handleSearch} />
     
