@@ -234,3 +234,7 @@ function MyPage() {
     </div>
   );
 
+}
+
+export default MyPage;
+
