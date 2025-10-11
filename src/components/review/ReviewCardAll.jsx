@@ -156,8 +156,8 @@ const VenueName = styled.span`
 `;
 
 const MetaDate = styled.time` 
-  margin-top: -6px;
-  margin-bottom: 6px;
+  margin-top: -4px;
+  margin-bottom: 8px;
   font-size: 12px;
   color: #B0B0B0;
 `;
