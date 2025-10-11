@@ -159,6 +159,7 @@
 
 /* 리스트 섹션 (공지/고객센터) */
 .list { 
+  margin-top: 16px;
   display: flex; 
   flex-direction: column; }
 .list-item {
@@ -187,11 +188,13 @@
 }
 .footer-actions {
   position: fixed;
-  bottom: 80px;     /* 하단 네비게이션 바로 위 */
+  bottom: 88px;   
   left: 0;
   width: 100%;
   display: flex;
-  flex-direction: column;
+  gap: 24px;
+  justify-content: center;
+  flex-direction: row;
   align-items: center;
 }
 
@@ -199,15 +202,17 @@
 .logout__button {
   all: unset;
   color: #B0B0B0;
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 400;
   text-decoration: underline;
   cursor: pointer;
-  margin-bottom: 24px;  /* 탈퇴하기와 간격 */
 }
 
 /* 빨간 탈퇴하기 (가장 아래) */
 .withdraw {
-  color: #e53935;
-  font-size: 14px;
-  font-weight: 500;
+  color: #B0B0B0;
+  font-size: 12px;
+  font-weight: 400;
+  text-decoration: underline;
+  cursor: pointer;
 }
