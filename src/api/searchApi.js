@@ -1,15 +1,14 @@
 import axios from 'axios';
 import { baseUrl } from './config';
+import http from './http';
 
 /**
  *  공연 검색 
  */
 export const searchPerformance = async ({ keyword, page, size }) => {
   try {
-    const url = `${baseUrl}/search/performance`;
-    console.log(`🔗 요청 URL: ${url}?keyword=${keyword}&page=${page}&size=${size}`);
-
-    const response = await axios.get(url, { params: { keyword, page, size } });
+   // console.log(`🔗 요청 URL: ${url}?keyword=${keyword}&page=${page}&size=${size}`);
+    const response = await http.get('/search/performance', { params: { keyword, page, size } });
     console.log('🎯 공연 검색 API 응답:', response.data);
 
     return {
@@ -26,10 +25,8 @@ export const searchPerformance = async ({ keyword, page, size }) => {
  */
 export const searchVenue = async ({ keyword, page, size }) => {
   try {
-    const url = `${baseUrl}/search/venue`;
-    console.log(`🔗 요청 URL: ${url}?keyword=${keyword}&page=${page}&size=${size}`);
-
-    const response = await axios.get(url, { params: { keyword, page, size } });
+   // console.log(`🔗 요청 URL: ${url}?keyword=${keyword}&page=${page}&size=${size}`);
+    const response = await http.get('/search/venue', { params: { keyword, page, size } });
     console.log('🎯 공연장 검색 API 응답:', response.data);
 
     return {
@@ -46,8 +43,7 @@ export const searchVenue = async ({ keyword, page, size }) => {
  */
 export const searchArtist = async ({ keyword, page, size }) => {
   try {
-    const url = `${baseUrl}/search/artist`;
-    const response = await axios.get(url, { params: { keyword, page, size } });
+    const response = await http.get('/search/artist', { params: { keyword, page, size } });
     return response.data?.artists || [];
   } catch (error) {
     console.error('📛 아티스트 검색 실패:', error);

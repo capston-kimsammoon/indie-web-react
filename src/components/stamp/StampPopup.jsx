@@ -66,18 +66,23 @@ export default function StampPopup({ onClose, stamps, onStampSelect }) {
 
 const ModalBackground = styled.div`
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 68px;                      /* ✅ 하단바 높이만큼 제외 */
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 16px;
-  padding-bottom: 100px;
+  justify-content: center;           /* ✅ 좌우 중앙 */
+  align-items: center;               /* ✅ 상하 중앙 (하단바 제외한 영역 기준) */
+  padding: 16px;
   background: rgba(0,0,0,.2);
-  z-index: 9999;             
+  z-index: 9999;
+  overscroll-behavior: none;
+  touch-action: none;
 `;
 
 const PopupContainer = styled.div`
   position: relative;
+  margin: 0 auto;
   height: 93%;
   width: 100%;
   max-width: ${({ theme }) => theme.layout.maxWidth};
@@ -88,6 +93,7 @@ const PopupContainer = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  overscroll-behavior: none;
 `;
 
 const FixedHeader = styled.div`
@@ -116,12 +122,14 @@ const CloseButton = styled.button`
 const ScrollArea = styled.div`
   flex: 1;
   overflow-y: ${({ isEmpty }) => (isEmpty ? "hidden" : "auto")};
-  padding: 8px 16px 16px 16px;
+  overflow-x: hidden;
+  padding: 8px 16px 0 16px;
   display: ${({ isEmpty }) => (isEmpty ? "flex" : "block")};
   justify-content: ${({ isEmpty }) => (isEmpty ? "center" : "initial")};
   align-items: ${({ isEmpty }) => (isEmpty ? "center" : "initial")};
   scrollbar-width: none;
   -ms-overflow-style: none;
+  overscroll-behavior: contain;
   &::-webkit-scrollbar {
     width: 0;
     height: 0;
@@ -131,7 +139,7 @@ const ScrollArea = styled.div`
 const CardGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr); 
-  column-gap: 36px; 
+  column-gap: 20px; 
   row-gap: 32px;
   padding: 0;
 `;

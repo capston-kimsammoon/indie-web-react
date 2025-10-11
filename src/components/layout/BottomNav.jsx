@@ -13,24 +13,24 @@ const NavWrapper = styled.nav`
   left: 0;
   right: 0;
   margin: 0 auto; 
-  max-width: var(--app-max-width, ${({ theme }) => theme.layout.maxWidth});
+  max-width: ${({ theme }) => theme.layout.maxWidth};
   height: 68px;
   display: flex;
-  justify-content: space-around;
-  align-items: flex-start;
   border-top: 1px solid ${({ theme }) => theme.colors.outlineGray};
   background-color: ${({ theme }) => theme.colors.bgWhite};
   z-index: 10;
 `;
 
 const NavItem = styled(NavLink)`
+  flex: 1; 
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-top: 8px; 
+  align-items: center; 
+  justify-content: flex-start; 
+  padding-top: 8px; 
   text-decoration: none;
   color: ${({ theme }) => theme.colors.lightGray};
-  font-size: ${({ theme }) => theme.fontSizes.xs}; /* 12px */
+  font-size: ${({ theme }) => theme.fontSizes.xs};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
 
   &.active {
@@ -41,14 +41,14 @@ const NavItem = styled(NavLink)`
     width: 24px;
     height: 24px;
     margin-bottom: 4px;
-    fill: currentColor; 
+    fill: currentColor;
   }
 `;
 
 function BottomNav() {
   return (
     <NavWrapper>
-      <NavItem to="/home">
+      <NavItem to="/">
         <HomeIcon />
         홈
       </NavItem>
@@ -60,7 +60,7 @@ function BottomNav() {
         <MapIcon />
         주변공연
       </NavItem>
-      <NavItem to="/stamp">
+      <NavItem to="/stamps">
         <StampIcon />
         스탬프
       </NavItem>

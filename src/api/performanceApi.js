@@ -1,4 +1,5 @@
 import axios from 'axios';
+import http from './http';
 import { baseUrl } from './config';
 
 // ✅ [공통 함수] 안전하게 배열 반환
@@ -99,13 +100,8 @@ export const fetchPerformances = async ({ region, sort, page, size }) => {
 
 // 공연-2. 공연 상세 정보 조회 (단일 객체 반환)
 export const fetchPerformanceDetail = async (id) => {
-  try {
-    const response = await axios.get(`${baseUrl}/performance/${id}`);
-    return response.data; // ✅ 단일 객체 그대로 반환
-  } catch (error) {
-    console.error('❌ 공연 상세 정보 조회 실패:', error.response?.data || error.message);
-    throw error;
-  }
+  const res = await http.get(`/performance/${id}`); // ✅ withCredentials 포함
+  return res.data;
 };
 
 // 가까운 공연 찾기-2. 지도 영역 내 예정 공연 조회 (POST)

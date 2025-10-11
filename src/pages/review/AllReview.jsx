@@ -12,13 +12,11 @@ import {
 import { fetchUserInfo } from '../../api/userApi';
 
 /* ===================== 스타일 ===================== */
-const HeaderSpacer = styled.div`
-  height: 28px;
-`;
-
-const PageWrap = styled.div`
-  max-width: 720px;
-  margin: 0 auto;
+const PageWrapper = styled.div`
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Heading = styled.h1`
@@ -104,7 +102,7 @@ const EmptyMessage = styled.div`
   padding: 16px 16px;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
-  color: ${({ theme }) => theme.colors.darkGray};
+  color: ${({ theme }) => theme.colors.themePink};
   display: flex;
   justify-content: center; 
   align-items: center;  
@@ -131,6 +129,23 @@ const Skeleton = styled.div`
     100% { background-position: -200% 0; }
   }
 `;
+
+const ScrollableList = styled.div`
+  padding-bottom: 116px;
+  flex-grow: 1;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none; 
+  }
+
+  -ms-overflow-style: none; 
+  scrollbar-width: none;
+
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+`;
+
 export default function AllReview({
   // prop으로 들어오면 우선 사용하고, 없으면 fetchUserInfo로 채움
   isLoggedIn: isLoggedInProp = undefined,
@@ -147,7 +162,7 @@ export default function AllReview({
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(10);
+  const [size] = useState(20);
   const [order, setOrder] = useState('desc');
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
@@ -275,9 +290,9 @@ export default function AllReview({
   }, [page, size, total]);
 
   return (
-    <PageWrap>
+    <PageWrapper>
        <Header title='공연장 리뷰' />
-       <HeaderSpacer />
+       <div style={{ height: "32px" }} />
       {err && <ErrorBox role="alert">{err}</ErrorBox>}
 
       <SubBar>
@@ -294,16 +309,6 @@ export default function AllReview({
             <option value="desc">최신순</option>
             <option value="asc">오래된순</option>
           </select>
-
-          <select
-            aria-label="페이지 크기"
-            value={size}
-            onChange={(e) => { setPage(1); setSize(Number(e.target.value)); }}
-          >
-            <option value={10}>10개</option>
-            <option value={20}>20개</option>
-            <option value={30}>30개</option>
-          </select>
         </Controls>
       </SubBar>
 
@@ -314,7 +319,7 @@ export default function AllReview({
       ) : items.length === 0 ? (
         <EmptyMessage>아직 작성된 리뷰가 없습니다.</EmptyMessage>
       ) : (
-        <>
+        <ScrollableList>
           <List>
             {items.map((rv) => (
               <ReviewCardAll
@@ -347,8 +352,8 @@ export default function AllReview({
               →
             </button>
           </Pager>
-        </>
+        </ScrollableList>
       )}
-    </PageWrap>
+    </PageWrapper>
   );
 }

@@ -1,6 +1,6 @@
 .search-bar {
   width: 100%;
-  padding: 2px 4px;
+  padding: 2px 0;
   .search-bar__input {
     display: flex;
     align-items: center;

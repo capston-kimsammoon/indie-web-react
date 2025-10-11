@@ -7,7 +7,7 @@ import Header from "../../components/layout/Header";
 import StampLogin from "../../components/stamp/StampLogin";
 import { fetchUserInfo } from "../../api/userApi";
 import PeriodModal from "../../components/modals/PeriodModal";
-import StampButtonIcon from "../../assets/icons/icon_s_stamp.svg";
+import StampButtonIcon from "../../assets/icons/icon_stamp.svg";
 import FilterButtonNone from "../../components/common/FilterButtonNone";
 import StampPopup from "../../components/stamp/StampPopup";
 import StampPopupSmall from "../../components/stamp/StampPopupSmall";
@@ -152,31 +152,49 @@ export default function StampPage() {
 
       {/* ✅ 메인 스탬프판 */}
       <StampBoard>
-        <ScrollArea>
+        <ScrollableList>
           {collectedStamps.length > 0 ? (
             <StampPageContainer>
-              {collectedStamps
-                .slice()
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
-                .map((stamp) => (
-                  <StampItem
-                    key={stamp.id}
-                    onClick={() => setSelectedStampDetail(stamp)}
-                  >
-                    <StampImage src={stamp.venueImageUrl} alt={stamp.place} />
-                    <StampDate>{stamp.date}</StampDate>
-                  </StampItem>
-                ))}
+              {(() => {
+                const rows = [];
+                const sorted = collectedStamps
+                  .slice()
+                  .sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                for (let i = 0; i < sorted.length; i += 3) {
+                  const slice = sorted.slice(i, i + 3);
+                  while (slice.length < 3) slice.push(null);
+                  rows.push(slice);
+                }
+                
+                return rows.map((rowItems, rowIndex) => (
+                  <StampRow key={rowIndex}>
+                    {rowItems.map((stamp, colIndex) => (
+                      <StampItemWrapper key={colIndex}>
+                        {stamp && (
+                          <StampItem onClick={() => setSelectedStampDetail(stamp)}>
+                            <StampImage src={stamp.venueImageUrl} alt={stamp.place} />
+                            <StampDate>{stamp.date}</StampDate>
+                          </StampItem>
+                        )}
+                      </StampItemWrapper>
+                    ))}
+                  </StampRow>
+                ));
+              })()}
             </StampPageContainer>
           ) : (
             <EmptyMessage>받은 스탬프가 없습니다.</EmptyMessage>
           )}
-        </ScrollArea>
+        </ScrollableList>
       </StampBoard>
 
-      {/* ✅ 하단 버튼 */}
       <StampButton onClick={() => setIsStampPopupOpen(true)}>
-        <img src={StampButtonIcon} alt="스탬프 찍기" />
+        <img
+          src={StampButtonIcon}
+          alt="스탬프 찍기"
+          style={{ transform: 'rotate(20deg)', marginLeft: '2px', marginBottom: '4px' }}
+        />
       </StampButton>
 
       {/* ✅ 스탬프 팝업 */}
@@ -217,7 +235,7 @@ export default function StampPage() {
              if (!pid) return;
              setSelectedStampDetail(null);         // 팝업 닫고
              navigate(`/performance/${pid}`);      // 상세로 이동
-   }}
+          }}
         />
       )}
 
@@ -275,53 +293,81 @@ const FilterGroup = styled.div`
 `;
 
 const PageWrapper = styled.div`
-  width: 100%;
-  max-width: ${({ theme }) => theme.layout.maxWidth};
-  margin: 0 auto;
-  height: 100dvh; 
-  position: fixed;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
-  flex-direction: column;
-  background: ${({ theme }) => theme.colors.bgWhite};
-  overflow: hidden;   
+  flex-direction: column; 
 `;
 
 const StampButton = styled.button`
-  position: fixed; 
-  background: none;
+  position: fixed;
+  right: 20px;
+  bottom: 100px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
   border: none;
   cursor: pointer;
-  right: 0px;
-  bottom: 100px;
+  background-color: ${({ theme }) => theme.colors.primaryGreen || '#3C9C67'};
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-  img {
-    width: 72px;
-    height: 72px;
-    display: block;
+  &:active {
+    transform: scale(0.95);
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.3);
   }
 
   @media (min-width: ${({ theme }) => theme.layout.maxWidth}) {
-    right: calc((100vw - ${({ theme }) => theme.layout.maxWidth}) / 2);
+    right: calc((100vw - ${({ theme }) => theme.layout.maxWidth}) / 2 + 20px);
   }
 `;
 
 const StampBoard = styled.div`
-  position: absolute;
-  top: 78.5px;
-  bottom: 108px;
-  left: 16px;
-  right: 16px;
-  display: flex;
-  flex-direction: column;
+  width: 100%;
+  position: relative;
+  padding: 78.5px 16px 108px 16px;
+  overflow-x: hidden;
+  touch-action: pan-y;
+  box-sizing: border-box;
+  
+  & > * {
+    box-sizing: border-box;
+  }
 `;
 
 const StampPageContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  row-gap: 24px;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   box-sizing: border-box;
-  justify-items: center; 
+  padding: 0;
+`;
+
+const StampRow = styled.div`
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+  justify-content: center;
+`;
+
+const StampItemWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  caret-color: transparent;
+  min-width: 0;
+  touch-action: pan-y;
+  user-select: none;
 `;
 
 const StampItem = styled.div`
@@ -329,16 +375,7 @@ const StampItem = styled.div`
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-
-  &:nth-child(3n + 1) {
-    justify-self: start;
-  }
-  &:nth-child(3n + 2) {
-    justify-self: center;
-  }
-  &:nth-child(3n + 3) {
-    justify-self: end;
-  }
+  width: 100%;
 `;
 
 const StampImage = styled.img`
@@ -359,24 +396,30 @@ const StampDate = styled.div`
   color: ${({ theme }) => theme.colors.stampGray};
 `;
 
-const ScrollArea = styled.div`
-  flex: 1;
+const ScrollableList = styled.div`
+  flex-grow: 1;
   overflow-y: auto;
-  margin-bottom: 16px;
+  box-sizing: border-box;  
 
   &::-webkit-scrollbar {
-    display: none;
+    display: none; 
   }
-  -ms-overflow-style: none;
+
+  -ms-overflow-style: none; 
   scrollbar-width: none;
+
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 `;
 
 const EmptyMessage = styled.div`
-padding: 16px 16px;
+  width: 100%;
+  padding: 16px 0;
+  display: flex;                
+  justify-content: center;      
+  align-items: center;          
+  text-align: center;          
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ theme }) => theme.colors.darkGray};
-  display: flex;
-  justify-content: center; 
-  align-items: center;  
 `;

@@ -17,7 +17,6 @@ import {
   cancelArtistAlert,
 } from '../../api/likeApi';
 
-
 /* ===== styles ===== */
 const TabRow = styled.div`
   display: flex;
@@ -50,7 +49,7 @@ function Search() {
 
   const [keyword, setKeyword] = useState(keywordFromURL);
   const [recent, setRecent] = useState([]);
-  const [tab, setTab] = useState(location.state?.initialTab || '공연');
+  const [tab, setTab] = useState('공연'); // ✅ 기본값을 '공연'으로 설정
 
   const [concerts, setConcerts] = useState([]);
   const [venues, setVenues] = useState([]);
@@ -153,15 +152,25 @@ function Search() {
     }
   }, []);
 
+  // ✅ URL에서 keyword가 있으면 초기 로드
+  useEffect(() => {
+    if (keywordFromURL) {
+      fetchSearchResults(keywordFromURL, '공연');
+    }
+  }, []);
+
   const handleSearch = (newKeyword) => {
     setKeyword(newKeyword);
     setRecent((prev) => [newKeyword, ...prev.filter((w) => w !== newKeyword)].slice(0, 10));
-    navigate(`/search?keyword=${newKeyword}`, { state: { initialTab: tab } });
-    fetchSearchResults(newKeyword, tab);
+    navigate(`/search?keyword=${newKeyword}`, { state: { initialTab: '공연' } });
+    fetchSearchResults(newKeyword, '공연'); // ✅ 항상 공연 탭으로 검색
   };
 
+  // ✅ 탭 변경 시 현재 keyword로 검색
   useEffect(() => {
-    if (keyword) fetchSearchResults(keyword, tab);
+    if (keyword) {
+      fetchSearchResults(keyword, tab);
+    }
   }, [tab, keyword, fetchSearchResults]);
 
   // 알림 토글: 다른 상세 페이지들과 동일하게 토큰 스킵 로직 제거
@@ -227,32 +236,10 @@ function Search() {
         </TabButton>
       </TabRow>
 
-      {/* 최근 검색어 */}
-      <div className="recent">
-        <h4>최근 검색어</h4>
-        <div className="recent-list">
-          {recent.slice(0, 4).map((word, idx) => (
-            <div key={idx} className="recent-chip" onClick={() => handleSearch(word)}>
-              {word}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setRecent((prev) => prev.filter((w) => w !== word));
-                }}
-                className="close-btn"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* 공연 */}
       {keyword && tab === '공연' && (
         <div className="search-section">
           <div className="section">
-            <h3>공연</h3>
             {concerts.length > 0 ? concerts.map((item) => {
               const postLike = toPostFromPerformance(item);
               return (
@@ -271,7 +258,6 @@ function Search() {
       {keyword && tab === '공연장' && (
         <div className="search-section">
           <div className="section">
-            <h3>공연장</h3>
             {venues.length > 0 ? venues.map((item) => (
               <div key={item.id} className="venue-item" onClick={() => navigate(`/venue/${item.id}`)}>
                 <img src={item.image_url || '/no-image.png'} alt={item.name} />
@@ -284,41 +270,42 @@ function Search() {
 
       {/* 아티스트 */}
       {keyword && tab === '아티스트' && (
-        <div className="artist-list">
-          {artists.length > 0 ? artists.map((artist) => (
-            <div className="artist-item" key={artist.id} onClick={() => navigate(`/artist/${artist.id}`)}>
-              <div className="artist-info">
-                <img className="artist-img" src={artist.profile_url || '/no-image.png'} alt={artist.name} />
-                <span className="artist-name">{artist.name}</span>
-              </div>
-              <div className="artist-buttons">
-                <div
-                  className={`notify ${alarmState[artist.id] ? 'on' : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleToggleAlarm(artist.id);
-                  }}
-                >
-                  공연알림 {alarmState[artist.id] ? <Bell size={16} /> : <BellOff size={16} />}
+        <div className="search-section">
+          <div className="section">
+            <div className="artist-list">
+              {artists.length > 0 ? artists.map((artist) => (
+                <div className="artist-item" key={artist.id} onClick={() => navigate(`/artist/${artist.id}`)}>
+                  <div className="artist-info">
+                    <img className="artist-img" src={artist.profile_url || '/no-image.png'} alt={artist.name} />
+                    <span className="artist-name">{artist.name}</span>
+                  </div>
+                  <div className="artist-buttons">
+                    <div
+                      className={`notify ${alarmState[artist.id] ? 'on' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleAlarm(artist.id);
+                      }}
+                    >
+                      공연알림 {alarmState[artist.id] ? <Bell size={16} /> : <BellOff size={16} />}
+                    </div>
+                    <Heart
+                      className={`heart ${likedState[artist.id] ? 'on' : ''}`}
+                      size={20}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleLike(artist.id);
+                      }}
+                    />
+                  </div>
                 </div>
-                <Heart
-                  className={`heart ${likedState[artist.id] ? 'on' : ''}`}
-                  size={20}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleToggleLike(artist.id);
-                  }}
-                />
-              </div>
+              )) : <p><strong>{keyword}</strong>와(과) 일치하는 아티스트가 없습니다.</p>}
             </div>
-          )) : <p><strong>{keyword}</strong>와(과) 일치하는 아티스트가 없습니다.</p>}
+          </div>
         </div>
       )}
-
-      
     </div>
   );
 }
 
 export default Search;
-

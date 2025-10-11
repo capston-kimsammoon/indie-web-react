@@ -5,13 +5,13 @@
 
 /* ============== 게스트(비로그인) 레이아웃 ============== */
 .guest {
-  margin-top: 70%;
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center; 
   align-items: center; 
   gap: 16px; 
+  margin-bottom: 20%;
 }
 .guest__cta {
   padding: 12px 24px;
@@ -185,26 +185,29 @@
   height: 18px; 
   color: #B0B0B0; 
 }
-
-.logout {
+.footer-actions {
+  position: fixed;
+  bottom: 80px;     /* 하단 네비게이션 바로 위 */
+  left: 0;
   width: 100%;
-  position: fixed;
-  bottom: 92px;
-  left: 0; 
-  right: 0;
   display: flex;
-  position: fixed;
-  justify-content: center;
-  padding: 0; 
+  flex-direction: column;
+  align-items: center;
 }
 
+/* 회색 로그아웃 (위쪽) */
 .logout__button {
-  all: unset;                
-  display: inline-block;
-  cursor: pointer;
+  all: unset;
   color: #B0B0B0;
   font-size: 14px;
-  line-height: 1;
-  border-radius: 4px;
   text-decoration: underline;
+  cursor: pointer;
+  margin-bottom: 24px;  /* 탈퇴하기와 간격 */
+}
+
+/* 빨간 탈퇴하기 (가장 아래) */
+.withdraw {
+  color: #e53935;
+  font-size: 14px;
+  font-weight: 500;
 }

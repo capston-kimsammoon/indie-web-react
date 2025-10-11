@@ -22,9 +22,6 @@ export default function ArtistDetailPage() {
   const [scheduledPerformances, setScheduledPerformances] = useState([]);
   const [pastPerformances, setPastPerformances] = useState([]);
 
-  // 🔑 하드코딩 제거 → localStorage에서 토큰 가져오기 (변경된 한 줄)
-  const authToken = localStorage.getItem('accessToken');
-
   useEffect(() => {
     const loadArtist = async () => {
       try {
@@ -50,14 +47,14 @@ export default function ArtistDetailPage() {
     loadArtist();
   }, [id]);
 
-  // ✅ 찜 ON/OFF
+  //  찜 ON/OFF
   const toggleLike = async () => {
     try {
       if (isLiked) {
-        await unlikeArtist(id, authToken);
+        await unlikeArtist(id);
         console.log('💔 [찜] 아티스트 언찜 API 성공');
       } else {
-        await likeArtist(id, authToken);
+        await likeArtist(id);
         console.log('❤️ [찜] 아티스트 찜 API 성공');
       }
       setIsLiked((prev) => !prev);
@@ -66,15 +63,15 @@ export default function ArtistDetailPage() {
     }
   };
 
-  // ✅ 알림 ON/OFF
+  //  알림 ON/OFF
   const toggleNotify = async () => {
     try {
       if (isNotified) {
-        await cancelArtistAlert(id, authToken);
+        await cancelArtistAlert(id);
         setIsNotified(false);
         console.log('🔕 [알림] 아티스트 알림 취소 성공');
       } else {
-        await registerArtistAlert(id, authToken);
+        await registerArtistAlert(id);
         setIsNotified(true);
         console.log('🔔 [알림] 아티스트 알림 등록 성공');
       }

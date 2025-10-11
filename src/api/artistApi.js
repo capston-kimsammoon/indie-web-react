@@ -1,6 +1,5 @@
 // src/api/artistApi.js
-import axios from 'axios';
-import { baseUrl } from './config';
+import http from './http';
 
 /**
  * 🎵 아티스트 목록 조회 (견고한 정규화)
@@ -12,7 +11,7 @@ import { baseUrl } from './config';
  */
 export const fetchArtistList = async ({ page = 1, size = 20 } = {}) => {
   try {
-    const { data } = await axios.get(`${baseUrl}/artist`, {
+    const { data } = await http.get(`/artist`, {
       params: { page, size },
       // withCredentials: false  // 공개 API면 불필요
     });
@@ -43,13 +42,12 @@ export const fetchArtistList = async ({ page = 1, size = 20 } = {}) => {
 };
 
 /**
- * 🎵 아티스트 상세 정보 조회
+ * 아티스트 상세 정보 조회
  * GET /artist/{id}
- * 반환: 프론트에서 쓰기 쉬운 키로 매핑
  */
 export const fetchArtistDetail = async (artistId) => {
   try {
-    const { data } = await axios.get(`${baseUrl}/artist/${artistId}`);
+   const { data } = await http.get(`/artist/${artistId}`);
 
     return {
       ...data,

@@ -10,7 +10,7 @@ const Card = styled.article.withConfig({
   width: 100%;
   box-sizing: border-box;
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #E4E4E4;
   border-radius: 10px;
   padding: 12px;
   display: flex;
@@ -28,18 +28,25 @@ const Card = styled.article.withConfig({
 
 const DeleteBtn = styled.button`
   position: absolute;
+  top: 8px;
   right: 8px;
-  top: 6px;
-  font-size: 16px;
-  line-height: 1;
-  color: #9ca3af;
-  background: transparent;
-  border: 0;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #E4E4E4;
+  background: #FAFAFA;
+  color: #4B4B4B;
+  font-size: 14px;
+  line-height: 1; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-
-  &:hover {
-    color: #ef4444;
-  }
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 `;
 
 const ThumbRow = styled.div`
@@ -60,7 +67,7 @@ const ThumbItem = styled.img`
   border-radius: 8px;
   object-fit: cover;
   cursor: pointer;
-  border: 1px solid #eee;
+  border: 1px solid #E4E4E4;
   background: #f2f2f2;
 `;
 
@@ -69,7 +76,7 @@ const MoreBtn = styled.button`
   width: 140px;
   height: 100px;
   border-radius: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid #E4E4E4;
   background: #f7f7f7;
   font-size: 14px;
   color: #555;
@@ -80,10 +87,12 @@ const BodyText = styled.p.withConfig({
   shouldForwardProp: (prop) => prop !== 'variant',
 })`
   font-size: 14px;
-  color: #444;
+  color: #2F2F2F;
   line-height: 1.4;
   white-space: pre-wrap;
   margin: 0;
+  padding-right: 32px; 
+  box-sizing: border-box;
 
   ${({ variant }) =>
     variant === 'compact' &&
@@ -99,15 +108,20 @@ const BodyText = styled.p.withConfig({
 
 const MetaBar = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
 `;
 
-const MetaLeft = styled.div`
+const MetaTop = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
-  min-width: 0; /* ellipsis 안전 */
+  min-width: 0;
+`;
+
+const TopRow = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 `;
 
 const Avatar = styled.img`
@@ -115,22 +129,14 @@ const Avatar = styled.img`
   height: 20px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #E4E4E4;
   flex-shrink: 0;
 `;
 
 const MetaName = styled.span`
   font-size: 12px;
-  font-weight: 600;
-  color: #111827;
-`;
-
-const Dot = styled.span`
-  display: inline-block;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: #d1d5db;
+  font-weight: 500;
+  color: #2F2F2F;
 `;
 
  const VenueInline = styled(Link)`
@@ -148,7 +154,7 @@ const Dot = styled.span`
    height: 18px;
    border-radius: 50%;   
    object-fit: cover;
-   border: 1px solid #eee;
+   border: 1px solid #E4E4E4;
    background: #f6f6f6;
    flex-shrink: 0;
 `;
@@ -160,25 +166,28 @@ const VenueName = styled.span`
   text-overflow: ellipsis;
 `;
 
-const MetaDate = styled.time`
+const MetaDate = styled.time` 
+  margin-top: -6px;
+  margin-bottom: 6px;
   font-size: 12px;
-  color: #6b7280;
-  margin-left: 6px;
+  color: #B0B0B0;
 `;
 
 const LikeBtn = styled.button.withConfig({
   shouldForwardProp: (prop) => prop !== 'active' && prop !== '$disabled',
 })`
+  position: absolute;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  right: 8px;
   font-size: 12px;
   padding: 4px 8px;
   border-radius: 9999px;
   cursor: pointer;
   background: #fff;
-  border: 1px solid #e5e7eb;
-  color: #6b7280;
+  border: 1px solid #E4E4E4;
+  color: #B0B0B0;
 
   ${({ active }) =>
     active &&
@@ -229,6 +238,7 @@ const CloseBtn = styled.button`
   cursor: pointer;
   font-size: 18px;
   line-height: 34px;
+  text-align: center;
 `;
 
 const NavBtn = styled.button`
@@ -377,64 +387,61 @@ export default function ReviewCard({
 
       {/* 3) 메타 (닉네임 옆에 공연장칩 → 날짜) */}
       <MetaBar>
-       <MetaLeft>
-  <Avatar
-    src={user?.profile_url || defaultAvatar}
-    alt={`${user?.nickname || '사용자'} 프로필 이미지`}
-    onError={(e) => { e.currentTarget.src = defaultAvatar }}
-  />
-  <MetaName>{user?.nickname || '익명'}</MetaName>
+        <TopRow>
+          <MetaDate dateTime={created ?? undefined}>{dateText}</MetaDate>
+        </TopRow>
 
-  {venue?.id && (
-    <>
-      <Dot />
-      <VenueInline
-       to={`/venue/${venue.id}`}
-       aria-label={`${venue.name} 상세로 이동`}
-       title={venue.name}
-     >
-       <VenueLogo
-         src={venue.logo_url || '/logo192.png'}
-         alt={`${venue.name || '공연장'} 로고`}
-         onError={(e)=>{ e.currentTarget.src='/logo192.png'; }}
-       />
-       <VenueName>{venue.name}</VenueName>
-     </VenueInline>
-    </>
-  )}
-
-  <Dot />
-  <MetaDate dateTime={created ?? undefined}>{dateText}</MetaDate>
-</MetaLeft>
-
-
-        {showLike && (
-          <LikeBtn
-            type="button"
-            onClick={handleToggleLike}
-            active={!!liked}
-            aria-pressed={!!liked}
-            aria-disabled={!isLoggedIn}
-            $disabled={!isLoggedIn}
-            disabled={!isLoggedIn}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill={liked ? 'currentColor' : 'none'}
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+        <MetaTop>
+          <Avatar
+            src={user?.profile_url || defaultAvatar}
+            alt={`${user?.nickname || '사용자'} 프로필 이미지`}
+            onError={(e) => { e.currentTarget.src = defaultAvatar }}
+          />
+          <MetaName>{user?.nickname || '익명'}</MetaName>
+          {venue?.id && (
+            <>
+              <VenueInline
+                to={`/venue/${venue.id}`}
+                aria-label={`${venue.name} 상세로 이동`}
+                title={venue.name}
+              >
+                <VenueLogo
+                  src={venue.logo_url || '/logo192.png'}
+                  alt={`${venue.name || '공연장'} 로고`}
+                  onError={(e)=>{ e.currentTarget.src='/logo192.png'; }}
+                />
+                <VenueName>{venue.name}</VenueName>
+              </VenueInline>
+            </>
+          )}
+          {showLike && (
+            <LikeBtn
+              type="button"
+              onClick={handleToggleLike}
+              active={!!liked}
+              aria-pressed={!!liked}
+              aria-disabled={!isLoggedIn}
+              $disabled={!isLoggedIn}
+              disabled={!isLoggedIn}
             >
-              <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 22l7.8-8.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path>
-            </svg>
-            <span>{count}</span>
-          </LikeBtn>
-        )}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill={liked ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 22l7.8-8.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path>
+              </svg>
+              <span>{count}</span>
+            </LikeBtn>
+          )}
+        </MetaTop>
       </MetaBar>
 
       {/* 라이트박스 */}

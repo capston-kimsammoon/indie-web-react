@@ -151,12 +151,14 @@ const PickerRow = styled.div`
   align-items: center;
   justify-content: center;
   margin-top: 16px; 
+  gap: 8px;
 `;
 
 const PickerGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1;
 `;
 
 const Picker = styled.div`
@@ -167,10 +169,12 @@ const SelectWrapper = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  padding: 6px 16px;
+  padding: 6px 12px;
   border: 1.4px solid ${({ theme }) => theme.colors.outlineGray};
   border-radius: 50px;
   background: ${({ theme }) => theme.colors.bgWhite};
+  flex: 1;
+  min-width: 0;
 
   select {
     border: none;
@@ -180,6 +184,7 @@ const SelectWrapper = styled.div`
     font-weight: ${({ theme }) => theme.fontWeights.medium};
     color: ${({ theme }) => theme.colors.darkGray};
     text-align: center;
+    width: 100%;
 
     appearance: none;
     -webkit-appearance: none;
@@ -196,6 +201,7 @@ const Divider = styled.span`
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.semibold};
   color: ${({ theme }) => theme.colors.darkGray};
-  margin: 0 44px;
+  margin: 0 20px;
+  flex-shrink: 0;
 `;
 

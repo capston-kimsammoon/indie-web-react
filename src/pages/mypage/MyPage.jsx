@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Settings, Pencil, User, Heart, Stamp, ChevronRight } from 'lucide-react';
+import styled from 'styled-components';
 import './Mypage.css';
 import Toggle from '../../components/ui/toggle';
 import Header from "../../components/layout/Header";
@@ -110,7 +111,7 @@ function MyPage() {
   }
 
   return (
-    <div className="page">
+    <PageWrapper>
       <Header title="마이페이지" />
       <div style={{ height: "16px" }} />
 
@@ -122,7 +123,7 @@ function MyPage() {
           <p className="guest__message">로그인 후 이용 가능합니다.</p>
         </div>
       ) : (
-        <>
+        <ScrollableList>
           {/* 상단 프로필 */}
           <div className="profile">
             <div className="profile__container">
@@ -191,46 +192,63 @@ function MyPage() {
           <Divider />
           
           {/* 🔹 설정 + 링크 리스트 */}
-          <div className="settings">
-            <div className="settings__toggle">
-              <span>알림 설정</span>
-              <Toggle value={alarmEnabled} onChange={(v) => handleSettingChange('alarm', v)} />
+          <div className='list'>
+            <div className="list-item">
+              <span className="list-item__label">공지사항</span>
+              <button 
+                className="chev-button" 
+                onClick={() => navigate('/notice')}
+              >
+                <ChevronRight className="chev" />
+              </button>
             </div>
-            <div className="settings__toggle">
-              <span>위치정보 사용</span>
-              <Toggle value={locationEnabled} onChange={(v) => handleSettingChange('location', v)} />
+
+            <div className="list-item">
+              <span className="list-item__label">고객센터</span>
+              <button 
+                className="chev-button" 
+                onClick={() => navigate('/support')}
+              >
+                <ChevronRight className="chev" />
+              </button>
             </div>
           </div>
 
-          <div className="list-item">
-            <span className="list-item__label">공지사항</span>
-            <button 
-              className="chev-button" 
-              onClick={() => navigate('/notice')}
-            >
-              <ChevronRight className="chev" />
-            </button>
-          </div>
-
-          <div className="list-item">
-            <span className="list-item__label">고객센터</span>
-            <button 
-              className="chev-button" 
-              onClick={() => navigate('/support')}
-            >
-              <ChevronRight className="chev" />
-            </button>
-          </div>
-
-          <div className="logout">
+          {/* ✅ 하단 고정된 로그아웃/탈퇴하기 영역 */}
+          <div className="footer-actions">
             <button className="logout__button" onClick={handleLogout}>
               로그아웃
             </button>
+            <span style={{ color: '#B0B0B0', fontSize: '12px' }}> | </span>
+            <div className="withdraw">탈퇴하기</div>
           </div>
-        </>
+        </ScrollableList>
       )}
-    </div>
+    </PageWrapper>
   );
 }
 
 export default MyPage;
+
+const PageWrapper = styled.div`
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ScrollableList = styled.div`
+  padding-bottom: 109px;
+  flex-grow: 1;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none; 
+  }
+
+  -ms-overflow-style: none; 
+  scrollbar-width: none;
+
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+`;

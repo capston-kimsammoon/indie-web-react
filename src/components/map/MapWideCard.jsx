@@ -9,7 +9,7 @@ const CardWrapper = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
-  margin-left: 8px;
+  margin-left: 6px;
   box-sizing: border-box;
   border: 1.4px solid rgba(60, 156, 103);
   border-radius: 10px;
