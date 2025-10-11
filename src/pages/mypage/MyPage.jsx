@@ -222,7 +222,7 @@ function MyPage() {
             </button>
           </div>
 
-          {/* ✅ 하단 고정된 로그아웃/탈퇴하기 영역 */}
+          {/*  하단 고정된 로그아웃/탈퇴하기 영역 */}
           <div className="footer-actions">
             <button className="logout__button" onClick={handleLogout}>
               로그아웃
@@ -234,3 +234,4 @@ function MyPage() {
     </div>
   );
 
+}
