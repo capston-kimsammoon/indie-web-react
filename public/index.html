@@ -14,20 +14,51 @@
 
     <title>React App</title>
 
-    <!-- ✅ Google tag (gtag.js) GA4 -->
+     <!-- GA4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SNVGJQSRQ2"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-SNVGJQSRQ2');
+      function gtag(){ dataLayer.push(arguments); }
+      gtag('js', new Date()); // GA 초기화 시점 ("이 시점부터 데이터 수집 시작합니다")
+
+      // 자동 page_view를 끄고 수동 전송만 사용 
+      // React Router가 페이지를 바꿀 때마다 수동으로 page_view 이벤트 전송
+      gtag('config', 'G-SNVGJQSRQ2', { send_page_view: false });
+
+      function trackPageView(url) { // 현재 페이지 URL을 기반으로 수동 page_view 이벤트를 보내는 역할
+        gtag('config', 'G-SNVGJQSRQ2', { page_path: url });
+      }
+
+      // 초기 1회
+      trackPageView(location.pathname + location.search);
+
+      // 브라우저의 ‘뒤로가기/앞으로가기’ 이벤트 감지
+      // 페이지가 바뀐 것이므로 GA4에 알려줘야 함 
+      addEventListener('popstate', () => {
+        trackPageView(location.pathname + location.search);
+      });
+
+      // React Router로 이동한 모든 페이지는 GA4에 page_view 이벤트가 자동 전송됨.
+      (function() {
+        const _push = history.pushState;
+        const _replace = history.replaceState;
+        function fire(){ trackPageView(location.pathname + location.search); }
+        history.pushState = function(){ _push.apply(this, arguments); fire(); };
+        history.replaceState = function(){ _replace.apply(this, arguments); fire(); };
+      })();
     </script>
 
-   <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=a0xuvmp3pj"></script>
-   
+   <!-- GA4는 SPA(ex. 리액트)에서 자동으로 모든 화면 전환을 정확히 추적하지 못함. 
+     => 자동 기능을 끄고, 브라우저의 라우팅 동작(pushState, popstate 등)을 후킹해서
+     수동으로 page_view를 보내는 방식으로 정확한 트래킹을 하는 것.
+    -->
+    <script
+      type="text/javascript"
+      src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=a0xuvmp3pj">
+    </script>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>이 앱을 사용하려면 JavaScript를 활성화해야 합니다.</noscript>
     <div id="root"></div>
   </body>
 </html>
