@@ -291,7 +291,7 @@ function Search() {
                     <span style={{
                       fontSize: '16px',
                       fontWeight: 500,
-                      color: '#1c1c1e',
+                      color: '#2F2F2F',
                     }}>
                       {item.name}
                     </span>
@@ -343,7 +343,7 @@ function Search() {
                     <span style={{
                       fontSize: '16px',
                       fontWeight: 500,
-                      color: '#1c1c1e',
+                      color: '#2F2F2F',
                     }}>
                       {artist.name}
                     </span>
