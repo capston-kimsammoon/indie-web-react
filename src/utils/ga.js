@@ -3,34 +3,34 @@ const lastClickAt = new Map(); // 클릭한 링크(url)을 키로, 마지막 클
 const DEDUP_WINDOW_MS = 2500;          // 2.5초 내 반복 클릭은 무시 
 
 export function trackOutboundDetailLink({
-  performanceId,
-  performanceTitle,
-  venueId,
-  venueName,
-  linkUrl,
+  performance_id,
+  performance_title,
+  venue_id,
+  venue_name,
+  link_url,
   source = 'performance_detail', // 어디서 눌렀는지
   surface = 'web',               // 플랫폼 구분 (웹/앱 통합 시 분석 편의)
-  userId,                        // 로그인 사용자 있으면 넘겨도 됨 (동의 준수)
+  user_id,                        // 로그인 사용자 있으면 넘겨도 됨 (동의 준수)
 }) {
-  if (typeof window === 'undefined' || !window.gtag || !linkUrl) return;
+  if (typeof window === 'undefined' || !window.gtag || !link_url) return;
 
   const now = Date.now();
-  const last = lastClickAt.get(linkUrl) || 0;
+  const last = lastClickAt.get(link_url) || 0;
   if (now - last < DEDUP_WINDOW_MS) return; // 같은 링크를 2.5초 안에 또 누르면 GA4로 이벤트 안 보냄 (하나의 클릭만 집계)
-  lastClickAt.set(linkUrl, now);
+  lastClickAt.set(link_url, now);
 
-  if (userId) { // user_id도 GA4에 포함시킬 거면 사용 (그런데 로그아웃 상태에서도 클릭이 가능하므로 지워도 될 듯..?)
-    window.gtag('set', { user_id: String(userId) });
+  if (user_id) { // user_id도 GA4에 포함시킬 거면 사용 (그런데 로그아웃 상태에서도 클릭이 가능하므로 지워도 될 듯..?)
+    window.gtag('set', { user_id: String(user_id) });
   }
 
   window.gtag('event', 'outbound_link_click', {
     event_category: 'engagement', // 이벤트 그룹
     event_label: 'Performance detail link', 
-    link_url: linkUrl, // 클릭한 실제 url 
-    performance_id: String(performanceId ?? ''), // 공연 ID
-    performance_title: performanceTitle ?? '', // 공연명
-    venue_id: String(venueId ?? ''), // 공연장 ID
-    venue_name: venueName ?? '', // 공연장 이름
+    link_url: link_url, // 클릭한 실제 url 
+    performance_id: String(performance_id ?? ''), // 공연 ID
+    performance_title: performance_title ?? '', // 공연명
+    venue_id: String(venue_id ?? ''), // 공연장 ID
+    venue_name: venue_name ?? '', // 공연장 이름
     source, // 클릭 출처 (예매 링크인지 상세 링크인지)
     surface, // 플랫폼 구분 (웹인지 앱인지)
     page_location: window.location.href, // 클릭 당시 페이지 경로 (ex. /performance/123)
