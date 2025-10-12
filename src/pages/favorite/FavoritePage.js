@@ -114,7 +114,7 @@ export default function FavoritePage() {
   };
 
   return (
-    <Container>
+    <PageWrapper>
       <Header title="찜 리스트" />
       <div style={{ height: "16px" }} />
 
@@ -131,40 +131,41 @@ export default function FavoritePage() {
         </TabButton>
       </TabRow>
 
-      <List>
-        {selectedTab === 'performance' &&
-          (perfList.length ? (
-            perfList.map((performance) => (
-              <PerformanceListCard
-                key={performance.id}
-                performance={performance}
-                onToggleLike={(id) =>
-                  togglePerformanceLike(id, performance.isLiked ?? true)
-                }
-                formatDate={true}
-              />
-            ))
-          ) : (
-            <Empty>찜한 공연이 없습니다.</Empty>
-          ))}
+      <ScrollableList>
+        <List>
+          {selectedTab === 'performance' &&
+            (perfList.length ? (
+              perfList.map((performance) => (
+                <PerformanceListCard
+                  key={performance.id}
+                  performance={performance}
+                  onToggleLike={(id) =>
+                    togglePerformanceLike(id, performance.isLiked ?? true)
+                  }
+                />
+              ))
+            ) : (
+              <Empty>찜한 공연이 없습니다.</Empty>
+            ))}
 
-        {selectedTab === 'artist' &&
-          (artistList.length ? (
-            artistList.map((artist) => (
-              <ArtistListCard
-                key={artist.id}
-                artist={artist}
-                onToggleLike={(id) =>
-                  toggleArtistLike(id, artist.isLiked ?? true)
-                }
-                onToggleAlarm={(id, enabled) => toggleArtistAlarm(id, enabled)}
-              />
-            ))
-          ) : (
-            <Empty>찜한 아티스트가 없습니다.</Empty>
-          ))}
-      </List>
-    </Container>
+          {selectedTab === 'artist' &&
+            (artistList.length ? (
+              artistList.map((artist) => (
+                <ArtistListCard
+                  key={artist.id}
+                  artist={artist}
+                  onToggleLike={(id) =>
+                    toggleArtistLike(id, artist.isLiked ?? true)
+                  }
+                  onToggleAlarm={(id, enabled) => toggleArtistAlarm(id, enabled)}
+                />
+              ))
+            ) : (
+              <Empty>찜한 아티스트가 없습니다.</Empty>
+            ))}
+        </List>
+      </ScrollableList>
+    </PageWrapper>
   );
 }
 
@@ -208,4 +209,27 @@ const Empty = styled.div`
   display: flex;
   justify-content: center; 
   align-items: center;    
+`;
+
+const PageWrapper = styled.div`
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ScrollableList = styled.div`
+  padding-bottom: 109px;
+  flex-grow: 1;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none; 
+  }
+
+  -ms-overflow-style: none; 
+  scrollbar-width: none;
+
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 `;
