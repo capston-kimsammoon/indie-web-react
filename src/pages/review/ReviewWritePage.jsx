@@ -226,7 +226,7 @@ export default function ReviewWritePage() {
   return (
     <Page>
       <Header title={title} />
-      <div style={{ height: "10px" }} />
+      <div style={{ height: "13px" }} />
 
       <Container>
         <Field>
