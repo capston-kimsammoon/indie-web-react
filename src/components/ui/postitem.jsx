@@ -65,7 +65,7 @@ function PostItem({ post, onClick }) {
           />
         )}
       </li>
-      <Divider style={{ marginBottom: '-16px' }} />
+      <Divider />
     </>
   );
 }
