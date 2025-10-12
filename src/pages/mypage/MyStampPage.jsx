@@ -129,7 +129,7 @@ const PageWrapper = styled.div`
 `;
 
 const Content = styled.div`
-  padding-bottom: 108px; 
+  padding-bottom: 94px; 
 `;
 
 const StampGrid = styled.div`
