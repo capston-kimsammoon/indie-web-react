@@ -1,6 +1,7 @@
 /* 공연 섹션 */
 .search-section {
   .section {
+    padding-top: 16px;
     margin-bottom: 24px;
 
     h3 {
