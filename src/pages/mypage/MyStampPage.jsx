@@ -38,7 +38,7 @@ export default function MyStampPage() {
   return (
     <PageWrapper>
       <Header title="내 스탬프" />
-      <div style={{ height: '24px' }} />
+      <div style={{ height: '26px' }} />
       <StampCount>
         <AllText>All</AllText> <CountText>{stamps.length}</CountText>
       </StampCount>
