@@ -15,7 +15,6 @@ import { fetchUserInfo } from '../../api/userApi';
 const PageWrapper = styled.div`
   height: 100vh;
   height: 100dvh;
-  margin-top: 16px;
   display: flex;
   flex-direction: column;
 `;
@@ -31,6 +30,7 @@ const SubBar = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  margin-top: 16px;
   margin-bottom: 12px;
   flex-wrap: wrap;
 `;
