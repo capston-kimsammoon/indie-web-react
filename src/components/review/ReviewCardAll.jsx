@@ -91,7 +91,6 @@ const BodyText = styled.p.withConfig({
   line-height: 1.4;
   white-space: pre-wrap;
   margin: 0;
-  padding-right: 32px; 
   box-sizing: border-box;
 `;
 
@@ -156,8 +155,8 @@ const VenueName = styled.span`
 `;
 
 const MetaDate = styled.time` 
-  margin-top: -4px;
-  margin-bottom: 8px;
+  margin-top: -6px;
+  margin-bottom: 6px;
   font-size: 12px;
   color: #B0B0B0;
 `;
