@@ -122,7 +122,7 @@ function MyPage() {
           </button>
           <p className="guest__message">로그인 후 이용 가능합니다.</p>
           <div className="footer-actions">
-            <button className="logout__button" onClick={handleLogout}>로그아웃</button>
+            <button className="logout__button" onClick={handleLogout}>공지사항</button>
           </div>
         </div>
       ) : (
