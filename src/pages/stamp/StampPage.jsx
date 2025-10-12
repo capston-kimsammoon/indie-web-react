@@ -331,7 +331,7 @@ const StampButton = styled.button`
 const StampBoard = styled.div`
   width: 100%;
   position: relative;
-  padding: 78.5px 16px 108px 16px;
+  padding: 0 0 108px 0;
   overflow-x: hidden;
   touch-action: pan-y;
   box-sizing: border-box;
@@ -391,7 +391,7 @@ const StampImage = styled.img`
 const StampDate = styled.div`
   margin-top: 12px;
   margin-bottom: 16px;
-  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-size: ${({ theme }) => theme.fontSizes.xs};
   font-weight: ${({ theme }) => theme.fontWeights.semibold};
   color: ${({ theme }) => theme.colors.stampGray};
 `;
