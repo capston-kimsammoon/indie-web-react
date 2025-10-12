@@ -16,8 +16,10 @@ const PageWrapper = styled.div`
 `;
 
 const ScrollableList = styled.div`
-  flex-grow: 1;
+  flex: 1;
   overflow-y: auto;
+  padding-bottom: 109px;
+  box-sizing: border-box;
 
   &::-webkit-scrollbar {
     display: none; 
@@ -40,6 +42,7 @@ const ActionRow = styled.div`
 
 const WriteButton = styled.button`
   padding: 6px 12px;
+  margin-top: 16px;
   border-radius: 8px;
   font-size: 14px;
   border: none;
