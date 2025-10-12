@@ -17,7 +17,7 @@ const toAbs = (url) => {
 const pickPoster = (p) =>
   p?.thumbnail || p?.posterUrl || p?.poster_url || p?.image || p?.image_url || '';
 
-export default function PerformanceListCard({ performance, onToggleLike, formatDate = false }) {
+export default function PerformanceListCard({ performance, onToggleLike }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -26,19 +26,6 @@ export default function PerformanceListCard({ performance, onToggleLike, formatD
 
   const handleClick = () => {
     navigate(`/performance/${performance.id}`);
-  };
-
-  const formatDisplayDate = (isoString) => {
-    if (!isoString) return '';
-    const date = new Date(isoString);
-    const days = ['일', '월', '화', '수', '목', '금', '토'];
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    const dow = days[date.getDay()];
-    const hh = String(date.getHours()).padStart(2, '0');
-    const mm = String(date.getMinutes()).padStart(2, '0');
-    return `${y}-${m}-${d} (${dow}) ${hh}:${mm}`;
   };
 
   return (
@@ -55,11 +42,7 @@ export default function PerformanceListCard({ performance, onToggleLike, formatD
         <Info>
           <Title>{title}</Title>
           <Venue>{venue}</Venue>
-          <Date>
-            {formatDate
-              ? formatDisplayDate(performance.date || performance.start_at)
-              : performance.date || performance.start_at}
-          </Date>
+          <Date>{date}</Date>
         </Info>
       </LeftSection>
 
