@@ -28,7 +28,7 @@ const TextareaWrap = styled.div`
   border: 1px solid ${({ theme }) => theme.colors?.border || '#E4E4E4'};
   border-radius: 12px;
   background: #fff;
-  padding: 12px 12px 36px; /* 하단에 아이콘 자리 */
+  padding: 8px 8px;
   width: 100%;
   box-sizing: border-box;
 `;
@@ -226,7 +226,7 @@ export default function ReviewWritePage() {
   return (
     <Page>
       <Header title={title} />
-      <div style={{ height: "6px" }} />
+      <div style={{ height: "10px" }} />
 
       <Container>
         <Field>
