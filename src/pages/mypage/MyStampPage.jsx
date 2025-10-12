@@ -134,7 +134,6 @@ const Content = styled.div`
 const StampGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  row-gap: 16px;
 `;
 
 const Message = styled.div`
@@ -148,7 +147,7 @@ const Message = styled.div`
 `;
 
 const ScrollableContent = styled.div`
-  padding-bottom: 109px;
+  margin-top: 16px;
   flex-grow: 1;
   overflow-y: auto;
   
