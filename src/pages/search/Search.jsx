@@ -364,16 +364,16 @@ function Search() {
 export default Search;
 
 const PageWrapper = styled.div`
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
 `;
 
 const ScrollableList = styled.div`
-  padding-bottom: 109px;
-  flex-grow: 1;
-  flex-shrink: 1;
-  min-height: 0;
+  flex: 1;
   overflow-y: auto;
+  box-sizing: border-box;
 
   &::-webkit-scrollbar {
     display: none; 
