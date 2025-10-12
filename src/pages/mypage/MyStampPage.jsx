@@ -97,8 +97,8 @@ export default function MyStampPage() {
 }
 
 const StampCount = styled.div`
-  padding-top: 6px;
-  padding-bottom: 0px;
+  padding-top: 20px;
+  padding-bottom: 6px;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.semibold};
 `;
