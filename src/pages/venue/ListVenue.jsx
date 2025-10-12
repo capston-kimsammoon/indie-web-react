@@ -108,7 +108,6 @@ function ListVenue() {
               />
             ))}
             {hasMore && <Loader ref={sentinelRef}>더 불러오는 중...</Loader>}
-            {!hasMore && <EndMessage>마지막 공연장입니다.</EndMessage>}
           </>
         ) : (
           <EmptyMessage>해당되는 공연장이 없습니다.</EmptyMessage>
@@ -164,13 +163,6 @@ const EmptyMessage = styled.div`
 `;
 
 const Loader = styled.div`
-  padding: 16px 0;
-  text-align: center;
-  color: ${({ theme }) => theme.colors?.darkGray || '#666'};
-  font-size: ${({ theme }) => theme.fontSizes?.sm || '14px'};
-`;
-
-const EndMessage = styled.div`
   padding: 16px 0;
   text-align: center;
   color: ${({ theme }) => theme.colors?.darkGray || '#666'};
