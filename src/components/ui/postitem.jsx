@@ -2,7 +2,6 @@
 import './postitem.css';
 import { MessageCirclePlus } from 'lucide-react';
 import { baseUrl } from '../../api/config';
-import Divider from '../../components/common/Divider';
 
 const formatDate = (isoDate) => {
   if (!isoDate) return '';
@@ -63,7 +62,6 @@ function PostItem({ post, onClick }) {
           }}
         />
       )}
-      <Divider />
     </div>
   );
 }
