@@ -178,7 +178,6 @@ const TabRow = styled.div`
   display: flex;
   justify-content: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineGray};
-  margin-bottom: 0.5rem;
 `;
 
 const TabButton = styled.button`
@@ -219,6 +218,7 @@ const PageWrapper = styled.div`
 `;
 
 const ScrollableList = styled.div`
+  padding-top: 16px;
   padding-bottom: 109px;
   flex-grow: 1;
   overflow-y: auto;
