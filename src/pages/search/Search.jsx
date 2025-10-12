@@ -375,6 +375,8 @@ const ScrollableList = styled.div`
   overflow-y: auto;
   box-sizing: border-box;
 
+  padding-bottom: ${({ isArtistTab }) => (isArtistTab ? '160px' : '109px')};
+
   &::-webkit-scrollbar {
     display: none; 
   }
