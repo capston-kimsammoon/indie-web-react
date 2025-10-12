@@ -226,6 +226,7 @@ export default function ReviewWritePage() {
   return (
     <Page>
       <Header title={title} />
+      <div style={{ height: "6px" }} />
 
       <Container>
         <Field>
