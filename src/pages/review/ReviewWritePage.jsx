@@ -9,13 +9,7 @@ import { fetchUserInfo } from '../../api/userApi';
 const Page = styled.div`
   width: 100%;
   margin: 0 auto;
-  padding: 0 var(--side) 88px; /* 하단 네비와 겹치지 않게 */
-  --side: 16px;          /* 공통 좌우 여백 */
   box-sizing: border-box;
-`;
-
-const HeaderSpacer = styled.div`
-  height: 28px;
 `;
 
 const Container = styled.div`
@@ -61,7 +55,7 @@ const AttachIconButton = styled.button`
   width: 28px;
   height: 28px;
   border-radius: 6px;
-  border: 1px solid ${({ theme }) => theme.colors?.border || '#e5e5e5'};
+  border: 1px solid ${({ theme }) => theme.colors?.border || '#E4E4E4'};
   background: ${({ theme }) => theme.colors?.white || '#fff'};
   display: inline-flex;
   align-items: center;
@@ -71,7 +65,7 @@ const AttachIconButton = styled.button`
 
 const Hint = styled.span`
   font-size: 12px;
-  color: ${({ theme }) => theme.colors?.lightGray || '#8a8a8a'};
+  color: ${({ theme }) => theme.colors?.lightGray || '#B0B0B0'};
 `;
 
 const HiddenFileInput = styled.input`
@@ -93,7 +87,7 @@ const PreviewItem = styled.div`
   height: 100%;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid ${({ theme }) => theme.colors?.border || '#eee'};
+  border: 1px solid ${({ theme }) => theme.colors?.border || '#E4E4E4'};
 `;
 
 const PreviewImg = styled.img`
@@ -251,7 +245,7 @@ export default function ReviewWritePage() {
                 title="이미지 첨부"
               >
                 {/* 간단한 이미지 아이콘 (SVG) */}
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                   <circle cx="8.5" cy="8.5" r="1.5"></circle>
