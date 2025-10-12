@@ -18,8 +18,8 @@ const SubBar = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  margin-top: 16px;
   margin-bottom: 12px;
-  padding: 0 16px;
   flex-wrap: wrap;
 `;
 
@@ -73,7 +73,6 @@ const List = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 16px;
   box-sizing: border-box;
 `;
 
