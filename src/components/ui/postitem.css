@@ -8,10 +8,6 @@
   cursor: pointer;
   box-sizing: border-box;
   box-shadow: none !important;
-  border-bottom: 1px solid #E4E4E4;
-}
-.post-item:last-child {
-  border-bottom: none;
 }
 
 .post-text {
