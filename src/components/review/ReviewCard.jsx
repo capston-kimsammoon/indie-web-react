@@ -1,7 +1,9 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import styled, { css } from 'styled-components'
 import defaultAvatar from '../../assets/icons/icon_b_my.svg';
-import styled, { css } from 'styled-components';
+import { Link } from 'react-router-dom'
 
+/* ==================== 스타일 ==================== */
 const Card = styled.article.withConfig({
   shouldForwardProp: (prop) => prop !== 'variant',
 })`
@@ -89,7 +91,7 @@ const BodyText = styled.p.withConfig({
   line-height: 1.4;
   white-space: pre-wrap;
   margin: 0;
-  padding-right: 32px;
+  padding-right: 32px; 
   box-sizing: border-box;
 `;
 
@@ -98,17 +100,17 @@ const MetaBar = styled.div`
   flex-direction: column;
 `;
 
-const TopRow = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-`;
-
 const MetaTop = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
   min-width: 0;
+`;
+
+const TopRow = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 `;
 
 const Avatar = styled.img`
@@ -126,7 +128,34 @@ const MetaName = styled.span`
   color: #2F2F2F;
 `;
 
-const MetaDate = styled.time`
+ const VenueInline = styled(Link)`
+   display: inline-flex;
+   align-items: center;
+   gap: 6px;
+   text-decoration: none;
+   color: inherit;
+   cursor: pointer;
+   &:hover { opacity: .9; }
+`;
+
+ const VenueLogo = styled.img`
+   width: 18px;
+   height: 18px;
+   border-radius: 50%;   
+   object-fit: cover;
+   border: 1px solid #E4E4E4;
+   background: #f6f6f6;
+   flex-shrink: 0;
+`;
+
+const VenueName = styled.span`
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const MetaDate = styled.time` 
   margin-top: -6px;
   margin-bottom: 6px;
   font-size: 12px;
@@ -166,6 +195,7 @@ const LikeBtn = styled.button.withConfig({
     `}
 `;
 
+/* 라이트박스 */
 const Lightbox = styled.div`
   position: fixed;
   inset: 0;
@@ -223,6 +253,7 @@ const NavBtn = styled.button`
         `}
 `;
 
+/* ==================== 컴포넌트 ==================== */
 export default function ReviewCard({
   review,
   variant = 'compact',
@@ -231,6 +262,7 @@ export default function ReviewCard({
   onToggleLike,
   onDelete,
 }) {
+  // snake_case, camelCase 모두 지원 + venue 포함
   const {
     id,
     user,
@@ -242,12 +274,16 @@ export default function ReviewCard({
     likeCount,
     liked_by_me,
     likedByMe,
+    venue, // { id, name, logo_url }가 있으면 표시
   } = review || {};
 
   const created = created_at ?? createdAt ?? null;
   const liked = (liked_by_me ?? likedByMe) ?? false;
   const count = (like_count ?? likeCount) ?? 0;
+
+  // 문자열/객체 형태 모두 대응
   const getImgUrl = (im) => (typeof im === 'string' ? im : im?.image_url || '');
+
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerIdx, setViewerIdx] = useState(0);
 
@@ -264,8 +300,8 @@ export default function ReviewCard({
     }
   }, [created]);
 
-  const showMeta = variant === 'full';
-  const showLike = showMeta;
+  const showMeta = variant === true;
+  const showLike = true;
   const canDelete = isOwner && isLoggedIn;
 
   const handleToggleLike = () => {
@@ -278,6 +314,7 @@ export default function ReviewCard({
     onDelete(id);
   };
 
+  // 라이트박스
   const openViewer = (idx = 0) => {
     setViewerIdx(idx);
     setViewerOpen(true);
@@ -310,6 +347,7 @@ export default function ReviewCard({
         </DeleteBtn>
       )}
 
+      {/* 1) 이미지(가로) */}
       {images?.length > 0 && (
         <ThumbRow>
           {images.slice(0, 3).map((img, idx) => {
@@ -333,8 +371,10 @@ export default function ReviewCard({
         </ThumbRow>
       )}
 
+      {/* 2) 본문 */}
       <BodyText variant={variant}>{content}</BodyText>
 
+      {/* 3) 메타 (닉네임 옆에 공연장칩 → 날짜) */}
       <MetaBar>
         <TopRow>
           <MetaDate dateTime={created ?? undefined}>{dateText}</MetaDate>
@@ -344,11 +384,25 @@ export default function ReviewCard({
           <Avatar
             src={user?.profile_url || defaultAvatar}
             alt={`${user?.nickname || '사용자'} 프로필 이미지`}
-            onError={(e) => {
-              e.currentTarget.src = defaultAvatar;
-            }}
+            onError={(e) => { e.currentTarget.src = defaultAvatar }}
           />
           <MetaName>{user?.nickname || '익명'}</MetaName>
+          {venue?.id && (
+            <>
+              <VenueInline
+                to={`/venue/${venue.id}`}
+                aria-label={`${venue.name} 상세로 이동`}
+                title={venue.name}
+              >
+                <VenueLogo
+                  src={venue.logo_url || '/logo192.png'}
+                  alt={`${venue.name || '공연장'} 로고`}
+                  onError={(e)=>{ e.currentTarget.src='/logo192.png'; }}
+                />
+                <VenueName>{venue.name}</VenueName>
+              </VenueInline>
+            </>
+          )}
           {showLike && (
             <LikeBtn
               type="button"
@@ -379,6 +433,7 @@ export default function ReviewCard({
         </MetaTop>
       </MetaBar>
 
+      {/* 라이트박스 */}
       {viewerOpen && images?.length > 0 && (
         <Lightbox onClick={closeViewer}>
           <ViewerImg
