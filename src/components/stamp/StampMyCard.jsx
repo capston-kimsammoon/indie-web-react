@@ -31,7 +31,7 @@ const CardWrapper = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.outlineGray};
   border-radius: 10px;
   display: flex;
-  padding: 16px; 
+  padding: 8px; 
   box-sizing: border-box;
   cursor: pointer;
 
@@ -41,11 +41,10 @@ const CardWrapper = styled.div`
 `;
 
 const Poster = styled.img`
-  width: 96px;
-  height: 128px;
-  border-radius: 5px;
+  width: 20vw; 
+  max-width: 5rem; 
+  height: auto; 
   object-fit: cover;
-  flex-shrink: 0; 
 `;
 
 const Info = styled.div`
