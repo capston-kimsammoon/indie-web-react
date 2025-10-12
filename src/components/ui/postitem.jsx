@@ -2,6 +2,7 @@
 import './postitem.css';
 import { MessageCirclePlus } from 'lucide-react';
 import { baseUrl } from '../../api/config';
+import Divider from '../common/Divider';
 
 const formatDate = (isoDate) => {
   if (!isoDate) return '';
@@ -32,7 +33,7 @@ function PostItem({ post, onClick }) {
     resolveThumb(post.image_url) ??
     resolveThumb(post.thumbnailUrl);
   return (
-    <div className="post-item" onClick={onClick}>
+    <li className="post-item" onClick={onClick}>
       <div className="post-text">
         <div>{post.title || '제목 없음'}</div>
         {!!post.dateText && <div className="date">{post.dateText}</div>}
@@ -62,7 +63,9 @@ function PostItem({ post, onClick }) {
           }}
         />
       )}
-    </div>
+
+      <Divider/>
+    </li>
   );
 }
 
