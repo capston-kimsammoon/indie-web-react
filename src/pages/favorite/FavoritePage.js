@@ -133,20 +133,23 @@ export default function FavoritePage() {
 
       <ScrollableList>
         <List>
-          {selectedTab === 'performance' &&
-            (perfList.length ? (
-              perfList.map((performance) => (
-                <PerformanceListCard
-                  key={performance.id}
-                  performance={performance}
-                  onToggleLike={(id) =>
-                    togglePerformanceLike(id, performance.isLiked ?? true)
-                  }
-                />
-              ))
-            ) : (
-              <Empty>찜한 공연이 없습니다.</Empty>
-            ))}
+          {selectedTab === 'performance' && (
+            <div style={{ paddingTop: '16px' }}>
+              {perfList.length ? (
+                perfList.map((performance) => (
+                  <PerformanceListCard
+                    key={performance.id}
+                    performance={performance}
+                    onToggleLike={(id) =>
+                      togglePerformanceLike(id, performance.isLiked ?? true)
+                    }
+                  />
+                ))
+              ) : (
+                <Empty>찜한 공연이 없습니다.</Empty>
+              )}
+            </div>
+          )}
 
           {selectedTab === 'artist' &&
             (artistList.length ? (
@@ -218,7 +221,6 @@ const PageWrapper = styled.div`
 `;
 
 const ScrollableList = styled.div`
-  padding-top: ${({ isPerformanceTab }) => (isPerformanceTab ? '16px' : '0')};
   padding-bottom: 109px;
   flex-grow: 1;
   overflow-y: auto;
