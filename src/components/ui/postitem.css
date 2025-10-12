@@ -21,8 +21,8 @@
 
 .post-text > div:first-child {
   font-size: 16px;
-  font-weight: 600;
-  color: #8faf24;
+  font-weight: 500;
+  color: #1c1c1e;
   margin-right: 40px;
   margin-bottom: 8px;
   overflow: hidden;
@@ -34,7 +34,7 @@
 .post-text > div:nth-child(2) {
   font-size: 14px;
   font-weight: 400;
-  color: #af2424;
+  color: #2F2F2F;
   margin-bottom: 8px;
 }
 
@@ -65,7 +65,7 @@
 .meta > div:nth-child(3) {
   font-size: 12px;
   font-weight: 400;
-  color: #1c8591;
+  color: #B0B0B0;
 }
 
 .comment-count {
