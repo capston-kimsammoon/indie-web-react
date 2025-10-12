@@ -59,7 +59,7 @@ const Row = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 12px 0;
   background: ${({ theme }) => theme.colors.bgWhite};
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineGray};
 `;
