@@ -41,7 +41,6 @@ export default function LoginPage() {
     <div className="login-page">
       <Header title="로그인" />
       <div className="login-box">
-        <h2 className="login-title">로그인</h2>
         <img
           src={KAKAO_BTN_SRC}
           alt="카카오로 로그인"
