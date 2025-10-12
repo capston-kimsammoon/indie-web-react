@@ -190,7 +190,6 @@ export default function MyReviewListPage() {
     }
   };
 
-  const title = useMemo(() => '내가 쓴 리뷰', []);
   const hasItems = items.length > 0;
 
   return (
@@ -219,8 +218,10 @@ export default function MyReviewListPage() {
 
         {/* 무한 스크롤 센티넬 */}
         {hasMore && !loadError && <Loader ref={sentinelRef}>더 불러오는 중…</Loader>}
-        {!hasMore && hasItems && <Loader>마지막 리뷰입니다.</Loader>}
+        {!hasMore && hasItems && <Empty>마지막 리뷰입니다.</Empty>}
       </ScrollableList>
     </PageWrapper>
   );
 }
+
+
