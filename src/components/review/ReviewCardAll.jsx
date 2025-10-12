@@ -26,15 +26,10 @@ const Card = styled.article.withConfig({
     `}
 `;
 
-const DeleteRow = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding-top: 8px;
-  padding-right: 8px;
-`;
-
 const DeleteBtn = styled.button`
+  position: absolute;
+  top: 8px;
+  right: 8px;
   width: 24px;
   height: 24px;
   min-width: 24px;
@@ -53,7 +48,6 @@ const DeleteBtn = styled.button`
   transition: all 0.2s ease;
   flex-shrink: 0;
 `;
-
 
 const ThumbRow = styled.div`
   display: flex;
@@ -342,14 +336,14 @@ export default function ReviewCard({
   return (
     <Card variant={variant} aria-label="venue-review-card">
       {canDelete && (
-          <DeleteBtn
-            type="button"
-            aria-label="리뷰 삭제"
-            title="리뷰 삭제"
-            onClick={handleDelete}
-          >
-            x
-          </DeleteBtn>
+        <DeleteBtn
+          type="button"
+          aria-label="리뷰 삭제"
+          title="리뷰 삭제"
+          onClick={handleDelete}
+        >
+          x
+        </DeleteBtn>
       )}
 
       {/* 1) 이미지(가로) */}
