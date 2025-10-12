@@ -13,7 +13,7 @@ const Page = styled.div`
 `;
 
 const Container = styled.div`
-  padding: 12px 0;   
+  padding: 0;   
   box-sizing: border-box;
 `;
 
@@ -25,7 +25,7 @@ const Field = styled.div`
 
 const TextareaWrap = styled.div`
   position: relative;
-  border: 1px solid ${({ theme }) => theme.colors?.border || '#e5e5e5'};
+  border: 1px solid ${({ theme }) => theme.colors?.border || '#E4E4E4'};
   border-radius: 12px;
   background: #fff;
   padding: 12px 12px 36px; /* 하단에 아이콘 자리 */
@@ -226,7 +226,6 @@ export default function ReviewWritePage() {
   return (
     <Page>
       <Header title={title} />
-      <HeaderSpacer />
 
       <Container>
         <Field>
