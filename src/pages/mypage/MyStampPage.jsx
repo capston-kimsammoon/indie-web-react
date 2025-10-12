@@ -128,7 +128,7 @@ const PageWrapper = styled.div`
 `;
 
 const Content = styled.div`
-  padding-bottom: 80px; 
+  padding-bottom: 108px; 
 `;
 
 const StampGrid = styled.div`
