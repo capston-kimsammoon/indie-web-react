@@ -6,15 +6,28 @@ import ReviewCard from '../../components/review/ReviewCard';
 import { fetchMyReviews, toggleReviewLike, deleteReview } from '../../api/reviewApi';
 import { fetchUserInfo } from '../../api/userApi';
 
-const HeaderSpacer = styled.div`
-  height: 28px;
+const PageWrapper = styled.div`
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
 `;
 
-const Page = styled.div`
-  width: 100%;
-  margin: 0 auto;
-  padding-bottom: 88px;        
-  --side: 16px;                
+const ScrollableList = styled.div`
+  padding-top: 16px;
+  padding-bottom: 109px;
+  flex-grow: 1;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none; 
+  }
+
+  -ms-overflow-style: none; 
+  scrollbar-width: none;
+
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 `;
 
 const List = styled.div`
@@ -181,31 +194,33 @@ export default function MyReviewListPage() {
   const hasItems = items.length > 0;
 
   return (
-    <Page>
-      <Header title="내 리뷰" />
-      <HeaderSpacer />
+    <PageWrapper>
+      <Header title="내 리뷰" />      
+      <div style={{ height: "16px" }} />
 
-      {initialLoading && <Loader>불러오는 중…</Loader>}
-      {!initialLoading && loadError && <Loader>불러오기에 실패했습니다.</Loader>}
-      {!initialLoading && !loadError && !hasItems && <Empty>작성한 리뷰가 없습니다.</Empty>}
+      <ScrollableList>
+        {initialLoading && <Loader>불러오는 중…</Loader>}
+        {!initialLoading && loadError && <Loader>불러오기에 실패했습니다.</Loader>}
+        {!initialLoading && !loadError && !hasItems && <Empty>작성한 리뷰가 없습니다.</Empty>}
 
-      <List>
-        {items.map((r) => (
-          <ReviewCard
-            key={r.id}
-            review={r}
-            variant="full"
-            isLoggedIn={isLoggedIn}
-            isOwner={r.user?.id && currentUserId && r.user.id === currentUserId}
-            onToggleLike={handleToggleLike}
-            onDelete={handleDelete}
-          />
-        ))}
-      </List>
+        <List>
+          {items.map((r) => (
+            <ReviewCard
+              key={r.id}
+              review={r}
+              variant="full"
+              isLoggedIn={isLoggedIn}
+              isOwner={r.user?.id && currentUserId && r.user.id === currentUserId}
+              onToggleLike={handleToggleLike}
+              onDelete={handleDelete}
+            />
+          ))}
+        </List>
 
-      {/* 무한 스크롤 센티넬 */}
-      {hasMore && !loadError && <Loader ref={sentinelRef}>더 불러오는 중…</Loader>}
-      {!hasMore && hasItems && <Loader>마지막 리뷰입니다.</Loader>}
-    </Page>
+        {/* 무한 스크롤 센티넬 */}
+        {hasMore && !loadError && <Loader ref={sentinelRef}>더 불러오는 중…</Loader>}
+        {!hasMore && hasItems && <Loader>마지막 리뷰입니다.</Loader>}
+      </ScrollableList>
+    </PageWrapper>
   );
 }
