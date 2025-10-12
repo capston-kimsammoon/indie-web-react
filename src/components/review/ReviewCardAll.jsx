@@ -91,6 +91,7 @@ const BodyText = styled.p.withConfig({
   line-height: 1.4;
   white-space: pre-wrap;
   margin: 0;
+  padding-right: 32px; 
   box-sizing: border-box;
 `;
 
