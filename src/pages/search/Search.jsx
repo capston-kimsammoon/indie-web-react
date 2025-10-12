@@ -364,8 +364,6 @@ function Search() {
 export default Search;
 
 const PageWrapper = styled.div`
-  height: 100vh;
-  height: 100dvh;
   display: flex;
   flex-direction: column;
 `;
