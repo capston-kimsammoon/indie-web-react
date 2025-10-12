@@ -121,13 +121,10 @@ const FilterGroup = styled.div`
 `;
 
 const PageWrapper = styled.div`
-  width: 100%;
-  max-width: ${({ theme }) => theme.layout.maxWidth};
-  margin: 0 auto;
-  min-height: 100vh;
-  background: ${({ theme }) => theme.colors.bgWhite};
-  padding-bottom: 16px;
-  border-radius: 10px;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Content = styled.div`
