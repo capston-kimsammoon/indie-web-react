@@ -32,39 +32,51 @@ function PostItem({ post, onClick }) {
     resolveThumb(post.thumbnail) ??
     resolveThumb(post.image_url) ??
     resolveThumb(post.thumbnailUrl);
+  function PostItem({ post, onClick }) {
+  if (!post) return null;
+
+  const thumbnailSrc =
+    resolveThumb(post.thumbnail_url) ??
+    resolveThumb(post.thumbnail_filename) ??
+    resolveThumb(post.thumbnail) ??
+    resolveThumb(post.image_url) ??
+    resolveThumb(post.thumbnailUrl);
+
   return (
-    <li className="post-item" onClick={onClick}>
-      <div className="post-text">
-        <div>{post.title || '제목 없음'}</div>
-        {!!post.dateText && <div className="date">{post.dateText}</div>}
-        {!!post.content && <div>{post.content}</div>}
+    <>
+      <li className="post-item" onClick={onClick}>
+        <div className="post-text">
+          <div>{post.title || '제목 없음'}</div>
+          {!!post.dateText && <div className="date">{post.dateText}</div>}
+          {!!post.content && <div>{post.content}</div>}
 
-        <div className="meta">
-          {typeof post.commentCount === 'number' && (
-            <div className="comment-count">
-              <MessageCirclePlus size={16} />
-              {post.commentCount}
-            </div>
-          )}
-          {(post.created_at || post.date) && (
-            <div>{formatDate(post.created_at ?? post.date)}</div>
-          )}
-          {!!post.author && <div>{post.author}</div>}
+          <div className="meta">
+            {typeof post.commentCount === 'number' && (
+              <div className="comment-count">
+                <MessageCirclePlus size={16} />
+                {post.commentCount}
+              </div>
+            )}
+            {(post.created_at || post.date) && (
+              <div>{formatDate(post.created_at ?? post.date)}</div>
+            )}
+            {!!post.author && <div>{post.author}</div>}
+          </div>
         </div>
-      </div>
 
-      {!!thumbnailSrc && (
-        <img
-          src={thumbnailSrc}
-          alt="썸네일"
-          className="thumbnail"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-          }}
-        />
-      )}
-    </li>
-    <Divider />
+        {!!thumbnailSrc && (
+          <img
+            src={thumbnailSrc}
+            alt="썸네일"
+            className="thumbnail"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        )}
+      </li>
+      <Divider />
+    </>
   );
 }
 
