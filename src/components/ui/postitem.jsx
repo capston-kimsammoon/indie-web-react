@@ -1,4 +1,3 @@
-// PostItem.jsx
 import './postitem.css';
 import { MessageCirclePlus } from 'lucide-react';
 import { baseUrl } from '../../api/config';
@@ -17,24 +16,15 @@ const formatDate = (isoDate) => {
 // 절대 URL 보정
 const resolveThumb = (u) => {
   if (!u) return null;
-  if (u.startsWith?.('http')) return u; // 이미 절대
+  if (u.startsWith?.('http')) return u; // 이미 절대 경로
   if (u.startsWith?.('/')) return `${baseUrl}${u}`; // "/static/..." 등
-  return `${baseUrl}/static/uploads/${u}`; // 파일명만 온 케이스
+  return `${baseUrl}/static/uploads/${u}`; // 파일명만 온 경우
 };
 
 function PostItem({ post, onClick }) {
   if (!post) return null;
 
-  // ✅ 우선순위에 thumbnail_url/thumbnail_filename 포함
-  const thumbnailSrc =
-    resolveThumb(post.thumbnail_url) ??
-    resolveThumb(post.thumbnail_filename) ??
-    resolveThumb(post.thumbnail) ??
-    resolveThumb(post.image_url) ??
-    resolveThumb(post.thumbnailUrl);
-  function PostItem({ post, onClick }) {
-  if (!post) return null;
-
+  // ✅ 우선순위에 따라 썸네일 URL 추출
   const thumbnailSrc =
     resolveThumb(post.thumbnail_url) ??
     resolveThumb(post.thumbnail_filename) ??
