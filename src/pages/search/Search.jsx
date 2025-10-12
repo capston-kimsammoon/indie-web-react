@@ -238,17 +238,19 @@ function Search() {
       {keyword && tab === '공연' && (
         <div className="search-section">
           <div className="section">
-            {concerts.length > 0 ? concerts.map((item) => {
-              const postLike = toPostFromPerformance(item);
-              return (
-                <PostItem
-                  key={postLike.id}
-                  post={postLike}
-                  onClick={() => navigate(`/performance/${item.id}`)}
-                  style={{ psdding-bottom: '16px', borderBottom: '1px solid #E4E4E4' }}
-                />
-              );
-            }) : <p><strong>{keyword}</strong>와(과) 일치하는 공연이 없습니다.</p>}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {concerts.length > 0 ? concerts.map((item) => {
+                const postLike = toPostFromPerformance(item);
+                return (
+                  <PostItem
+                    key={postLike.id}
+                    post={postLike}
+                    onClick={() => navigate(`/performance/${item.id}`)}
+                    style={{ paddingBottom: '16px', borderBottom: '1px solid #E4E4E4' }}
+                  />
+                );
+              }) : <p><strong>{keyword}</strong>와(과) 일치하는 공연이 없습니다.</p>}
+            </div>
           </div>
         </div>
       )}
