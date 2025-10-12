@@ -218,7 +218,7 @@ const PageWrapper = styled.div`
 `;
 
 const ScrollableList = styled.div`
-  padding-top: 16px;
+  padding-top: ${({ isPerformanceTab }) => (isPerformanceTab ? '16px' : '0')};
   padding-bottom: 109px;
   flex-grow: 1;
   overflow-y: auto;
