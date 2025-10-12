@@ -63,9 +63,8 @@ function PostItem({ post, onClick }) {
           }}
         />
       )}
-
-      <Divider/>
     </li>
+   <Divider/>
   );
 }
 
