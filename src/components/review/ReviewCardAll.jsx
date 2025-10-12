@@ -342,7 +342,6 @@ export default function ReviewCard({
   return (
     <Card variant={variant} aria-label="venue-review-card">
       {canDelete && (
-        <DeleteRow>
           <DeleteBtn
             type="button"
             aria-label="리뷰 삭제"
@@ -351,7 +350,6 @@ export default function ReviewCard({
           >
             x
           </DeleteBtn>
-        </DeleteRow>
       )}
 
       {/* 1) 이미지(가로) */}
