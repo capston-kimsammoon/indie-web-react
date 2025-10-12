@@ -18,6 +18,7 @@ const Container = styled.div`
 `;
 
 const Field = styled.div`
+  margin-top: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
