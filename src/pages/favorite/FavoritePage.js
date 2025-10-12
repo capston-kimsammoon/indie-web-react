@@ -141,6 +141,7 @@ export default function FavoritePage() {
                 onToggleLike={(id) =>
                   togglePerformanceLike(id, performance.isLiked ?? true)
                 }
+                formatDate={true}
               />
             ))
           ) : (
