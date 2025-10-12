@@ -26,14 +26,25 @@ const Card = styled.article.withConfig({
 
 const DeleteBtn = styled.button`
   position: absolute;
+  top: 8px;
   right: 8px;
-  top: 6px;
-  font-size: 16px;
-  line-height: 1;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #E4E4E4;
+  background: #FAFAFA;
   color: #4B4B4B;
-  background: transparent;
-  border: 0;
+  font-size: 14px;
+  line-height: 1; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 `;
 
 const ThumbRow = styled.div`
@@ -64,9 +75,9 @@ const MoreBtn = styled.button`
   height: 100px;
   border-radius: 8px;
   border: 1px solid #E4E4E4;
-  background: #FFF;
+  background: #f7f7f7;
   font-size: 14px;
-  color: #3333;
+  color: #555;
   cursor: pointer;
 `;
 
@@ -74,35 +85,30 @@ const BodyText = styled.p.withConfig({
   shouldForwardProp: (prop) => prop !== 'variant',
 })`
   font-size: 14px;
-  font-weight: 400;
-  color: #4B4B4B;
+  color: #2F2F2F;
   line-height: 1.4;
+  white-space: pre-wrap;
   margin: 0;
-
-  ${({ variant }) =>
-    variant === 'compact' &&
-    css`
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: normal;
-
-      min-height: calc(1.4em * 2);
-    `}
+  padding-right: 32px;
+  box-sizing: border-box;
 `;
 
 const MetaBar = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
 `;
 
-const MetaLeft = styled.div`
+const TopRow = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
+const MetaTop = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
+  min-width: 0;
 `;
 
 const Avatar = styled.img`
@@ -117,28 +123,31 @@ const Avatar = styled.img`
 const MetaName = styled.span`
   font-size: 12px;
   font-weight: 500;
-  color: #4B4B4B;
+  color: #2F2F2F;
 `;
 
 const MetaDate = styled.time`
+  margin-top: -6px;
+  margin-bottom: 6px;
   font-size: 12px;
-  color: #6b7280;
-  margin-left: 6px;
+  color: #B0B0B0;
 `;
 
 const LikeBtn = styled.button.withConfig({
-  shouldForwardProp: (prop) => prop !== 'active',
+  shouldForwardProp: (prop) => prop !== 'active' && prop !== '$disabled',
 })`
+  position: absolute;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  right: 8px;
   font-size: 12px;
   padding: 4px 8px;
   border-radius: 9999px;
   cursor: pointer;
   background: #fff;
-  border: 1px solid #e5e7eb;
-  color: #6b7280;
+  border: 1px solid #E4E4E4;
+  color: #B0B0B0;
 
   ${({ active }) =>
     active &&
@@ -147,8 +156,7 @@ const LikeBtn = styled.button.withConfig({
       border-color: #fda4af;
       color: #e11d48;
     `}
- 
-    /* 비로그인: 클릭 불가 + 희미하게 */
+
   ${({ $disabled }) =>
     $disabled &&
     css`
@@ -156,7 +164,6 @@ const LikeBtn = styled.button.withConfig({
       pointer-events: none;
       cursor: default;
     `}
-
 `;
 
 const Lightbox = styled.div`
@@ -190,6 +197,7 @@ const CloseBtn = styled.button`
   cursor: pointer;
   font-size: 18px;
   line-height: 34px;
+  text-align: center;
 `;
 
 const NavBtn = styled.button`
@@ -245,12 +253,15 @@ export default function ReviewCard({
 
   const dateText = useMemo(() => {
     if (!created) return '';
-    const s =
-      typeof created === 'string'
-        ? created
-        : new Date(created).toISOString();
-    const m = s.match(/^\d{4}-\d{2}-\d{2}/);
-    return m ? m[0] : s.slice(0, 10);
+    try {
+      const d = new Date(created);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    } catch {
+      return created;
+    }
   }, [created]);
 
   const showMeta = variant === 'full';
@@ -267,7 +278,6 @@ export default function ReviewCard({
     onDelete(id);
   };
 
-  // 라이트박스
   const openViewer = (idx = 0) => {
     setViewerIdx(idx);
     setViewerOpen(true);
@@ -300,7 +310,6 @@ export default function ReviewCard({
         </DeleteBtn>
       )}
 
-      {/* 1) 이미지(가로) */}
       {images?.length > 0 && (
         <ThumbRow>
           {images.slice(0, 3).map((img, idx) => {
@@ -324,12 +333,14 @@ export default function ReviewCard({
         </ThumbRow>
       )}
 
-      {/* 2) 본문 */}
       <BodyText variant={variant}>{content}</BodyText>
 
-      {/* 3) 메타 */}
       <MetaBar>
-        <MetaLeft>
+        <TopRow>
+          <MetaDate dateTime={created ?? undefined}>{dateText}</MetaDate>
+        </TopRow>
+
+        <MetaTop>
           <Avatar
             src={user?.profile_url || defaultAvatar}
             alt={`${user?.nickname || '사용자'} 프로필 이미지`}
@@ -338,39 +349,36 @@ export default function ReviewCard({
             }}
           />
           <MetaName>{user?.nickname || '익명'}</MetaName>
-          {showMeta && <MetaDate dateTime={created ?? undefined}>{dateText}</MetaDate>}
-        </MetaLeft>
-
-        {showLike && (
-          <LikeBtn
-            type="button"
-            onClick={handleToggleLike}
-            active={!!liked}
-            aria-pressed={!!liked}
-            aria-disabled={!isLoggedIn}
-           $disabled={!isLoggedIn}
-           disabled={!isLoggedIn}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill={liked ? 'currentColor' : 'none'}
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
+          {showLike && (
+            <LikeBtn
+              type="button"
+              onClick={handleToggleLike}
+              active={!!liked}
+              aria-pressed={!!liked}
+              aria-disabled={!isLoggedIn}
+              $disabled={!isLoggedIn}
+              disabled={!isLoggedIn}
             >
-              <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 22l7.8-8.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path>
-            </svg>
-            <span>{count}</span>
-          </LikeBtn>
-        )}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill={liked ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 22l7.8-8.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path>
+              </svg>
+              <span>{count}</span>
+            </LikeBtn>
+          )}
+        </MetaTop>
       </MetaBar>
 
-      {/* 라이트박스 */}
       {viewerOpen && images?.length > 0 && (
         <Lightbox onClick={closeViewer}>
           <ViewerImg
