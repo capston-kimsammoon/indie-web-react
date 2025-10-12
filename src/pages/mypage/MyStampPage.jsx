@@ -128,7 +128,7 @@ const PageWrapper = styled.div`
 `;
 
 const Content = styled.div`
-  padding-bottom: 174px; //158
+  padding-bottom: 32px; //158
 `;
 
 const StampGrid = styled.div`
@@ -150,6 +150,7 @@ const ScrollableContent = styled.div`
   margin-top: 16px;
   flex-grow: 1;
   overflow-y: auto;
+  overscroll-behavior: none;
   
   &::-webkit-scrollbar {
     display: none;
