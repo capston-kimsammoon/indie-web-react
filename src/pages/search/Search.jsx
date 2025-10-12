@@ -245,6 +245,7 @@ function Search() {
                   key={postLike.id}
                   post={postLike}
                   onClick={() => navigate(`/performance/${item.id}`)}
+                  style={{ psdding-bottom: '16px', borderBottom: '1px solid #E4E4E4' }}
                 />
               );
             }) : <p><strong>{keyword}</strong>와(과) 일치하는 공연이 없습니다.</p>}
@@ -267,7 +268,7 @@ function Search() {
                       alignItems: 'center',
                       gap: '12px',
                       padding: '12px 16px',
-                      borderBottom: '1px solid #f0f0f2',
+                      borderBottom: '1px solid #E4E4E4',
                       cursor: 'pointer',
                     }}
                   >
@@ -317,7 +318,7 @@ function Search() {
                       alignItems: 'center',
                       gap: '12px',
                       padding: '12px 16px',
-                      borderBottom: '1px solid #f0f0f2',
+                      borderBottom: '1px solid #E4E4E4',
                       cursor: 'pointer',
                     }}
                   >
