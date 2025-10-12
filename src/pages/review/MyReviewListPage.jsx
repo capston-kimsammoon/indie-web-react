@@ -13,8 +13,47 @@ const PageWrapper = styled.div`
   flex-direction: column;
 `;
 
+const SubBar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 0 16px;
+  flex-wrap: wrap;
+`;
+
+const Stat = styled.span`
+  font-size: 14px;
+  font-weight: 600;
+  color: #3C9C68;  
+`;
+
+const AllText = styled.span`
+  color: #4B4B4B;
+`;
+
+const CountText = styled.span`
+  color: #3C9C68;
+`;
+
+const Controls = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  select, button {
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #374151;
+    cursor: pointer;
+  }
+`;
+
 const ScrollableList = styled.div`
-  padding-top: 16px;
   padding-bottom: 109px;
   flex-grow: 1;
   overflow-y: auto;
@@ -34,12 +73,12 @@ const List = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 0 var(--side);
+  padding: 16px;
   box-sizing: border-box;
 `;
 
 const Loader = styled.div`
-  padding: 16px var(--side);
+  padding: 16px 16px;
   text-align: center;
   color: ${({ theme }) => theme.colors?.darkGray || '#666'};
   font-size: ${({ theme }) => theme.fontSizes?.sm || '14px'};
@@ -55,8 +94,18 @@ const Empty = styled.div`
   align-items: center;  
 `;
 
+const ErrorBox = styled.div`
+  padding: 12px 14px;
+  color: #991b1b;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  margin: 16px 16px 0 16px;
+`;
+
 export default function MyReviewListPage() {
   const [items, setItems] = useState([]);
+  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const size = 20;
   const [hasMore, setHasMore] = useState(false);
@@ -65,6 +114,7 @@ export default function MyReviewListPage() {
   const [loadError, setLoadError] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [order, setOrder] = useState('desc');
   const sentinelRef = useRef(null);
 
   useEffect(() => {
@@ -102,10 +152,11 @@ export default function MyReviewListPage() {
       setInitialLoading(true);
       setLoadError(null);
       try {
-        const res = await fetchMyReviews({ page: 1, size });
+        const res = await fetchMyReviews({ page: 1, size, order });
         const list = Array.isArray(res?.items) ? res.items : [];
         if (!mounted) return;
         setItems(mapReviews(list));
+        setTotal(res?.total ?? list.length);
         setPage(2);
         setHasMore(list.length >= size);
       } catch (e) {
@@ -118,13 +169,13 @@ export default function MyReviewListPage() {
       }
     })();
     return () => { mounted = false; };
-  }, []);
+  }, [order]);
 
   const loadMore = useCallback(async () => {
     if (!hasMore || loadingMore || loadError) return;
     setLoadingMore(true);
     try {
-      const res = await fetchMyReviews({ page, size });
+      const res = await fetchMyReviews({ page, size, order });
       const list = Array.isArray(res?.items) ? res.items : [];
       setItems(prev => mergeDedupe(prev, mapReviews(list)));
       setPage(p => p + 1);
@@ -135,7 +186,7 @@ export default function MyReviewListPage() {
     } finally {
       setLoadingMore(false);
     }
-  }, [page, size, hasMore, loadingMore, loadError]);
+  }, [page, size, hasMore, loadingMore, loadError, order]);
 
   useEffect(() => {
     if (loadError) return;
@@ -146,13 +197,9 @@ export default function MyReviewListPage() {
     return () => ob.disconnect();
   }, [loadMore, loadError]);
 
-  // toggle like / delete 그대로…
-
-  // 좋아요 토글
   const handleToggleLike = async (reviewId, nextLiked) => {
     if (!isLoggedIn) return;
     try {
-      // API는 “현재 상태”를 기준으로 동작하도록 구현했었다면 아래처럼 반전값 전달
       const isCurrentlyLiked = !nextLiked;
       const data = await toggleReviewLike(reviewId, isCurrentlyLiked);
       setItems((prev) =>
@@ -177,13 +224,13 @@ export default function MyReviewListPage() {
     }
   };
 
-  // 삭제
   const handleDelete = async (reviewId) => {
     if (!isLoggedIn) return;
     if (!window.confirm('이 리뷰를 삭제하시겠습니까?')) return;
     try {
       await deleteReview(reviewId);
       setItems((prev) => prev.filter((it) => it.id !== reviewId));
+      setTotal(t => Math.max(0, t - 1));
     } catch (e) {
       console.error('리뷰 삭제 실패:', e);
       alert('삭제에 실패했습니다.');
@@ -197,9 +244,27 @@ export default function MyReviewListPage() {
       <Header title="내 리뷰" />      
       <div style={{ height: "16px" }} />
 
+      {loadError && <ErrorBox role="alert">리뷰를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.</ErrorBox>}
+
+      <SubBar>
+        <Stat>
+          <AllText>My </AllText>
+          <CountText>{total}</CountText>
+        </Stat>
+        <Controls>
+          <select
+            aria-label="정렬"
+            value={order}
+            onChange={(e) => setOrder(e.target.value === 'asc' ? 'asc' : 'desc')}
+          >
+            <option value="desc">최신순</option>
+            <option value="asc">오래된순</option>
+          </select>
+        </Controls>
+      </SubBar>
+
       <ScrollableList>
         {initialLoading && <Loader>불러오는 중…</Loader>}
-        {!initialLoading && loadError && <Loader>불러오기에 실패했습니다.</Loader>}
         {!initialLoading && !loadError && !hasItems && <Empty>작성한 리뷰가 없습니다.</Empty>}
 
         <List>
@@ -216,12 +281,9 @@ export default function MyReviewListPage() {
           ))}
         </List>
 
-        {/* 무한 스크롤 센티넬 */}
         {hasMore && !loadError && <Loader ref={sentinelRef}>더 불러오는 중…</Loader>}
         {!hasMore && hasItems && <Empty>마지막 리뷰입니다.</Empty>}
       </ScrollableList>
     </PageWrapper>
   );
 }
-
-
