@@ -151,8 +151,8 @@ const Message = styled.div`
 `;
 
 const ScrollableContent = styled.div`
-  margin-top: 16px;
-  height: calc(100vh - 80px); 
+  padding-bottom: 109px;
+  flex-grow: 1;
   overflow-y: auto;
   
   &::-webkit-scrollbar {
