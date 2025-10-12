@@ -8,15 +8,26 @@ import { fetchVenueDetail } from '../../api/venueApi';
 import { fetchReviews, toggleReviewLike, deleteReview } from '../../api/reviewApi';
 import { fetchUserInfo } from '../../api/userApi';
 
-const Page = styled.div`
-  width: 100%;
-  margin: 0 auto;
-  padding-bottom: 88px; /* 하단 네비와 겹치지 않게 */
-  --side: 16px;
+const PageWrapper = styled.div`
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
 `;
 
-const HeaderSpacer = styled.div`
-  height: 28px;
+const ScrollableList = styled.div`
+  flex-grow: 1;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none; 
+  }
+
+  -ms-overflow-style: none; 
+  scrollbar-width: none;
+
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 `;
 
 const ActionRow = styled.div`
@@ -46,12 +57,14 @@ const List = styled.div`
   box-sizing: border-box;
 `;
 
-const Empty = styled.div`
-  padding: 40px var(--side);
-  color: ${({ theme }) => theme.colors?.lightGray || '#999'};
-  text-align: center;
-  font-size: ${({ theme }) => theme.fontSizes?.sm || '14px'};
-  box-sizing: border-box;
+const EmptyMessage = styled.div`
+  padding: 16px 16px;
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
+  color: ${({ theme }) => theme.colors.darkGray};
+  display: flex;
+  justify-content: center; 
+  align-items: center;  
 `;
 
 const Loader = styled.div`
@@ -250,9 +263,8 @@ export default function VenueReviewListPage() {
   const hasItems = items.length > 0;
 
   return (
-    <Page>
+    <PageWrapper>
       <Header title={title} />
-      <HeaderSpacer />
 
       <ActionRow>
         <WriteButton onClick={goWrite} disabled={!isLoggedIn}>
@@ -260,26 +272,27 @@ export default function VenueReviewListPage() {
         </WriteButton>
       </ActionRow>
 
-      {initialLoading && <Loader>불러오는 중…</Loader>}
+      <ScrollableList>
+        {initialLoading && <Loader>불러오는 중…</Loader>}
+        {!initialLoading && !hasItems && <EmptyMessage>아직 등록된 리뷰가 없습니다.</EmptyMessage>}
 
-      {!initialLoading && !hasItems && <Empty>아직 등록된 리뷰가 없습니다.</Empty>}
+        <List>
+          {items.map((r) => (
+            <ReviewCard
+              key={r.id} // ✅ id만 사용 → 중복 key 제거
+              review={r}
+              variant="full"
+              isLoggedIn={isLoggedIn}
+              isOwner={r.user?.id && currentUserId && r.user.id === currentUserId}
+              onToggleLike={handleToggleLike}
+              onDelete={handleDelete}
+            />
+          ))}
+        </List>
 
-      <List>
-        {items.map((r) => (
-          <ReviewCard
-            key={r.id} // ✅ id만 사용 → 중복 key 제거
-            review={r}
-            variant="full"
-            isLoggedIn={isLoggedIn}
-            isOwner={r.user?.id && currentUserId && r.user.id === currentUserId}
-            onToggleLike={handleToggleLike}
-            onDelete={handleDelete}
-          />
-        ))}
-      </List>
-
-      {hasMore && <Loader ref={sentinelRef}>더 불러오는 중…</Loader>}
-      {!hasMore && hasItems && <Loader>마지막 리뷰입니다.</Loader>}
-    </Page>
+        {hasMore && <Loader ref={sentinelRef}>더 불러오는 중…</Loader>}
+        {!hasMore && hasItems && <Loader>마지막 리뷰입니다.</Loader>}
+      </ScrollableList>
+    </PageWrapper>
   );
 }
