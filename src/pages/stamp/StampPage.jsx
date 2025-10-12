@@ -140,123 +140,122 @@ export default function StampPage() {
       <Header title="스탬프" />
       <div style={{ height: "16px" }} />
 
-       <main className="app-scroll">
+      <MainContent className="app-scroll">
+        <FilterBar>
+          <FilterGroup>
+            <FilterButtonNone onClick={() => setIsPeriodModalOpen(true)}>
+              기간 설정
+            </FilterButtonNone>
+          </FilterGroup>
+        </FilterBar>
 
-      <FilterBar>
-        <FilterGroup>
-          <FilterButtonNone onClick={() => setIsPeriodModalOpen(true)}>
-            기간 설정
-          </FilterButtonNone>
-        </FilterGroup>
-      </FilterBar>
+        {/* ✅ 메인 스탬프판 */}
+        <StampBoard>
+          <ScrollableList>
+            {collectedStamps.length > 0 ? (
+              <StampPageContainer>
+                {(() => {
+                  const rows = [];
+                  const sorted = collectedStamps
+                    .slice()
+                    .sort((a, b) => new Date(b.date) - new Date(a.date));
+                  
+                  for (let i = 0; i < sorted.length; i += 3) {
+                    const slice = sorted.slice(i, i + 3);
+                    while (slice.length < 3) slice.push(null);
+                    rows.push(slice);
+                  }
+                  
+                  return rows.map((rowItems, rowIndex) => (
+                    <StampRow key={rowIndex}>
+                      {rowItems.map((stamp, colIndex) => (
+                        <StampItemWrapper key={colIndex}>
+                          {stamp && (
+                            <StampItem onClick={() => setSelectedStampDetail(stamp)}>
+                              <StampImage src={stamp.venueImageUrl} alt={stamp.place} />
+                              <StampDate>{stamp.date}</StampDate>
+                            </StampItem>
+                          )}
+                        </StampItemWrapper>
+                      ))}
+                    </StampRow>
+                  ));
+                })()}
+              </StampPageContainer>
+            ) : (
+              <EmptyMessage>받은 스탬프가 없습니다.</EmptyMessage>
+            )}
+          </ScrollableList>
+        </StampBoard>
 
-      {/* ✅ 메인 스탬프판 */}
-      <StampBoard>
-        <ScrollableList>
-          {collectedStamps.length > 0 ? (
-            <StampPageContainer>
-              {(() => {
-                const rows = [];
-                const sorted = collectedStamps
-                  .slice()
-                  .sort((a, b) => new Date(b.date) - new Date(a.date));
-                
-                for (let i = 0; i < sorted.length; i += 3) {
-                  const slice = sorted.slice(i, i + 3);
-                  while (slice.length < 3) slice.push(null);
-                  rows.push(slice);
-                }
-                
-                return rows.map((rowItems, rowIndex) => (
-                  <StampRow key={rowIndex}>
-                    {rowItems.map((stamp, colIndex) => (
-                      <StampItemWrapper key={colIndex}>
-                        {stamp && (
-                          <StampItem onClick={() => setSelectedStampDetail(stamp)}>
-                            <StampImage src={stamp.venueImageUrl} alt={stamp.place} />
-                            <StampDate>{stamp.date}</StampDate>
-                          </StampItem>
-                        )}
-                      </StampItemWrapper>
-                    ))}
-                  </StampRow>
-                ));
-              })()}
-            </StampPageContainer>
-          ) : (
-            <EmptyMessage>받은 스탬프가 없습니다.</EmptyMessage>
-          )}
-        </ScrollableList>
-      </StampBoard>
+        <StampButton onClick={() => setIsStampPopupOpen(true)}>
+          <img
+            src={StampButtonIcon}
+            alt="스탬프 찍기"
+            style={{ transform: 'rotate(20deg)', marginLeft: '2px', marginBottom: '4px' }}
+          />
+        </StampButton>
 
-      <StampButton onClick={() => setIsStampPopupOpen(true)}>
-        <img
-          src={StampButtonIcon}
-          alt="스탬프 찍기"
-          style={{ transform: 'rotate(20deg)', marginLeft: '2px', marginBottom: '4px' }}
-        />
-      </StampButton>
+        {/* ✅ 스탬프 팝업 */}
+        {isStampPopupOpen && (
+          <StampPopup
+            onClose={() => setIsStampPopupOpen(false)}
+            stamps={availableStamps}
+            onStampSelect={(stamp) => {
+              if (stamp.is_collected) {
+                setIsStampSmall2Open(true);
+              } else {
+                setSelectedStamp(stamp);
+                setIsConfirmPopupOpen(true);
+              }
+            }}
+          />
+        )}
 
-      {/* ✅ 스탬프 팝업 */}
-      {isStampPopupOpen && (
-        <StampPopup
-          onClose={() => setIsStampPopupOpen(false)}
-          stamps={availableStamps}
-          onStampSelect={(stamp) => {
-            if (stamp.is_collected) {
-              setIsStampSmall2Open(true);
-            } else {
-              setSelectedStamp(stamp);
-              setIsConfirmPopupOpen(true);
-            }
-          }}
-        />
-      )}
+        {/* ✅ 수집 확인 팝업 */}
+        {isConfirmPopupOpen && (
+          <StampPopupSmall
+            onConfirm={() => handleStampCollect(selectedStamp)}
+            onCancel={() => setIsConfirmPopupOpen(false)}
+          />
+        )}
 
-      {/* ✅ 수집 확인 팝업 */}
-      {isConfirmPopupOpen && (
-        <StampPopupSmall
-          onConfirm={() => handleStampCollect(selectedStamp)}
-          onCancel={() => setIsConfirmPopupOpen(false)}
-        />
-      )}
+        {/* ✅ 이미 수집된 스탬프 팝업 */}
+        {isStampSmall2Open && (
+          <StampPopupSmall2 onClose={() => setIsStampSmall2Open(false)} />
+        )}
 
-      {/* ✅ 이미 수집된 스탬프 팝업 */}
-      {isStampSmall2Open && (
-        <StampPopupSmall2 onClose={() => setIsStampSmall2Open(false)} />
-      )}
+        {/* ✅ 스탬프 상세 팝업 */}
+        {selectedStampDetail && (
+          <StampDetailPopup
+            concert={selectedStampDetail}
+            onClose={() => setSelectedStampDetail(null)}
+            onPosterClick={(pid) => {
+              if (!pid) return;
+              setSelectedStampDetail(null);         // 팝업 닫고
+              navigate(`/performance/${pid}`);      // 상세로 이동
+            }}
+          />
+        )}
 
-      {/* ✅ 스탬프 상세 팝업 */}
-      {selectedStampDetail && (
-        <StampDetailPopup
-          concert={selectedStampDetail}
-          onClose={() => setSelectedStampDetail(null)}
-          onPosterClick={(pid) => {
-             if (!pid) return;
-             setSelectedStampDetail(null);         // 팝업 닫고
-             navigate(`/performance/${pid}`);      // 상세로 이동
-          }}
-        />
-      )}
-
-      {/* ✅ 기간 설정 모달 */}
-      {isPeriodModalOpen && (
-        <PeriodModal
-          startYear={startYear}
-          startMonth={startMonth}
-          endYear={endYear}
-          endMonth={endMonth}
-          onChange={({ startYear, startMonth, endYear, endMonth }) => {
-            setStartYear(startYear);
-            setStartMonth(startMonth);
-            setEndYear(endYear);
-            setEndMonth(endMonth);
-          }}
-          onClose={() => setIsPeriodModalOpen(false)}
-        />
-      )}
-      {!isLoggedIn && <StampLogin />}
-      </main>
+        {/* ✅ 기간 설정 모달 */}
+        {isPeriodModalOpen && (
+          <PeriodModal
+            startYear={startYear}
+            startMonth={startMonth}
+            endYear={endYear}
+            endMonth={endMonth}
+            onChange={({ startYear, startMonth, endYear, endMonth }) => {
+              setStartYear(startYear);
+              setStartMonth(startMonth);
+              setEndYear(endYear);
+              setEndMonth(endMonth);
+            }}
+            onClose={() => setIsPeriodModalOpen(false)}
+          />
+        )}
+        {!isLoggedIn && <StampLogin />}
+      </MainContent>
     </PageWrapper>
 
     {isPeriodModalOpen && (
@@ -274,7 +273,6 @@ export default function StampPage() {
         onClose={() => setIsPeriodModalOpen(false)}
       />
     )}
-    
     {!isLoggedIn && <StampLogin />}
   </>
   );
@@ -285,6 +283,7 @@ const FilterBar = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 16px 0;
+  flex-shrink: 0;
 `;
 
 const FilterGroup = styled.div`
@@ -333,7 +332,7 @@ const StampBoard = styled.div`
   width: 100%;
   position: relative;
   padding: 0 0 108px 0;
-  overflow-x: hidden;
+  overflow: hidden;
   touch-action: pan-y;
   box-sizing: border-box;
   
@@ -411,6 +410,14 @@ const ScrollableList = styled.div`
 
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
+`;
+
+const MainContent = styled.main`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
 `;
 
 const EmptyMessage = styled.div`
