@@ -51,6 +51,7 @@ const DeleteBtn = styled.button`
 
 const ThumbRow = styled.div`
   display: flex;
+  padding-right: 32px; 
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 2px;
