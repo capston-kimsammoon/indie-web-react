@@ -16,7 +16,7 @@ const PageWrapper = styled.div`
 `;
 
 const ScrollableList = styled.div`
-  flex: 1;
+  flex-grow: 1;
   overflow-y: auto;
   padding-bottom: 109px;
   box-sizing: border-box;
@@ -72,11 +72,13 @@ const EmptyMessage = styled.div`
 `;
 
 const Loader = styled.div`
-  padding: 16px var(--side);
-  text-align: center;
-  color: ${({ theme }) => theme.colors?.darkGray || '#666'};
-  font-size: ${({ theme }) => theme.fontSizes?.sm || '14px'};
-  box-sizing: border-box;
+  padding: 16px 16px;
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
+  color: ${({ theme }) => theme.colors.darkGray};
+  display: flex;
+  justify-content: center; 
+  align-items: center;  
 `;
 
 export default function VenueReviewListPage() {
