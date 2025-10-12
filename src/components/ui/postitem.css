@@ -8,6 +8,7 @@
   cursor: pointer;
   box-sizing: border-box;
   box-shadow: none !important;
+  border-bottom: 1px solid #E4E4E4;
 }
 
 .post-text {
@@ -22,7 +23,7 @@
 .post-text > div:first-child {
   font-size: 16px;
   font-weight: 500;
-  color: #1c1c1e;
+  color: #2F2F2F;
   margin-right: 40px;
   margin-bottom: 8px;
   overflow: hidden;
