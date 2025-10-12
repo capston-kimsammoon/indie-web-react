@@ -329,6 +329,7 @@ const StampButton = styled.button`
 `;
 
 const StampBoard = styled.div`
+  flex: 1;
   width: 100%;
   position: relative;
   padding: 0 0 108px 0;
@@ -397,7 +398,7 @@ const StampDate = styled.div`
 `;
 
 const ScrollableList = styled.div`
-  flex-grow: 1;
+  height: 100%;
   overflow-y: auto;
   box-sizing: border-box;  
 
