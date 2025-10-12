@@ -39,6 +39,7 @@ const ActionRow = styled.div`
 
 const WriteButton = styled.button`
   padding: 6px 12px;
+  margin-top: 13px;
   border-radius: 8px;
   font-size: 14px;
   border: none;
