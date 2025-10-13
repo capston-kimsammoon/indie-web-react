@@ -1,5 +1,4 @@
-// src/pages/favorite/FavoritePage.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import Header from '../../components/layout/Header';
 import PerformanceListCard from '../../components/performance/PerformanceListCard';
@@ -16,68 +15,137 @@ import {
 } from '../../api/likeApi';
 
 export default function FavoritePage() {
-  const [selectedTab, setSelectedTab] = useState('performance'); // 'performance' | 'artist'
-
-  // 공연/아티스트 각각 응답 배열로 상태 분리
-  const [perfList, setPerfList] = useState([]);
-  const [perfPageInfo, setPerfPageInfo] = useState({ page: 1, totalPages: 1 });
-
-  const [artistList, setArtistList] = useState([]);
-  const [artistPageInfo, setArtistPageInfo] = useState({
-    page: 1,
-    totalPages: 1,
-  });
-
+  const [selectedTab, setSelectedTab] = useState('performance');
   const authToken = localStorage.getItem('accessToken');
 
-  // 찜한 공연 목록
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetchLikedPerformances(1, 20, authToken);
-        setPerfList(res.performances ?? []);
-        setPerfPageInfo({
-          page: res.page ?? 1,
-          totalPages: res.totalPages ?? 1,
-        });
-      } catch (e) {
-        console.error('📛 찜 공연 로딩 실패:', e);
-      }
-    };
-    load();
-  }, [authToken]);
+  // 공연 상태
+  const [perfList, setPerfList] = useState([]);
+  const [perfPage, setPerfPage] = useState(1);
+  const [perfHasMore, setPerfHasMore] = useState(true);
+  const [perfLoading, setPerfLoading] = useState(false);
+  const perfSentinelRef = useRef(null);
 
-  // 찜한 아티스트 목록
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetchLikedArtists({ page: 1, size: 20, authToken });
-        setArtistList(res.artists ?? []);
-        setArtistPageInfo({
-          page: res.page ?? 1,
-          totalPages: res.totalPages ?? 1,
-        });
-      } catch (e) {
-        console.error('📛 찜 아티스트 로딩 실패:', e);
+  // 아티스트 상태
+  const [artistList, setArtistList] = useState([]);
+  const [artistPage, setArtistPage] = useState(1);
+  const [artistHasMore, setArtistHasMore] = useState(true);
+  const [artistLoading, setArtistLoading] = useState(false);
+  const artistSentinelRef = useRef(null);
+
+  const size = 20;
+
+  // 공연 로드
+  const loadPerformances = useCallback(async (pageNum) => {
+    if (perfLoading) return;
+    setPerfLoading(true);
+    try {
+      const res = await fetchLikedPerformances(pageNum, size, authToken);
+      const newPerfs = res.performances ?? [];
+
+      if (pageNum === 1) {
+        setPerfList(newPerfs);
+      } else {
+        setPerfList(prev => [...prev, ...newPerfs]);
       }
-    };
-    load();
-  }, [authToken]);
+
+      setPerfPage(pageNum + 1);
+      setPerfHasMore(newPerfs.length >= size);
+    } catch (e) {
+      console.error('공연 로딩 실패:', e);
+      if (pageNum === 1) {
+        setPerfList([]);
+      }
+    } finally {
+      setPerfLoading(false);
+    }
+  }, [authToken, perfLoading, size]);
+
+  // 아티스트 로드
+  const loadArtists = useCallback(async (pageNum) => {
+    if (artistLoading) return;
+    setArtistLoading(true);
+    try {
+      const res = await fetchLikedArtists({ page: pageNum, size, authToken });
+      const newArtists = res.artists ?? [];
+
+      if (pageNum === 1) {
+        setArtistList(newArtists);
+      } else {
+        setArtistList(prev => [...prev, ...newArtists]);
+      }
+
+      setArtistPage(pageNum + 1);
+      setArtistHasMore(newArtists.length >= size);
+    } catch (e) {
+      console.error('아티스트 로딩 실패:', e);
+      if (pageNum === 1) {
+        setArtistList([]);
+      }
+    } finally {
+      setArtistLoading(false);
+    }
+  }, [authToken, artistLoading, size]);
+
+  // 초기 로드
+  useEffect(() => {
+    setPerfPage(1);
+    setPerfHasMore(true);
+    loadPerformances(1);
+  }, []);
+
+  useEffect(() => {
+    setArtistPage(1);
+    setArtistHasMore(true);
+    loadArtists(1);
+  }, []);
+
+  // 공연 무한 스크롤
+  useEffect(() => {
+    const el = perfSentinelRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && perfHasMore && !perfLoading) {
+          loadPerformances(perfPage);
+        }
+      },
+      { rootMargin: '200px 0px' }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [perfPage, perfHasMore, perfLoading, loadPerformances]);
+
+  // 아티스트 무한 스크롤
+  useEffect(() => {
+    const el = artistSentinelRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && artistHasMore && !artistLoading) {
+          loadArtists(artistPage);
+        }
+      },
+      { rootMargin: '200px 0px' }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [artistPage, artistHasMore, artistLoading, loadArtists]);
 
   // 공연 찜 토글
   const togglePerformanceLike = async (id, isLiked) => {
     try {
       if (isLiked) {
         await unlikePerformance(id, authToken);
-        setPerfList((prev) => prev.filter((p) => p.id !== id)); // 언라이크 → 목록 제거
+        setPerfList((prev) => prev.filter((p) => p.id !== id));
       } else {
         await likePerformance(id, authToken);
-        // 필요 시 재조회
-        // const res = await fetchLikedPerformances(perfPageInfo.page, 20, authToken);
-        // setPerfList(res.performances ?? []);
       }
     } catch (e) {
-      console.error('📛 공연 찜 토글 실패:', e);
+      console.error('공연 찜 토글 실패:', e);
     }
   };
 
@@ -86,30 +154,26 @@ export default function FavoritePage() {
     try {
       if (isLiked) {
         await unlikeArtist(id, authToken);
-        setArtistList((prev) => prev.filter((a) => a.id !== id)); // 언라이크 → 목록 제거
+        setArtistList((prev) => prev.filter((a) => a.id !== id));
       } else {
         await likeArtist(id, authToken);
-        // 필요 시 재조회
-        // const res = await fetchLikedArtists({ page: artistPageInfo.page, size: 20, authToken });
-        // setArtistList(res.artists ?? []);
       }
     } catch (e) {
-      console.error('📛 아티스트 찜 토글 실패:', e);
+      console.error('아티스트 찜 토글 실패:', e);
     }
   };
 
-  // 아티스트 알림 토글 (POST/DELETE /alert)
+  // 아티스트 알림 토글
   const toggleArtistAlarm = async (id, enabled) => {
     try {
       if (enabled) await cancelArtistAlert(id, authToken);
       else await registerArtistAlert(id, authToken);
 
-      // 낙관적 업데이트
       setArtistList((prev) =>
         prev.map((a) => (a.id === id ? { ...a, isAlarmEnabled: !enabled } : a))
       );
     } catch (e) {
-      console.error('📛 아티스트 알림 토글 실패:', e);
+      console.error('아티스트 알림 토글 실패:', e);
     }
   };
 
@@ -136,46 +200,52 @@ export default function FavoritePage() {
           {selectedTab === 'performance' && (
             <div style={{ paddingTop: '16px' }}>
               {perfList.length ? (
-                perfList.map((performance) => (
-                  <PerformanceListCard
-                    key={performance.id}
-                    performance={performance}
-                    onToggleLike={(id) =>
-                      togglePerformanceLike(id, performance.isLiked ?? true)
-                    }
-                  />
-                ))
+                <>
+                  {perfList.map((performance) => (
+                    <PerformanceListCard
+                      key={performance.id}
+                      performance={performance}
+                      onToggleLike={(id) =>
+                        togglePerformanceLike(id, performance.isLiked ?? true)
+                      }
+                    />
+                  ))}
+                  {perfHasMore && <Loader ref={perfSentinelRef}>더 불러오는 중...</Loader>}
+                  {!perfHasMore && <EndMessage>마지막 공연입니다.</EndMessage>}
+                </>
               ) : (
                 <Empty>찜한 공연이 없습니다.</Empty>
               )}
             </div>
           )}
 
-          {selectedTab === 'artist' &&
-            (artistList.length ? (
-              artistList.map((artist) => (
-                <ArtistListCard
-                  key={artist.id}
-                  artist={artist}
-                  onToggleLike={(id) =>
-                    toggleArtistLike(id, artist.isLiked ?? true)
-                  }
-                  onToggleAlarm={(id, enabled) => toggleArtistAlarm(id, enabled)}
-                />
-              ))
-            ) : (
-              <Empty>찜한 아티스트가 없습니다.</Empty>
-            ))}
+          {selectedTab === 'artist' && (
+            <>
+              {artistList.length ? (
+                <>
+                  {artistList.map((artist) => (
+                    <ArtistListCard
+                      key={artist.id}
+                      artist={artist}
+                      onToggleLike={(id) =>
+                        toggleArtistLike(id, artist.isLiked ?? true)
+                      }
+                      onToggleAlarm={(id, enabled) => toggleArtistAlarm(id, enabled)}
+                    />
+                  ))}
+                  {artistHasMore && <Loader ref={artistSentinelRef}>더 불러오는 중...</Loader>}
+                  {!artistHasMore && <EndMessage>마지막 아티스트입니다.</EndMessage>}
+                </>
+              ) : (
+                <Empty>찜한 아티스트가 없습니다.</Empty>
+              )}
+            </>
+          )}
         </List>
       </ScrollableList>
     </PageWrapper>
   );
 }
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
 
 const TabRow = styled.div`
   display: flex;
@@ -210,7 +280,8 @@ const Empty = styled.div`
   color: ${({ theme }) => theme.colors.darkGray};
   display: flex;
   justify-content: center; 
-  align-items: center;    
+  align-items: center;
+  margin-top: 32px;    
 `;
 
 const PageWrapper = styled.div`
@@ -234,4 +305,18 @@ const ScrollableList = styled.div`
 
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
+`;
+
+const Loader = styled.div`
+  padding: 16px 0;
+  text-align: center;
+  color: ${({ theme }) => theme.colors?.darkGray || '#666'};
+  font-size: ${({ theme }) => theme.fontSizes?.sm || '14px'};
+`;
+
+const EndMessage = styled.div`
+  padding: 16px 0;
+  text-align: center;
+  color: ${({ theme }) => theme.colors?.darkGray || '#666'};
+  font-size: ${({ theme }) => theme.fontSizes?.sm || '14px'};
 `;
