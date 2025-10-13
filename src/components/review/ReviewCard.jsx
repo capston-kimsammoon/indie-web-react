@@ -363,7 +363,7 @@ export default function ReviewCard({
 
       {/* 1) 이미지(가로) */}
       {images?.length > 0 && (
-        <ThumbRow>
+        <ThumbRow hasPadding={canDelete}>
           {images.slice(0, 3).map((img, idx) => {
             const url = getImgUrl(img);
             return (
@@ -386,7 +386,7 @@ export default function ReviewCard({
       )}
 
       {/* 2) 본문 */}
-      <BodyText variant={variant}>{content}</BodyText>
+      <BodyText variant={variant} hasPadding={canDelete}>{content}</BodyText>
 
       {/* 3) 메타 (날짜 닉네임 옆에 공연장칩) */}
       <MetaBar>
