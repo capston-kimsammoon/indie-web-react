@@ -36,7 +36,6 @@ export default function FavoritePage() {
 
   // 공연 로드
   const loadPerformances = useCallback(async (pageNum) => {
-    if (perfLoading) return;
     setPerfLoading(true);
     try {
       const res = await fetchLikedPerformances(pageNum, size, authToken);
@@ -58,11 +57,10 @@ export default function FavoritePage() {
     } finally {
       setPerfLoading(false);
     }
-  }, [authToken, perfLoading, size]);
+  }, [authToken, size]);
 
   // 아티스트 로드
   const loadArtists = useCallback(async (pageNum) => {
-    if (artistLoading) return;
     setArtistLoading(true);
     try {
       const res = await fetchLikedArtists({ page: pageNum, size, authToken });
@@ -84,29 +82,29 @@ export default function FavoritePage() {
     } finally {
       setArtistLoading(false);
     }
-  }, [authToken, artistLoading, size]);
+  }, [authToken, size]);
 
   // 초기 로드
   useEffect(() => {
     setPerfPage(1);
     setPerfHasMore(true);
     loadPerformances(1);
-  }, []);
+  }, [loadPerformances]);
 
   useEffect(() => {
     setArtistPage(1);
     setArtistHasMore(true);
     loadArtists(1);
-  }, []);
+  }, [loadArtists]);
 
   // 공연 무한 스크롤
   useEffect(() => {
     const el = perfSentinelRef.current;
-    if (!el) return;
+    if (!el || perfLoading || !perfHasMore) return;
 
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting && perfHasMore && !perfLoading) {
+        if (entries[0].isIntersecting) {
           loadPerformances(perfPage);
         }
       },
@@ -120,11 +118,11 @@ export default function FavoritePage() {
   // 아티스트 무한 스크롤
   useEffect(() => {
     const el = artistSentinelRef.current;
-    if (!el) return;
+    if (!el || artistLoading || !artistHasMore) return;
 
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting && artistHasMore && !artistLoading) {
+        if (entries[0].isIntersecting) {
           loadArtists(artistPage);
         }
       },
@@ -198,7 +196,7 @@ export default function FavoritePage() {
       </TabRow>
     
       <ScrollableList>
-        <FavoriteSection>
+        <FavoriteSection padded={selectedTab === 'performance'}>
           {selectedTab === 'performance' ? (
             perfList.length ? (
               <>
@@ -212,7 +210,7 @@ export default function FavoritePage() {
                   />
                 ))}
                 {perfHasMore && <Loader ref={perfSentinelRef}>더 불러오는 중...</Loader>}
-                {!perfHasMore && <EndMessage>마지막 공연입니다.</EndMessage>}
+                {!perfHasMore && <EndMessage negativeMargin>마지막 공연입니다.</EndMessage>}
               </>
             ) : (
               <Empty>찜한 공연이 없습니다.</Empty>
@@ -249,6 +247,7 @@ const TabRow = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineGray};
   min-height: 32px;
   max-height: 32px;
+  margin-bottom: 12px;
 `;
 
 const TabButton = styled.button`
@@ -295,15 +294,15 @@ const SectionInner = styled.div`
 const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100vh;  /* 전체 화면 채우기 */
-  height: 100dvh; /* 모바일 대응 */
-  overflow: hidden; /* 스크롤 영역은 아래에서만 */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 `;
 
 const ScrollableList = styled.div`
-  flex: 1; /* Header와 Tab을 제외한 나머지 영역 모두 차지 */
+  flex: 1; 
   overflow-y: auto;
-  padding-bottom: 109px; /* 하단바 여백 */
+  padding-bottom: 109px;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
 
@@ -315,8 +314,7 @@ const ScrollableList = styled.div`
 const FavoriteSection = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 100%; /* 내용이 적을 때도 영역 안정화 */
-  padding-top: 16px; /* 탭 아래 여백 */
+  padding-top: ${({ padded }) => (padded ? '16px' : '0')};
 `;
 
 const Loader = styled.div`
@@ -327,7 +325,8 @@ const Loader = styled.div`
 `;
 
 const EndMessage = styled.div`
-  padding: ${({ noTopPadding }) => (noTopPadding ? '0 0 16px 0' : '16px 0')};
+  padding: 16px 0;
+  margin-top: ${({ negativeMargin }) => (negativeMargin ? '-16px' : '0')};
   text-align: center;
   color: ${({ theme }) => theme.colors?.darkGray || '#666'};
   font-size: ${({ theme }) => theme.fontSizes?.sm || '14px'};
