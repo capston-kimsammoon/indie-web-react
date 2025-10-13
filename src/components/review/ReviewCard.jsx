@@ -388,7 +388,7 @@ export default function ReviewCard({
       {/* 2) 본문 */}
       <BodyText variant={variant}>{content}</BodyText>
 
-      {/* 3) 메타 (닉네임 옆에 공연장칩 → 날짜) */}
+      {/* 3) 메타 (날짜 닉네임 옆에 공연장칩) */}
       <MetaBar>
         <TopRow>
           <MetaDate dateTime={created ?? undefined}>{dateText}</MetaDate>
