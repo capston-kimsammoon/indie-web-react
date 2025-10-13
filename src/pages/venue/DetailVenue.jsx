@@ -495,6 +495,7 @@ const DetailVenue = () => {
                         variant="venueDetail"   
                         isLoggedIn={false}    
                         isOwner={false}
+                        hideImages={true}
                       />
                     </ReviewCardWrapper>
                   ))}
