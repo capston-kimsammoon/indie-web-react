@@ -18,6 +18,40 @@ function ListVenue() {
   const size = 20;
   const sentinelRef = useRef(null);
 
+  // ✅ 상태 복원
+  useEffect(() => {
+    const saved = sessionStorage.getItem('venueListState');
+    if (saved) {
+      const { scrollY, selectedRegions, venues, page } = JSON.parse(saved);
+      setSelectedRegions(selectedRegions || ['전체']);
+      setVenues(venues || []);
+      setPage(page || 1);
+
+      // 스크롤 복원 (렌더 이후)
+      setTimeout(() => {
+        window.scrollTo(0, scrollY || 0);
+      }, 0);
+    } else {
+      // 저장된 상태가 없을 때만 새로 로드
+      loadVenues(1);
+    }
+  }, []);
+
+  // ✅ 언마운트 시 상태 저장
+  useEffect(() => {
+    return () => {
+      sessionStorage.setItem(
+        'venueListState',
+        JSON.stringify({
+          scrollY: window.scrollY,
+          selectedRegions,
+          venues,
+          page,
+        })
+      );
+    };
+  }, [selectedRegions, venues, page]);
+
   // API 호출 함수
   const loadVenues = useCallback(async (pageNum) => {
     if (loading) return;
