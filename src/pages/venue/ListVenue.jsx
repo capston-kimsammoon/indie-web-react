@@ -37,6 +37,20 @@ function ListVenue() {
     }
   }, []);
 
+  // ✅ 스크롤 복원용 useEffect (리스트 로드 완료 후 실행)
+  useEffect(() => {
+    const saved = sessionStorage.getItem('venueListState');
+    if (!saved) return;
+    const { scrollY } = JSON.parse(saved);
+  
+    // venues가 실제로 렌더링된 후 복원
+    if (venues.length > 0) {
+      setTimeout(() => {
+        window.scrollTo(0, scrollY || 0);
+      }, 50); // 살짝 지연 (렌더 타이밍 맞추기)
+    }
+  }, [venues]);
+
   // ✅ 언마운트 시 상태 저장
   useEffect(() => {
     return () => {
