@@ -100,7 +100,7 @@ export default function FavoritePage() {
   // 공연 무한 스크롤
   useEffect(() => {
     const el = perfSentinelRef.current;
-    if (!el || perfLoading || !perfHasMore) return;
+    if (!el || perfLoading) return;
 
     const observer = new IntersectionObserver(
       entries => {
@@ -118,7 +118,7 @@ export default function FavoritePage() {
   // 아티스트 무한 스크롤
   useEffect(() => {
     const el = artistSentinelRef.current;
-    if (!el || artistLoading || !artistHasMore) return;
+    if (!el || artistLoading) return;
 
     const observer = new IntersectionObserver(
       entries => {
@@ -242,12 +242,12 @@ export default function FavoritePage() {
 }
 
 const TabRow = styled.div`
+  padding-bottom: 12px;
   display: flex;
   justify-content: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineGray};
   min-height: 32px;
   max-height: 32px;
-  margin-bottom: 12px;
 `;
 
 const TabButton = styled.button`
