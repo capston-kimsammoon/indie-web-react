@@ -196,9 +196,9 @@ export default function FavoritePage() {
       </TabRow>
 
       <ScrollableList>
-        <List padded={selectedTab === 'performance'}>
-          {selectedTab === 'performance' && (
-            <>
+        {selectedTab === 'performance' && (
+          <FavoriteSection>
+            <SectionInner>
               {perfList.length ? (
                 <>
                   {perfList.map((performance) => (
@@ -210,17 +210,23 @@ export default function FavoritePage() {
                       }
                     />
                   ))}
-                  {perfHasMore && <Loader ref={perfSentinelRef}>더 불러오는 중...</Loader>}
-                  {!perfHasMore && <EndMessage noTopPadding>마지막 공연입니다.</EndMessage>}
+                  {perfHasMore && (
+                    <Loader ref={perfSentinelRef}>더 불러오는 중...</Loader>
+                  )}
+                  {!perfHasMore && (
+                    <EndMessage noTopPadding>마지막 공연입니다.</EndMessage>
+                  )}
                 </>
               ) : (
                 <Empty>찜한 공연이 없습니다.</Empty>
               )}
-            </>
-          )}
-
-          {selectedTab === 'artist' && (
-            <>
+            </SectionInner>
+          </FavoriteSection>
+        )}
+      
+        {selectedTab === 'artist' && (
+          <FavoriteSection>
+            <SectionInner>
               {artistList.length ? (
                 <>
                   {artistList.map((artist) => (
@@ -230,18 +236,24 @@ export default function FavoritePage() {
                       onToggleLike={(id) =>
                         toggleArtistLike(id, artist.isLiked ?? true)
                       }
-                      onToggleAlarm={(id, enabled) => toggleArtistAlarm(id, enabled)}
+                      onToggleAlarm={(id, enabled) =>
+                        toggleArtistAlarm(id, enabled)
+                      }
                     />
                   ))}
-                  {artistHasMore && <Loader ref={artistSentinelRef}>더 불러오는 중...</Loader>}
-                  {!artistHasMore && <EndMessage>마지막 아티스트입니다.</EndMessage>}
+                  {artistHasMore && (
+                    <Loader ref={artistSentinelRef}>더 불러오는 중...</Loader>
+                  )}
+                  {!artistHasMore && (
+                    <EndMessage>마지막 아티스트입니다.</EndMessage>
+                  )}
                 </>
               ) : (
                 <Empty>찜한 아티스트가 없습니다.</Empty>
               )}
-            </>
-          )}
-        </List>
+            </SectionInner>
+          </FavoriteSection>
+        )}
       </ScrollableList>
     </PageWrapper>
   );
@@ -285,6 +297,21 @@ const Empty = styled.div`
   justify-content: center; 
   align-items: center;
   margin-top: 32px;    
+`;
+
+const FavoriteSection = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
+const SectionInner = styled.div`
+  padding-top: 16px;
+  margin-bottom: 24px;
+
+  h3 {
+    margin-bottom: 8px;
+  }
 `;
 
 const PageWrapper = styled.div`
