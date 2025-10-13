@@ -35,76 +35,80 @@ export default function FavoritePage() {
   const size = 30;
 
   // 공연 로드
-  const loadPerformances = useCallback(async (pageNum) => {
-    setPerfLoading(true);
-    try {
-      const res = await fetchLikedPerformances(pageNum, size, authToken);
-      const newPerfs = res.performances ?? [];
+  const loadPerformances = useCallback(
+    async (pageNum) => {
+      if (perfLoading) return;
+      setPerfLoading(true);
+      try {
+        const res = await fetchLikedPerformances(pageNum, size, authToken);
+        const newPerfs = res.performances ?? [];
 
-      if (pageNum === 1) {
-        setPerfList(newPerfs);
-      } else {
-        setPerfList(prev => [...prev, ...newPerfs]);
-      }
+        if (pageNum === 1) {
+          setPerfList(newPerfs);
+        } else {
+          setPerfList((prev) => [...prev, ...newPerfs]);
+        }
 
-      setPerfPage(pageNum + 1);
-      setPerfHasMore(newPerfs.length >= size);
-    } catch (e) {
-      console.error('공연 로딩 실패:', e);
-      if (pageNum === 1) {
-        setPerfList([]);
+        setPerfPage(pageNum + 1);
+        setPerfHasMore(newPerfs.length >= size);
+      } catch (e) {
+        console.error('공연 로딩 실패:', e);
+        if (pageNum === 1) setPerfList([]);
+      } finally {
+        setPerfLoading(false);
       }
-    } finally {
-      setPerfLoading(false);
-    }
-  }, [authToken, size]);
+    },
+    [authToken, perfLoading, size]
+  );
 
   // 아티스트 로드
-  const loadArtists = useCallback(async (pageNum) => {
-    setArtistLoading(true);
-    try {
-      const res = await fetchLikedArtists({ page: pageNum, size, authToken });
-      const newArtists = res.artists ?? [];
+  const loadArtists = useCallback(
+    async (pageNum) => {
+      if (artistLoading) return;
+      setArtistLoading(true);
+      try {
+        const res = await fetchLikedArtists({ page: pageNum, size, authToken });
+        const newArtists = res.artists ?? [];
 
-      if (pageNum === 1) {
-        setArtistList(newArtists);
-      } else {
-        setArtistList(prev => [...prev, ...newArtists]);
-      }
+        if (pageNum === 1) {
+          setArtistList(newArtists);
+        } else {
+          setArtistList((prev) => [...prev, ...newArtists]);
+        }
 
-      setArtistPage(pageNum + 1);
-      setArtistHasMore(newArtists.length >= size);
-    } catch (e) {
-      console.error('아티스트 로딩 실패:', e);
-      if (pageNum === 1) {
-        setArtistList([]);
+        setArtistPage(pageNum + 1);
+        setArtistHasMore(newArtists.length >= size);
+      } catch (e) {
+        console.error('아티스트 로딩 실패:', e);
+        if (pageNum === 1) setArtistList([]);
+      } finally {
+        setArtistLoading(false);
       }
-    } finally {
-      setArtistLoading(false);
-    }
-  }, [authToken, size]);
+    },
+    [authToken, artistLoading, size]
+  );
 
   // 초기 로드
   useEffect(() => {
     setPerfPage(1);
     setPerfHasMore(true);
     loadPerformances(1);
-  }, [loadPerformances]);
+  }, []);
 
   useEffect(() => {
     setArtistPage(1);
     setArtistHasMore(true);
     loadArtists(1);
-  }, [loadArtists]);
+  }, []);
 
   // 공연 무한 스크롤
   useEffect(() => {
     const el = perfSentinelRef.current;
-    if (!el || perfLoading) return;
+    if (!el) return;
 
     const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting) {
+      (entries) => {
+        if (entries[0].isIntersecting && !perfLoading) {
           loadPerformances(perfPage);
         }
       },
@@ -113,16 +117,16 @@ export default function FavoritePage() {
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [perfPage, perfHasMore, perfLoading, loadPerformances]);
+  }, [perfPage, perfLoading, loadPerformances]);
 
   // 아티스트 무한 스크롤
   useEffect(() => {
     const el = artistSentinelRef.current;
-    if (!el || artistLoading) return;
+    if (!el) return;
 
     const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting) {
+      (entries) => {
+        if (entries[0].isIntersecting && !artistLoading) {
           loadArtists(artistPage);
         }
       },
@@ -131,7 +135,7 @@ export default function FavoritePage() {
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [artistPage, artistHasMore, artistLoading, loadArtists]);
+  }, [artistPage, artistLoading, loadArtists]);
 
   // 공연 찜 토글
   const togglePerformanceLike = async (id, isLiked) => {
@@ -179,7 +183,7 @@ export default function FavoritePage() {
     <PageWrapper>
       <Header title="찜 리스트" />
       <div style={{ height: '16px' }} />
-    
+
       <TabRow>
         <TabButton
           active={selectedTab === 'performance'}
@@ -194,9 +198,9 @@ export default function FavoritePage() {
           아티스트
         </TabButton>
       </TabRow>
-    
+
       <ScrollableList>
-        <FavoriteSection padded={selectedTab === 'performance'}>
+        <FavoriteSection>
           {selectedTab === 'performance' ? (
             perfList.length ? (
               <>
@@ -209,8 +213,10 @@ export default function FavoritePage() {
                     }
                   />
                 ))}
-                {perfHasMore && <Loader ref={perfSentinelRef}>더 불러오는 중...</Loader>}
-                {!perfHasMore && <EndMessage negativeMargin>마지막 공연입니다.</EndMessage>}
+                {perfHasMore && (
+                  <Loader ref={perfSentinelRef}>더 불러오는 중...</Loader>
+                )}
+                {!perfHasMore && <EndMessage>마지막 공연입니다.</EndMessage>}
               </>
             ) : (
               <Empty>찜한 공연이 없습니다.</Empty>
@@ -229,8 +235,12 @@ export default function FavoritePage() {
                   }
                 />
               ))}
-              {artistHasMore && <Loader ref={artistSentinelRef}>더 불러오는 중...</Loader>}
-              {!artistHasMore && <EndMessage>마지막 아티스트입니다.</EndMessage>}
+              {artistHasMore && (
+                <Loader ref={artistSentinelRef}>더 불러오는 중...</Loader>
+              )}
+              {!artistHasMore && (
+                <EndMessage>마지막 아티스트입니다.</EndMessage>
+              )}
             </>
           ) : (
             <Empty>찜한 아티스트가 없습니다.</Empty>
@@ -241,13 +251,15 @@ export default function FavoritePage() {
   );
 }
 
+/* ==================== 스타일 ==================== */
+
 const TabRow = styled.div`
-  padding-bottom: 12px;
   display: flex;
   justify-content: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineGray};
   min-height: 32px;
   max-height: 32px;
+  margin-bottom: 12px; /* ✅ 탭 아래 여백 */
 `;
 
 const TabButton = styled.button`
@@ -262,33 +274,7 @@ const TabButton = styled.button`
     active ? `1.5px solid ${theme.colors.themeGreen}` : theme.colors.lightGray};
   background-color: transparent;
   cursor: pointer;
-  font-family: inherit; 
-`;
-
-const List = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding-top: ${({ padded }) => (padded ? '16px' : '0')};
-`;
-
-const Empty = styled.div`
-  padding: 16px 16px;
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  font-weight: ${({ theme }) => theme.fontWeights.medium};
-  color: ${({ theme }) => theme.colors.darkGray};
-  display: flex;
-  justify-content: center; 
-  align-items: center;
-  margin-top: 32px;    
-`;
-
-const SectionInner = styled.div`
-  padding-top: 16px;
-  margin-bottom: 24px;
-
-  h3 {
-    margin-bottom: 8px;
-  }
+  font-family: inherit;
 `;
 
 const PageWrapper = styled.div`
@@ -300,7 +286,7 @@ const PageWrapper = styled.div`
 `;
 
 const ScrollableList = styled.div`
-  flex: 1; 
+  flex: 1;
   overflow-y: auto;
   padding-bottom: 109px;
   overscroll-behavior: none;
@@ -314,7 +300,8 @@ const ScrollableList = styled.div`
 const FavoriteSection = styled.div`
   display: flex;
   flex-direction: column;
-  padding-top: ${({ padded }) => (padded ? '16px' : '0')};
+  min-height: 100%;
+  padding-top: 16px;
 `;
 
 const Loader = styled.div`
@@ -325,9 +312,19 @@ const Loader = styled.div`
 `;
 
 const EndMessage = styled.div`
-  padding: 16px 0;
-  margin-top: ${({ negativeMargin }) => (negativeMargin ? '-16px' : '0')};
+  padding: ${({ noTopPadding }) => (noTopPadding ? '0 0 16px 0' : '16px 0')};
   text-align: center;
   color: ${({ theme }) => theme.colors?.darkGray || '#666'};
   font-size: ${({ theme }) => theme.fontSizes?.sm || '14px'};
+`;
+
+const Empty = styled.div`
+  padding: 16px 16px;
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
+  color: ${({ theme }) => theme.colors.darkGray};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 32px;
 `;
