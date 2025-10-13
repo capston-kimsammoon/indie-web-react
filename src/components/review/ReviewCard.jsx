@@ -275,6 +275,7 @@ export default function ReviewCard({
   isOwner = false,
   onToggleLike,
   onDelete,
+  hideImages = false,
 }) {
   // snake_case, camelCase 모두 지원 + venue 포함
   const {
@@ -362,7 +363,7 @@ export default function ReviewCard({
       )}
 
       {/* 1) 이미지(가로) */}
-      {images?.length > 0 && (
+      {!hideImages && images?.length > 0 && (
         <ThumbRow hasPadding={canDelete}>
           {images.slice(0, 3).map((img, idx) => {
             const url = getImgUrl(img);
