@@ -49,12 +49,15 @@ const DeleteBtn = styled.button`
   flex-shrink: 0;
 `;
 
-const ThumbRow = styled.div`
+const ThumbRow = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'hasPadding',
+})`
   display: flex;
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 2px;
   scrollbar-width: none;
+  max-width: ${({ hasPadding }) => hasPadding ? 'calc(100% - 32px)' : '100%'};
   &::-webkit-scrollbar {
     display: none;
   }
@@ -84,13 +87,14 @@ const MoreBtn = styled.button`
 `;
 
 const BodyText = styled.p.withConfig({
-  shouldForwardProp: (prop) => prop !== 'variant',
+  shouldForwardProp: (prop) => prop !== 'variant' && prop !== 'hasPadding',
 })`
   font-size: 14px;
   color: #2F2F2F;
   line-height: 1.4;
   white-space: pre-wrap;
   margin: 0;
+  padding-right: ${({ hasPadding }) => hasPadding ? '32px' : '0'};
   box-sizing: border-box;
 `;
 
@@ -155,8 +159,8 @@ const VenueName = styled.span`
 `;
 
 const MetaDate = styled.time` 
-  margin-top: -6px;
-  margin-bottom: 6px;
+  margin-top: -4px;
+  margin-bottom: 8px;
   font-size: 12px;
   color: #B0B0B0;
 `;
@@ -348,7 +352,7 @@ export default function ReviewCard({
 
       {/* 1) 이미지(가로) */}
       {images?.length > 0 && (
-        <ThumbRow>
+        <ThumbRow hasPadding={canDelete}>
           {images.slice(0, 3).map((img, idx) => {
             const url = getImgUrl(img);
             return (
@@ -371,7 +375,7 @@ export default function ReviewCard({
       )}
 
       {/* 2) 본문 */}
-      <BodyText variant={variant}>{content}</BodyText>
+      <BodyText variant={variant} hasPadding={canDelete}>{content}</BodyText>
 
       {/* 3) 메타 (닉네임 옆에 공연장칩 → 날짜) */}
       <MetaBar>

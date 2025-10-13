@@ -2,7 +2,7 @@
   list-style: none;
   width: 100%;
   padding: 8px;
-  padding-bottom: 0px;
+  padding-right: 84px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -18,18 +18,17 @@
   justify-content: center;
   min-width: 0;
   margin-right: 8px;
+  max-width: calc(100% - 84px);
 }
 
 .post-text > div:first-child {
   font-size: 16px;
   font-weight: 500;
   color: #2F2F2F;
-  margin-right: 40px;
   margin-bottom: 8px;
   overflow: hidden;
-  -webkit-line-clamp: 2;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: nowrap; 
 }
 
 .post-text > div:nth-child(2) {
