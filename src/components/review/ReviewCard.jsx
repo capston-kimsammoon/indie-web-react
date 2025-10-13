@@ -106,6 +106,7 @@ const BodyText = styled.p.withConfig({
       overflow: hidden;
       text-overflow: ellipsis;
       word-break: break-word;
+      min-height: calc(1.4em * 2);
     `}
 `;
 
