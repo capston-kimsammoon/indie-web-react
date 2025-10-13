@@ -100,11 +100,11 @@ export default function FavoritePage() {
   // 공연 무한 스크롤
   useEffect(() => {
     const el = perfSentinelRef.current;
-    if (!el || perfLoading) return;
+    if (!el) return;
 
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting) {
+        if (entries[0].isIntersecting && perfHasMore && !perfLoading) {
           loadPerformances(perfPage);
         }
       },
@@ -118,11 +118,11 @@ export default function FavoritePage() {
   // 아티스트 무한 스크롤
   useEffect(() => {
     const el = artistSentinelRef.current;
-    if (!el || artistLoading) return;
+    if (!el) return;
 
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting) {
+        if (entries[0].isIntersecting && artistHasMore && !artistLoading) {
           loadArtists(artistPage);
         }
       },
@@ -253,6 +253,7 @@ const TabRow = styled.div`
 const TabButton = styled.button`
   flex: 1;
   padding: 0.75rem 1rem;
+  padding-bottom: 12px;
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ active, theme }) =>
@@ -280,15 +281,6 @@ const Empty = styled.div`
   justify-content: center; 
   align-items: center;
   margin-top: 32px;    
-`;
-
-const SectionInner = styled.div`
-  padding-top: 16px;
-  margin-bottom: 24px;
-
-  h3 {
-    margin-bottom: 8px;
-  }
 `;
 
 const PageWrapper = styled.div`
@@ -320,14 +312,14 @@ const FavoriteSection = styled.div`
 const Loader = styled.div`
   padding: 16px 0;
   text-align: center;
-  color: ${({ theme }) => theme.colors?.darkGray || '#666'};
-  font-size: ${({ theme }) => theme.fontSizes?.sm || '14px'};
+  color: ${({ theme }) => theme.colors.darkGray};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
 `;
 
 const EndMessage = styled.div`
   padding: 16px 0;
   margin-top: ${({ negativeMargin }) => (negativeMargin ? '-16px' : '0')};
   text-align: center;
-  color: ${({ theme }) => theme.colors?.darkGray || '#666'};
-  font-size: ${({ theme }) => theme.fontSizes?.sm || '14px'};
+  color: ${({ theme }) => theme.colors.darkGray};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
 `;
