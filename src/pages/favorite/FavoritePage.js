@@ -196,7 +196,7 @@ export default function FavoritePage() {
       </TabRow>
 
       <ScrollableList>
-        <List style={{ paddingTop: '16px' }}>
+        <List>
           {selectedTab === 'performance' && (
             <>
               {perfList.length ? (
@@ -251,6 +251,8 @@ const TabRow = styled.div`
   display: flex;
   justify-content: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineGray};
+  min-height: 32px;
+  max-height: 32px;
 `;
 
 const TabButton = styled.button`
