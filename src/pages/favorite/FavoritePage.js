@@ -99,43 +99,46 @@ export default function FavoritePage() {
   useEffect(() => {
     const el = perfSentinelRef.current;
     if (!el) return;
-
+  
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && perfHasMore && !perfLoading) {
           loadPerformances(perfPage);
         }
+  
+        if (!perfHasMore) {
+          observer.disconnect();
+        }
       },
       { rootMargin: '200px 0px' }
     );
-
+  
     observer.observe(el);
     return () => observer.disconnect();
   }, [perfPage, perfHasMore, perfLoading, loadPerformances]);
 
   // 아티스트 무한 스크롤
-  const loadNextArtists = useCallback(() => {
-    if (!artistHasMore || artistLoading) return;
-    loadArtists(artistPage);
-  }, [artistHasMore, artistLoading, artistPage, loadArtists]);
-
   useEffect(() => {
-  const el = artistSentinelRef.current;
-  if (!el) return;
+    const el = artistSentinelRef.current;
+    if (!el) return;
+  
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && artistHasMore && !artistLoading) {
+          loadArtists(artistPage);
+        }
+  
+        if (!artistHasMore) {
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px 0px' }
+    );
+  
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [artistPage, artistHasMore, artistLoading, loadArtists]);
 
-  const observer = new IntersectionObserver(
-    entries => {
-      if (entries[0].isIntersecting && artistHasMore && !artistLoading) {
-        loadArtists(artistPage);
-      }
-    },
-    { rootMargin: '200px 0px' }
-  );
-
-  observer.observe(el);
-
-  return () => observer.disconnect();
-}, [artistPage, artistHasMore, artistLoading, loadArtists]);
 
   // 공연 찜 토글
   const togglePerformanceLike = async (id, isLiked) => {
@@ -254,7 +257,7 @@ const TabRow = styled.div`
 const TabButton = styled.button`
   flex: 1;
   padding: 0.75rem 1rem;
-  padding-bottom: 20px;
+  line-height: 3;
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ active, theme }) =>
