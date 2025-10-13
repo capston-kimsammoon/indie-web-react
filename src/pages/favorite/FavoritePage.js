@@ -180,80 +180,64 @@ export default function FavoritePage() {
   return (
     <PageWrapper>
       <Header title="찜 리스트" />
-      <div style={{ height: "16px" }} />
-
+      <div style={{ height: '16px' }} />
+    
       <TabRow>
         <TabButton
           active={selectedTab === 'performance'}
-          onClick={() => setSelectedTab('performance')}>
+          onClick={() => setSelectedTab('performance')}
+        >
           공연
         </TabButton>
         <TabButton
           active={selectedTab === 'artist'}
-          onClick={() => setSelectedTab('artist')}>
+          onClick={() => setSelectedTab('artist')}
+        >
           아티스트
         </TabButton>
       </TabRow>
-
+    
       <ScrollableList>
-        {selectedTab === 'performance' && (
-          <FavoriteSection>
-            <SectionInner>
-              {perfList.length ? (
-                <>
-                  {perfList.map((performance) => (
-                    <PerformanceListCard
-                      key={performance.id}
-                      performance={performance}
-                      onToggleLike={(id) =>
-                        togglePerformanceLike(id, performance.isLiked ?? true)
-                      }
-                    />
-                  ))}
-                  {perfHasMore && (
-                    <Loader ref={perfSentinelRef}>더 불러오는 중...</Loader>
-                  )}
-                  {!perfHasMore && (
-                    <EndMessage noTopPadding>마지막 공연입니다.</EndMessage>
-                  )}
-                </>
-              ) : (
-                <Empty>찜한 공연이 없습니다.</Empty>
-              )}
-            </SectionInner>
-          </FavoriteSection>
-        )}
-      
-        {selectedTab === 'artist' && (
-          <FavoriteSection>
-            <SectionInner>
-              {artistList.length ? (
-                <>
-                  {artistList.map((artist) => (
-                    <ArtistListCard
-                      key={artist.id}
-                      artist={artist}
-                      onToggleLike={(id) =>
-                        toggleArtistLike(id, artist.isLiked ?? true)
-                      }
-                      onToggleAlarm={(id, enabled) =>
-                        toggleArtistAlarm(id, enabled)
-                      }
-                    />
-                  ))}
-                  {artistHasMore && (
-                    <Loader ref={artistSentinelRef}>더 불러오는 중...</Loader>
-                  )}
-                  {!artistHasMore && (
-                    <EndMessage>마지막 아티스트입니다.</EndMessage>
-                  )}
-                </>
-              ) : (
-                <Empty>찜한 아티스트가 없습니다.</Empty>
-              )}
-            </SectionInner>
-          </FavoriteSection>
-        )}
+        <FavoriteSection>
+          {selectedTab === 'performance' ? (
+            perfList.length ? (
+              <>
+                {perfList.map((performance) => (
+                  <PerformanceListCard
+                    key={performance.id}
+                    performance={performance}
+                    onToggleLike={(id) =>
+                      togglePerformanceLike(id, performance.isLiked ?? true)
+                    }
+                  />
+                ))}
+                {perfHasMore && <Loader ref={perfSentinelRef}>더 불러오는 중...</Loader>}
+                {!perfHasMore && <EndMessage>마지막 공연입니다.</EndMessage>}
+              </>
+            ) : (
+              <Empty>찜한 공연이 없습니다.</Empty>
+            )
+          ) : artistList.length ? (
+            <>
+              {artistList.map((artist) => (
+                <ArtistListCard
+                  key={artist.id}
+                  artist={artist}
+                  onToggleLike={(id) =>
+                    toggleArtistLike(id, artist.isLiked ?? true)
+                  }
+                  onToggleAlarm={(id, enabled) =>
+                    toggleArtistAlarm(id, enabled)
+                  }
+                />
+              ))}
+              {artistHasMore && <Loader ref={artistSentinelRef}>더 불러오는 중...</Loader>}
+              {!artistHasMore && <EndMessage>마지막 아티스트입니다.</EndMessage>}
+            </>
+          ) : (
+            <Empty>찜한 아티스트가 없습니다.</Empty>
+          )}
+        </FavoriteSection>
       </ScrollableList>
     </PageWrapper>
   );
@@ -299,12 +283,6 @@ const Empty = styled.div`
   margin-top: 32px;    
 `;
 
-const FavoriteSection = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-`;
-
 const SectionInner = styled.div`
   padding-top: 16px;
   margin-bottom: 24px;
@@ -315,26 +293,30 @@ const SectionInner = styled.div`
 `;
 
 const PageWrapper = styled.div`
-  height: 100vh;
-  height: 100dvh;
   display: flex;
   flex-direction: column;
+  height: 100vh;  /* 전체 화면 채우기 */
+  height: 100dvh; /* 모바일 대응 */
+  overflow: hidden; /* 스크롤 영역은 아래에서만 */
 `;
 
 const ScrollableList = styled.div`
-  padding-bottom: 109px;
-  flex-grow: 1;
+  flex: 1; /* Header와 Tab을 제외한 나머지 영역 모두 차지 */
   overflow-y: auto;
-
-  &::-webkit-scrollbar {
-    display: none; 
-  }
-
-  -ms-overflow-style: none; 
-  scrollbar-width: none;
-
+  padding-bottom: 109px; /* 하단바 여백 */
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const FavoriteSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100%; /* 내용이 적을 때도 영역 안정화 */
+  padding-top: 16px; /* 탭 아래 여백 */
 `;
 
 const Loader = styled.div`
