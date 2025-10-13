@@ -149,6 +149,7 @@ const Message = styled.div`
 
 const ScrollableContent = styled.div`
   margin-top: 16px;
+  padding-bottom: 16px;
   flex-grow: 1;
   overflow-y: auto;
   overscroll-behavior: none;
