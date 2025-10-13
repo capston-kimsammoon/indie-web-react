@@ -120,19 +120,22 @@ export default function FavoritePage() {
   }, [artistHasMore, artistLoading, artistPage, loadArtists]);
 
   useEffect(() => {
-    const el = artistSentinelRef.current;
-    if (!el) return;
+  const el = artistSentinelRef.current;
+  if (!el) return;
 
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting) loadNextArtists();
-      },
-      { rootMargin: '200px 0px' }
-    );
+  const observer = new IntersectionObserver(
+    entries => {
+      if (entries[0].isIntersecting && artistHasMore && !artistLoading) {
+        loadArtists(artistPage);
+      }
+    },
+    { rootMargin: '200px 0px' }
+  );
 
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [loadNextArtists]);
+  observer.observe(el);
+
+  return () => observer.disconnect();
+}, [artistPage, artistHasMore, artistLoading, loadArtists]);
 
   // 공연 찜 토글
   const togglePerformanceLike = async (id, isLiked) => {
@@ -220,12 +223,15 @@ export default function FavoritePage() {
                 <ArtistListCard
                   key={artist.id}
                   artist={artist}
-                  onToggleLike={id => toggleArtistLike(id, artist.isLiked ?? true)}
+                  onToggleLike={(id) => toggleArtistLike(id, artist.isLiked ?? true)}
                   onToggleAlarm={(id, enabled) => toggleArtistAlarm(id, enabled)}
                 />
               ))}
-              {artistHasMore && <Loader ref={artistSentinelRef}>더 불러오는 중...</Loader>}
-              {!artistHasMore && <EndMessage>마지막 아티스트입니다.</EndMessage>}
+              {artistHasMore ? (
+                <Loader ref={artistSentinelRef}>더 불러오는 중...</Loader>
+              ) : (
+                <EndMessage>마지막 아티스트입니다.</EndMessage>
+              )}
             </>
           ) : (
             <Empty>찜한 아티스트가 없습니다.</Empty>
@@ -247,8 +253,8 @@ const TabRow = styled.div`
 
 const TabButton = styled.button`
   flex: 1;
-  padding: 0 1rem;
-  padding-top: 4px;
+  padding: 0.75rem 1rem;
+  padding-bottom: 20px;
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ active, theme }) =>
@@ -259,7 +265,6 @@ const TabButton = styled.button`
   background-color: transparent;
   cursor: pointer;
   font-family: inherit; 
-  line-height: 1.75;
 `;
 
 const List = styled.div`
