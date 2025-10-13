@@ -292,26 +292,26 @@ const Empty = styled.div`
   color: ${({ theme }) => theme.colors.darkGray};
   display: flex;
   justify-content: center; 
-  align-items: center;    
+  align-items: center;
+  margin-top: 32px;    
 `;
 
 const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
   height: 100vh;
   height: 100dvh;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 `;
 
 const ScrollableList = styled.div`
   flex: 1; 
   overflow-y: auto;
-  padding-bottom: 109px;
+  &::-webkit-scrollbar {
+    display: none; 
+  }
+  -ms-overflow-style: none; 
+  scrollbar-width: none;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
 `;
 
