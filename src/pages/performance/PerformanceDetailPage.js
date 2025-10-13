@@ -160,31 +160,31 @@ export default function PerformanceDetailPage() {
             </LinkValue>
             </LabelRow>
             <LabelRow>
-              <Label>예매 링크</Label>
-              <LinkValue>
-                {performance.detailLink ? (
-                  <a
-                    href={performance.detailLink}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={() =>
-                      trackOutboundDetailLink({
-                        performance_id: performance.id,
-                        performance_title: performance.title,
-                        venue_id: performance.venueId,
-                        venue_name: performance.venue,
-                        link_url: performance.detailLink,
-                        source: 'performance_detail_ticket',
-                      })
-                    }
-                  >
-                    예매 사이트 바로가기
-                  </a>
-                ) : (
-                  <span style={{ textDecoration: 'none' }}>정보 없음</span>
-                )}
-              </LinkValue>
-            </LabelRow>
+            <Label>예매 링크</Label>
+            <LinkValue>
+              {performance.detailLink ? (
+                <a
+                  href={performance.detailLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() =>
+                    trackOutboundDetailLink({
+                      performance_id: performance.id,
+                      performance_title: performance.title,
+                      venue_id: performance.venueId,
+                      venue_name: performance.venue,
+                      link_url: performance.detailLink,
+                      source: 'performance_detail_ticket',
+                    })
+                  }
+                >
+                  예매 사이트 바로가기
+                </a>
+              ) : (
+                <span style={{ textDecoration: 'none', pointerEvents: 'none', color: '#B0B0B0' }}>정보 없음</span>
+              )}
+            </LinkValue>
+          </LabelRow>
           </InfoSection>
         </ScrollableList>
       </PageWrapper>
