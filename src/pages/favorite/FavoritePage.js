@@ -96,48 +96,40 @@ export default function FavoritePage() {
   }, [loadArtists]);
 
   // 공연 무한 스크롤
-  useEffect(() => {
-    const el = perfSentinelRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting && perfHasMore && !perfLoading) {
-          loadPerformances(perfPage);
-        }
-        if (!perfHasMore) {
-          observer.disconnect();
-        }
-      },
-      { rootMargin: '200px 0px' }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [perfPage, perfHasMore, perfLoading, loadPerformances]);
+  useEffect(() => {
+    const el = perfSentinelRef.current;
+    if (!el || !perfHasMore) return;  // ✅ perfHasMore가 false면 바로 return
+  
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && perfHasMore && !perfLoading) {
+          loadPerformances(perfPage);
+        }
+      },
+      { rootMargin: '200px 0px' }
+    );
+  
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [perfPage, perfHasMore, perfLoading, loadPerformances]);
   
   // 아티스트 무한 스크롤
   useEffect(() => {
-    const el = artistSentinelRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting && artistHasMore && !artistLoading) {
-          loadArtists(artistPage);
-        }
-        // ⭐ 추가된 부분: 데이터가 없으면 즉시 Observer 해제
-        if (!artistHasMore) {
-          observer.disconnect();
-        }
-      },
-      { rootMargin: '200px 0px' }
-    );
-
-    observer.observe(el);
-
-    return () => observer.disconnect();
-  }, [artistPage, artistHasMore, artistLoading, loadArtists]);
+    const el = artistSentinelRef.current;
+    if (!el || !artistHasMore) return;  // ✅ artistHasMore가 false면 바로 return
+  
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && artistHasMore && !artistLoading) {
+          loadArtists(artistPage);
+        }
+      },
+      { rootMargin: '200px 0px' }
+    );
+  
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [artistPage, artistHasMore, artistLoading, loadArtists]);
 
   // 공연 찜 토글
   const togglePerformanceLike = async (id, isLiked) => {
