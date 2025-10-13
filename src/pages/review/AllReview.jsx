@@ -30,7 +30,7 @@ const SubBar = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 24px;
   margin-bottom: 12px;
   flex-wrap: wrap;
 `;
@@ -300,7 +300,7 @@ export default function AllReview({
         <Stat>
           <AllText>All </AllText>
           <CountText>{total}</CountText>
-      </Stat>
+        </Stat>
         <Controls>
           <select
             aria-label="정렬"
