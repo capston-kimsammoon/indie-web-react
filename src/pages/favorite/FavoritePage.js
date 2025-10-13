@@ -196,7 +196,7 @@ export default function FavoritePage() {
       </TabRow>
 
       <ScrollableList>
-        <List>
+        <List padded={selectedTab === 'performance'}>
           {selectedTab === 'performance' && (
             <>
               {perfList.length ? (
@@ -273,6 +273,7 @@ const TabButton = styled.button`
 const List = styled.div`
   display: flex;
   flex-direction: column;
+  padding-top: ${({ padded }) => (padded ? '16px' : '0')};
 `;
 
 const Empty = styled.div`
