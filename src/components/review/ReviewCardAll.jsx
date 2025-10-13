@@ -57,7 +57,7 @@ const ThumbRow = styled.div.withConfig({
   overflow-x: auto;
   padding-bottom: 2px;
   scrollbar-width: none;
-  max-width: ${({ hasPadding }) => hasPadding ? 'calc(100% - 32px)' : '100%'};
+  max-width: ${({ hasPadding }) => hasPadding ? 'calc(100% - 32px)' : '90%'};
   &::-webkit-scrollbar {
     display: none;
   }
