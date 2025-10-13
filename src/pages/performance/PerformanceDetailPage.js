@@ -181,7 +181,7 @@ export default function PerformanceDetailPage() {
                   예매 사이트 바로가기
                 </a>
               ) : (
-                <span style={{ textDecoration: 'none', pointerEvents: 'none', color: '#B0B0B0' }}>정보 없음</span>
+                <Value>정보 없음</Value>
               )}
             </LinkValue>
           </LabelRow>
