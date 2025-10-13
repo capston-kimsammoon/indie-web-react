@@ -173,14 +173,16 @@ export default function PerformanceDetailPage() {
                         performance_title: performance.title,
                         venue_id: performance.venueId,
                         venue_name: performance.venue,
-                        link_url: performance.detailLink,          
-                        source: 'performance_detail_ticket',      
+                        link_url: performance.detailLink,
+                        source: 'performance_detail_ticket',
                       })
                     }
                   >
-                  예매 사이트 바로가기
+                    예매 사이트 바로가기
                   </a>
-                ) : '정보 없음' }
+                ) : (
+                  <span style={{ textDecoration: 'none' }}>정보 없음</span>
+                )}
               </LinkValue>
             </LabelRow>
           </InfoSection>
