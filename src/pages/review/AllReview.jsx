@@ -30,7 +30,7 @@ const SubBar = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-top: 22px;
+  margin-top: 19px;
   margin-bottom: 12px;
   flex-wrap: wrap;
 `;
