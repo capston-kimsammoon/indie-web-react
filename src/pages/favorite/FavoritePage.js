@@ -18,14 +18,12 @@ export default function FavoritePage() {
   const [selectedTab, setSelectedTab] = useState('performance');
   const authToken = localStorage.getItem('accessToken');
 
-  // 공연 상태
   const [perfList, setPerfList] = useState([]);
   const [perfPage, setPerfPage] = useState(1);
   const [perfHasMore, setPerfHasMore] = useState(true);
   const [perfLoading, setPerfLoading] = useState(false);
   const perfSentinelRef = useRef(null);
 
-  // 아티스트 상태
   const [artistList, setArtistList] = useState([]);
   const [artistPage, setArtistPage] = useState(1);
   const [artistHasMore, setArtistHasMore] = useState(true);
@@ -34,7 +32,6 @@ export default function FavoritePage() {
 
   const size = 30;
 
-  // 공연 로드
   const loadPerformances = useCallback(async (pageNum) => {
     if (perfLoading) return;
     setPerfLoading(true);
@@ -58,7 +55,6 @@ export default function FavoritePage() {
     }
   }, [size, perfLoading]);
 
-  // 아티스트 로드
   const loadArtists = useCallback(async (pageNum) => {
     if (artistLoading) return;
     setArtistLoading(true);
@@ -82,7 +78,6 @@ export default function FavoritePage() {
     }
   }, [size, artistLoading]);
 
-  // 초기 로드
   useEffect(() => {
     setPerfPage(1);
     setPerfHasMore(true);
@@ -95,43 +90,41 @@ export default function FavoritePage() {
     loadArtists(1);
   }, [loadArtists]);
 
-  // 공연 무한 스크롤
   useEffect(() => {
     const el = perfSentinelRef.current;
-    if (!el || !perfHasMore) return;  // ✅ perfHasMore가 false면 바로 return
-  
+    if (!el || !perfHasMore) return;
+
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting && perfHasMore && !perfLoading) {
+        if (entries[0].isIntersecting && !perfLoading) {
           loadPerformances(perfPage);
         }
       },
       { rootMargin: '200px 0px' }
     );
-  
+
     observer.observe(el);
     return () => observer.disconnect();
   }, [perfPage, perfHasMore, perfLoading, loadPerformances]);
-  
-  // 아티스트 무한 스크롤
+
   useEffect(() => {
     const el = artistSentinelRef.current;
-    if (!el || !artistHasMore) return;  // ✅ artistHasMore가 false면 바로 return
-  
+    if (!el || !artistHasMore) return;
+
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting && artistHasMore && !artistLoading) {
+        if (entries[0].isIntersecting && !artistLoading) {
           loadArtists(artistPage);
         }
       },
       { rootMargin: '200px 0px' }
     );
-  
+
     observer.observe(el);
     return () => observer.disconnect();
   }, [artistPage, artistHasMore, artistLoading, loadArtists]);
 
-  // 공연 찜 토글
+
   const togglePerformanceLike = async (id, isLiked) => {
     try {
       if (isLiked) {
@@ -145,7 +138,6 @@ export default function FavoritePage() {
     }
   };
 
-  // 아티스트 찜 토글
   const toggleArtistLike = async (id, isLiked) => {
     try {
       if (isLiked) {
@@ -159,7 +151,6 @@ export default function FavoritePage() {
     }
   };
 
-  // 아티스트 알림 토글
   const toggleArtistAlarm = async (id, enabled) => {
     try {
       if (enabled) await cancelArtistAlert(id, authToken);
@@ -247,8 +238,8 @@ const TabRow = styled.div`
 
 const TabButton = styled.button`
   flex: 1;
-  margin-top: 16px;
-  padding-bottom: 1.8rem;
+  margin-top: 12px;
+  padding-bottom: 1.9rem;
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ active, theme }) =>
