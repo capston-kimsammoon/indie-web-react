@@ -36,10 +36,11 @@ export default function FavoritePage() {
 
   // 공연 로드
   const loadPerformances = useCallback(async (pageNum) => {
+    if (perfLoading) return;
     setPerfLoading(true);
     try {
-      const res = await fetchLikedPerformances(pageNum, size, authToken);
-      const newPerfs = res.performances ?? [];
+      const res = await fetchLikedPerformances(pageNum, size);
+      const newPerfs = res?.performances ?? [];
 
       if (pageNum === 1) {
         setPerfList(newPerfs);
@@ -51,20 +52,19 @@ export default function FavoritePage() {
       setPerfHasMore(newPerfs.length >= size);
     } catch (e) {
       console.error('공연 로딩 실패:', e);
-      if (pageNum === 1) {
-        setPerfList([]);
-      }
+      if (pageNum === 1) setPerfList([]);
     } finally {
       setPerfLoading(false);
     }
-  }, [authToken, size]);
+  }, [size, perfLoading]);
 
   // 아티스트 로드
   const loadArtists = useCallback(async (pageNum) => {
+    if (artistLoading) return;
     setArtistLoading(true);
     try {
-      const res = await fetchLikedArtists({ page: pageNum, size, authToken });
-      const newArtists = res.artists ?? [];
+      const res = await fetchLikedArtists(pageNum, size);
+      const newArtists = res?.artists ?? [];
 
       if (pageNum === 1) {
         setArtistList(newArtists);
@@ -76,13 +76,11 @@ export default function FavoritePage() {
       setArtistHasMore(newArtists.length >= size);
     } catch (e) {
       console.error('아티스트 로딩 실패:', e);
-      if (pageNum === 1) {
-        setArtistList([]);
-      }
+      if (pageNum === 1) setArtistList([]);
     } finally {
       setArtistLoading(false);
     }
-  }, [authToken, size]);
+  }, [size, artistLoading]);
 
   // 초기 로드
   useEffect(() => {
@@ -116,29 +114,32 @@ export default function FavoritePage() {
   }, [perfPage, perfHasMore, perfLoading, loadPerformances]);
 
   // 아티스트 무한 스크롤
+  const loadNextArtists = useCallback(() => {
+    if (!artistHasMore || artistLoading) return;
+    loadArtists(artistPage);
+  }, [artistHasMore, artistLoading, artistPage, loadArtists]);
+
   useEffect(() => {
     const el = artistSentinelRef.current;
     if (!el) return;
 
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting && artistHasMore && !artistLoading) {
-          loadArtists(artistPage);
-        }
+        if (entries[0].isIntersecting) loadNextArtists();
       },
       { rootMargin: '200px 0px' }
     );
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [artistPage, artistHasMore, artistLoading, loadArtists]);
+  }, [loadNextArtists]);
 
   // 공연 찜 토글
   const togglePerformanceLike = async (id, isLiked) => {
     try {
       if (isLiked) {
         await unlikePerformance(id, authToken);
-        setPerfList((prev) => prev.filter((p) => p.id !== id));
+        setPerfList(prev => prev.filter(p => p.id !== id));
       } else {
         await likePerformance(id, authToken);
       }
@@ -152,7 +153,7 @@ export default function FavoritePage() {
     try {
       if (isLiked) {
         await unlikeArtist(id, authToken);
-        setArtistList((prev) => prev.filter((a) => a.id !== id));
+        setArtistList(prev => prev.filter(a => a.id !== id));
       } else {
         await likeArtist(id, authToken);
       }
@@ -167,8 +168,8 @@ export default function FavoritePage() {
       if (enabled) await cancelArtistAlert(id, authToken);
       else await registerArtistAlert(id, authToken);
 
-      setArtistList((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, isAlarmEnabled: !enabled } : a))
+      setArtistList(prev =>
+        prev.map(a => (a.id === id ? { ...a, isAlarmEnabled: !enabled } : a))
       );
     } catch (e) {
       console.error('아티스트 알림 토글 실패:', e);
@@ -179,7 +180,7 @@ export default function FavoritePage() {
     <PageWrapper>
       <Header title="찜 리스트" />
       <div style={{ height: '16px' }} />
-    
+
       <TabRow>
         <TabButton
           active={selectedTab === 'performance'}
@@ -194,19 +195,17 @@ export default function FavoritePage() {
           아티스트
         </TabButton>
       </TabRow>
-    
+
       <ScrollableList>
         <FavoriteSection padded={selectedTab === 'performance'}>
           {selectedTab === 'performance' ? (
             perfList.length ? (
               <>
-                {perfList.map((performance) => (
+                {perfList.map(performance => (
                   <PerformanceListCard
                     key={performance.id}
                     performance={performance}
-                    onToggleLike={(id) =>
-                      togglePerformanceLike(id, performance.isLiked ?? true)
-                    }
+                    onToggleLike={id => togglePerformanceLike(id, performance.isLiked ?? true)}
                   />
                 ))}
                 {perfHasMore && <Loader ref={perfSentinelRef}>더 불러오는 중...</Loader>}
@@ -217,16 +216,12 @@ export default function FavoritePage() {
             )
           ) : artistList.length ? (
             <>
-              {artistList.map((artist) => (
+              {artistList.map(artist => (
                 <ArtistListCard
                   key={artist.id}
                   artist={artist}
-                  onToggleLike={(id) =>
-                    toggleArtistLike(id, artist.isLiked ?? true)
-                  }
-                  onToggleAlarm={(id, enabled) =>
-                    toggleArtistAlarm(id, enabled)
-                  }
+                  onToggleLike={id => toggleArtistLike(id, artist.isLiked ?? true)}
+                  onToggleAlarm={(id, enabled) => toggleArtistAlarm(id, enabled)}
                 />
               ))}
               {artistHasMore && <Loader ref={artistSentinelRef}>더 불러오는 중...</Loader>}
@@ -252,8 +247,8 @@ const TabRow = styled.div`
 
 const TabButton = styled.button`
   flex: 1;
-  padding: 0.75rem 1rem;
-  padding-bottom: 12px;
+  padding: 0 1rem;
+  padding-top: 4px;
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ active, theme }) =>
@@ -264,6 +259,7 @@ const TabButton = styled.button`
   background-color: transparent;
   cursor: pointer;
   font-family: inherit; 
+  line-height: 1.75;
 `;
 
 const List = styled.div`
@@ -273,7 +269,7 @@ const List = styled.div`
 `;
 
 const Empty = styled.div`
-  padding: 16px 16px;
+  padding: 16px;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ theme }) => theme.colors.darkGray};
