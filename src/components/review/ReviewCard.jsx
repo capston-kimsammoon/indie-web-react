@@ -49,12 +49,15 @@ const DeleteBtn = styled.button`
   flex-shrink: 0;
 `;
 
-const ThumbRow = styled.div`
+const ThumbRow = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'hasPadding',
+})`
   display: flex;
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 2px;
   scrollbar-width: none;
+  max-width: ${({ hasPadding }) => hasPadding ? 'calc(100% - 32px)' : '100%'};
   &::-webkit-scrollbar {
     display: none;
   }
@@ -84,14 +87,14 @@ const MoreBtn = styled.button`
 `;
 
 const BodyText = styled.p.withConfig({
-  shouldForwardProp: (prop) => prop !== 'variant',
+  shouldForwardProp: (prop) => prop !== 'variant' && prop !== 'hasPadding',
 })`
   font-size: 14px;
   color: #2F2F2F;
   line-height: 1.4;
   white-space: pre-wrap;
   margin: 0;
-  padding-right: 32px; 
+  padding-right: ${({ hasPadding }) => hasPadding ? '32px' : '0'};
   box-sizing: border-box;
 
   ${({ variant }) =>
