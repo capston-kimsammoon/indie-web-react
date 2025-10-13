@@ -223,7 +223,7 @@ export default function FavoritePage() {
                       }
                     />
                   ))}
-                  {/* ✅ 마지막 표기 */}
+                  {/*  마지막 표기 */}
                   {!perfHasMore && perfList.length > 0 && (
                     <Empty>마지막 공연입니다.</Empty>
                   )}
@@ -247,7 +247,7 @@ export default function FavoritePage() {
                     onToggleAlarm={(id, enabled) => toggleArtistAlarm(id, enabled)}
                   />
                 ))}
-                {/* ✅ 마지막 표기 */}
+                {/*  마지막 표기 */}
                 {!artistHasMore && artistList.length > 0 && (
                   <Empty>마지막 아티스트입니다.</Empty>
                 )}
