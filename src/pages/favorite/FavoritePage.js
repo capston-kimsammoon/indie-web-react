@@ -247,7 +247,8 @@ const TabRow = styled.div`
 
 const TabButton = styled.button`
   flex: 1;
-  padding-bottom: 2rem;
+  margin-top: 16px;
+  padding-bottom: 1.8rem;
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ active, theme }) =>
