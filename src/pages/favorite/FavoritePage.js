@@ -140,11 +140,10 @@ export default function FavoritePage() {
         await likePerformance(id, authToken);
       }
     } catch (e) {
-      console.error('📛 공연 찜 토글 실패:', e);
+      console.error('공연 찜 토글 실패:', e);
     }
   };
 
-  // 아티스트 찜 토글
   const toggleArtistLike = async (id, isLiked) => {
     try {
       if (isLiked) {
@@ -154,7 +153,7 @@ export default function FavoritePage() {
         await likeArtist(id, authToken);
       }
     } catch (e) {
-      console.error('📛 아티스트 찜 토글 실패:', e);
+      console.error('아티스트 찜 토글 실패:', e);
     }
   };
 
@@ -167,7 +166,7 @@ export default function FavoritePage() {
         prev.map((a) => (a.id === id ? { ...a, isAlarmEnabled: !enabled } : a))
       );
     } catch (e) {
-      console.error('📛 아티스트 알림 토글 실패:', e);
+      console.error('아티스트 알림 토글 실패:', e);
     }
   };
 
@@ -222,9 +221,7 @@ export default function FavoritePage() {
                 <ArtistListCard
                   key={artist.id}
                   artist={artist}
-                  onToggleLike={(id) =>
-                    toggleArtistLike(id, artist.isLiked ?? true)
-                  }
+                  onToggleLike={(id) => toggleArtistLike(id, artist.isLiked ?? true)}
                   onToggleAlarm={(id, enabled) => toggleArtistAlarm(id, enabled)}
                 />
               ))
@@ -259,13 +256,16 @@ const Loading = styled.div`
 const End = styled(Loading)``;
 
 const TabRow = styled.div`
+  padding-bottom: 12px;
   display: flex;
   justify-content: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineGray};
+  min-height: 32px;
+  max-height: 32px;
 `;
 
 const TabButton = styled.button`
-   flex: 1;
+  flex: 1;
   padding: 0.75rem 1rem;
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
@@ -282,17 +282,18 @@ const TabButton = styled.button`
 const List = styled.div`
   display: flex;
   flex-direction: column;
+  padding-top: ${({ padded }) => (padded ? '16px' : '0')};
 `;
 
 const Empty = styled.div`
-  padding: 16px 16px;
+  padding: 16px;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ theme }) => theme.colors.darkGray};
   display: flex;
   justify-content: center; 
-  align-items: center;    
-
+  align-items: center;
+  margin-top: 32px;    
 `;
 
 const PageWrapper = styled.div`
@@ -303,8 +304,7 @@ const PageWrapper = styled.div`
 `;
 
 const ScrollableList = styled.div`
-  padding-bottom: 109px;
-  flex-grow: 1;
+  flex: 1; 
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none; 
@@ -314,3 +314,4 @@ const ScrollableList = styled.div`
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
 `;
+

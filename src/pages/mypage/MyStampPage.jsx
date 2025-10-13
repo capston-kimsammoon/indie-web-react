@@ -38,7 +38,7 @@ export default function MyStampPage() {
   return (
     <PageWrapper>
       <Header title="내 스탬프" />
-      <div style={{ height: '16px' }} />
+      <div style={{ height: '26px' }} />
       <StampCount>
         <AllText>All</AllText> <CountText>{stamps.length}</CountText>
       </StampCount>
@@ -97,7 +97,8 @@ export default function MyStampPage() {
 }
 
 const StampCount = styled.div`
-  padding: 16px 0;
+  padding-top: 20px;
+  padding-bottom: 6px;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.semibold};
 `;
@@ -128,13 +129,12 @@ const PageWrapper = styled.div`
 `;
 
 const Content = styled.div`
-  padding-bottom: 174px; //158
+  padding-bottom: 94px; 
 `;
 
 const StampGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
-  row-gap: 16px;
 `;
 
 const Message = styled.div`
@@ -148,9 +148,11 @@ const Message = styled.div`
 `;
 
 const ScrollableContent = styled.div`
-  padding-bottom: 109px;
+  margin-top: 16px;
+  padding-bottom: 16px;
   flex-grow: 1;
   overflow-y: auto;
+  overscroll-behavior: none;
   
   &::-webkit-scrollbar {
     display: none;
