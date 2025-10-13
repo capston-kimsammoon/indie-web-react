@@ -205,6 +205,7 @@ export default function FavoritePage() {
                     onToggleLike={id => togglePerformanceLike(id, performance.isLiked ?? true)}
                   />
                 ))}
+                {perfHasMore && <Loader ref={perfSentinelRef}>더 불러오는 중...</Loader>}
                 {!perfHasMore && <EndMessage negativeMargin>마지막 공연입니다.</EndMessage>}
               </>
             ) : (
@@ -246,7 +247,7 @@ const TabRow = styled.div`
 
 const TabButton = styled.button`
   flex: 1;
-  padding: 2rem 1rem;
+  padding-bottom: 2rem;
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ active, theme }) =>
