@@ -244,7 +244,7 @@ const ListSection = styled.div`
   padding-top: 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px; 
+  gap: 10px;
 `;
 
 const Loading = styled.div`
@@ -276,7 +276,7 @@ const TabButton = styled.button`
     active ? `1.5px solid ${theme.colors.themeGreen}` : theme.colors.lightGray};
   background-color: transparent;
   cursor: pointer;
-  font-family: inherit; 
+  font-family: inherit;
 `;
 
 const List = styled.div`
@@ -291,9 +291,8 @@ const Empty = styled.div`
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ theme }) => theme.colors.darkGray};
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
-  margin-top: 32px;    
 `;
 
 const PageWrapper = styled.div`
@@ -306,10 +305,8 @@ const PageWrapper = styled.div`
 const ScrollableList = styled.div`
   flex: 1; 
   overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none; 
-  }
-  -ms-overflow-style: none; 
+  &::-webkit-scrollbar { display: none; }
+  -ms-overflow-style: none;
   scrollbar-width: none;
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
