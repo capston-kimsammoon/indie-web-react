@@ -32,7 +32,7 @@ export default function FavoritePage() {
   const [artistLoading, setArtistLoading] = useState(false);
   const artistSentinelRef = useRef(null);
 
-  const size = 20;
+  const size = 30;
 
   // 공연 로드
   const loadPerformances = useCallback(async (pageNum) => {
