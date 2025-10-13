@@ -137,52 +137,50 @@ export default function PerformanceDetailPage() {
               <Label>상세 정보</Label>
               <LinkValue>
               {performance.shortcode ? (
-          <a
-          href={`https://www.instagram.com/p/${performance.shortcode}/`}
-          target="_blank"
-          rel="noreferrer"
-          onClick={() =>
-            trackOutboundDetailLink({
-              performance_id: performance.id,
-              performance_title: performance.title,
-              venue_id: performance.venueId,
-              venue_name: performance.venue,
-              link_url: `https://www.instagram.com/p/${performance.shortcode}/`,
-              source: 'performance_detail_instagram',
-            })
-          }
-        >
-          공연 상세 페이지 바로가기
-        </a>
-      ) : (
-        <span>상세 정보 없음</span>
-      )}
-              </LinkValue>
+                <a
+                href={`https://www.instagram.com/p/${performance.shortcode}/`}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() =>
+                  trackOutboundDetailLink({
+                    performance_id: performance.id,
+                    performance_title: performance.title,
+                    venue_id: performance.venueId,
+                    venue_name: performance.venue,
+                    link_url: `https://www.instagram.com/p/${performance.shortcode}/`,
+                    source: 'performance_detail_instagram',
+                  })
+                }
+              >
+                공연 상세 페이지 바로가기
+              </a>
+            ) : (
+              <span>상세 정보 없음</span>
+            )}
+            </LinkValue>
             </LabelRow>
             <LabelRow>
               <Label>예매 링크</Label>
               <LinkValue>
                 {performance.detailLink ? (
-          <a
-          href={performance.detailLink}
-          target="_blank"
-          rel="noreferrer"
-          onClick={() =>
-            trackOutboundDetailLink({
-              performance_id: performance.id,
-              performance_title: performance.title,
-              venue_id: performance.venueId,
-              venue_name: performance.venue,
-              link_url: performance.detailLink,          
-              source: 'performance_detail_ticket',      
-            })
-          }
-        >
-          예매 사이트 바로가기
-        </a>
-      ) : (
-        <span>예매 링크 없음</span>
-      )}
+                  <a
+                    href={performance.detailLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() =>
+                      trackOutboundDetailLink({
+                        performance_id: performance.id,
+                        performance_title: performance.title,
+                        venue_id: performance.venueId,
+                        venue_name: performance.venue,
+                        link_url: performance.detailLink,          
+                        source: 'performance_detail_ticket',      
+                      })
+                    }
+                  >
+                  예매 사이트 바로가기
+                  </a>
+                ) : '정보 없음' }
               </LinkValue>
             </LabelRow>
           </InfoSection>
