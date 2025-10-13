@@ -196,9 +196,9 @@ export default function FavoritePage() {
       </TabRow>
 
       <ScrollableList>
-        <List>
+        <List style={{ paddingTop: '16px' }}>
           {selectedTab === 'performance' && (
-            <div style={{ paddingTop: '16px' }}>
+            <>
               {perfList.length ? (
                 <>
                   {perfList.map((performance) => (
@@ -211,12 +211,12 @@ export default function FavoritePage() {
                     />
                   ))}
                   {perfHasMore && <Loader ref={perfSentinelRef}>더 불러오는 중...</Loader>}
-                  {!perfHasMore && <EndMessage>마지막 공연입니다.</EndMessage>}
+                  {!perfHasMore && <EndMessage noTopPadding>마지막 공연입니다.</EndMessage>}
                 </>
               ) : (
                 <Empty>찜한 공연이 없습니다.</Empty>
               )}
-            </div>
+            </>
           )}
 
           {selectedTab === 'artist' && (
@@ -315,7 +315,7 @@ const Loader = styled.div`
 `;
 
 const EndMessage = styled.div`
-  padding: 16px 0;
+  padding: ${({ noTopPadding }) => (noTopPadding ? '0 0 16px 0' : '16px 0')};
   text-align: center;
   color: ${({ theme }) => theme.colors?.darkGray || '#666'};
   font-size: ${({ theme }) => theme.fontSizes?.sm || '14px'};
