@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import defaultAvatar from '../../assets/icons/icon_b_my.svg';
+import defaultAvatar from '../../assets/icons/icon_user_default_profile.svg';
 import styled, { css } from 'styled-components';
 
 const Card = styled.article.withConfig({

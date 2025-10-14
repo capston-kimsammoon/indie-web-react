@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import styled, { css } from 'styled-components'
-import defaultAvatar from '../../assets/icons/icon_b_my.svg';
+import defaultAvatar from '../../assets/icons/icon_user_default_profile.svg';
 import { Link } from 'react-router-dom'
 
 /* ==================== 스타일 ==================== */
