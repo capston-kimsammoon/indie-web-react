@@ -193,7 +193,9 @@ const HomePage = () => {
 
   return (
     <>
-      <Header logoSrc={modieHeaderLogo} />
+      <HeaderWrapper>
+        <Header logoSrc={modieHeaderLogo} />
+      </HeaderWrapper>
       <div style={{ height: "16px" }} />
 
       <ScrollableContent>
@@ -252,6 +254,13 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
+const HeaderWrapper = styled.div`
+  img {
+    height: 20px !important;
+    width: auto;
+  }
+`;
 
 const ScrollableContent = styled.div`
   height: calc(100dvh - 56px); 
