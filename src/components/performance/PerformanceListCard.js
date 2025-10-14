@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import HeartButton from '../common/HeartButton';
+import { formatKoreanFlexible, formatKoreanDateTime } from '../../utils/dateUtils';
 
 // ---- helpers ----
 const toAbs = (url) => {
@@ -41,6 +42,16 @@ export default function PerformanceListCard({ performance, onToggleLike }) {
   const posterSrc = toAbs(pickPoster(performance));
   const { title, venue, date, isLiked } = performance;
 
+  const rawTime =
+  performance.time ||
+  performance.start_time ||
+  performance.startTime ||
+  null;
+
+  const formattedDate = rawTime
+  ? formatKoreanFlexible(date, rawTime)
+  : formatKoreanFlexible(date); // ISO에 시간이 있으면 내부에서 판단
+
   const handleClick = () => {
     navigate(`/performance/${performance.id}`);
   };
@@ -59,7 +70,7 @@ export default function PerformanceListCard({ performance, onToggleLike }) {
         <Info>
           <Title>{title}</Title>
           <Venue>{venue}</Venue>
-          <Date>{date}</Date>
+          <Date>{formattedDate}</Date>
         </Info>
       </LeftSection>
       {location.pathname === '/favorite' && (

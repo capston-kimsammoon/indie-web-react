@@ -18,6 +18,12 @@ function normalizeTime(t) {
   return t; // 이미 HH:MM:SS면 그대로
 }
 
+/** 내부용: time이 비었거나 00:00(또는 00:00:00)인지 */
+function isZeroTime(t) {
+  if (!t) return true;
+  return /^0{2}:0{2}(:0{2})?$/.test(t.trim());
+}
+
 /**
  * 날짜/시간 문자열을 "YYYY-MM-DD (요일) 오전/오후 N시"로 포맷
  * ex) 2025-09-25T19:00:00 → "2025-09-25 (목) 오후 7시"
@@ -39,6 +45,36 @@ export function formatKoreanDateTime(value) {
   const dd = String(dt.getDate()).padStart(2, '0');
 
   return `${yyyy}-${mm}-${dd} (${weekday}) ${ampm} ${displayHour}시`;
+}
+
+/** 날짜만: "YYYY-MM-DD (요일)" */
+export function formatKoreanDateOnly(value) {
+  const dt = parseDateTime(value);
+  if (!dt) return '';
+  const weekdays = ['일','월','화','수','목','금','토'];
+  const yyyy = dt.getFullYear();
+  const mm = String(dt.getMonth() + 1).padStart(2, '0');
+  const dd = String(dt.getDate()).padStart(2, '0');
+  const weekday = weekdays[dt.getDay()];
+  return `${yyyy}-${mm}-${dd} (${weekday})`;
+}
+
+export function formatKoreanFlexible(dateStr, timeStr) {
+  // ISO에 시간이 포함된 경우
+  if (dateStr && typeof dateStr === 'string' && dateStr.includes('T')) {
+    const dt = parseDateTime(dateStr);
+    if (!dt) return '';
+    const hh = dt.getHours();
+    const mm = dt.getMinutes();
+    return (hh === 0 && mm === 0)
+      ? formatKoreanDateOnly(dateStr)
+      : formatKoreanDateTime(dateStr);
+  }
+  // date + time 분리인 경우
+  if (isZeroTime(timeStr)) {
+    return formatKoreanDateOnly(dateStr);
+  }
+  return formatKoreanFromParts(dateStr, timeStr);
 }
 
 /* date + time이 분리되어 오는 경우 */
