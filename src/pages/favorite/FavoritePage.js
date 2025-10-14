@@ -268,9 +268,9 @@ const Container = styled.div`
 `;
 
 const TabRow = styled.div`
+  padding-top: 0.75rem;
   display: flex;
   justify-content: center;
-  height: 80px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineGray};
   position: sticky;
   top: 0;            
