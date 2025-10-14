@@ -223,7 +223,6 @@ export default function FavoritePage() {
                       }
                     />
                   ))}
-                  {/*  마지막 표기 */}
                   {!perfHasMore && perfList.length > 0 && (
                     <Empty>마지막 공연입니다.</Empty>
                   )}
@@ -233,7 +232,7 @@ export default function FavoritePage() {
               )}
             </div>
           )}
-
+      
           {selectedTab === 'artist' &&
             (artistList.length ? (
               <>
@@ -244,10 +243,11 @@ export default function FavoritePage() {
                     onToggleLike={(id) =>
                       toggleArtistLike(id, artist.isLiked ?? true)
                     }
-                    onToggleAlarm={(id, enabled) => toggleArtistAlarm(id, enabled)}
+                    onToggleAlarm={(id, enabled) =>
+                      toggleArtistAlarm(id, enabled)
+                    }
                   />
                 ))}
-                {/*  마지막 표기 */}
                 {!artistHasMore && artistList.length > 0 && (
                   <Empty>마지막 아티스트입니다.</Empty>
                 )}
@@ -286,6 +286,11 @@ const TabButton = styled.button`
   background-color: transparent;
   cursor: pointer;
   font-family: inherit; 
+`;
+
+const List = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 const Empty = styled.div`
