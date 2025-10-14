@@ -5,7 +5,7 @@ import VenueItem from './components/VenueItem';
 import RegionSelectButton from './components/RegionSelectButton';
 import RegionSelectSheet from './components/RegionSelectSheet';
 import { useNavigate } from 'react-router-dom';
-import { fetchVenueList } from '../../api/venueApi'; 
+import { fetchVenueList } from '../../api/venueApi';
 
 function ListVenue() {
   const navigate = useNavigate();
@@ -18,44 +18,35 @@ function ListVenue() {
   const size = 20;
   const sentinelRef = useRef(null);
 
-  // ✅ 상태 복원
+  const SESSION_KEY = 'venueListState';
+
+  // ---------------------------
+  // 1) 마운트 시 상태 복원
+  // ---------------------------
   useEffect(() => {
-    const saved = sessionStorage.getItem('venueListState');
+    const saved = sessionStorage.getItem(SESSION_KEY);
     if (saved) {
       const { scrollY, selectedRegions, venues, page } = JSON.parse(saved);
       setSelectedRegions(selectedRegions || ['전체']);
       setVenues(venues || []);
       setPage(page || 1);
 
-      // 스크롤 복원 (렌더 이후)
+      // venues 렌더 후 스크롤 복원
       setTimeout(() => {
         window.scrollTo(0, scrollY || 0);
       }, 0);
     } else {
-      // 저장된 상태가 없을 때만 새로 로드
       loadVenues(1);
     }
   }, []);
 
-  // ✅ 스크롤 복원용 useEffect (리스트 로드 완료 후 실행)
-  useEffect(() => {
-    const saved = sessionStorage.getItem('venueListState');
-    if (!saved) return;
-    const { scrollY } = JSON.parse(saved);
-  
-    // venues가 실제로 렌더링된 후 복원
-    if (venues.length > 0) {
-      setTimeout(() => {
-        window.scrollTo(0, scrollY || 0);
-      }, 50); // 살짝 지연 (렌더 타이밍 맞추기)
-    }
-  }, [venues]);
-
-  // ✅ 언마운트 시 상태 저장
+  // ---------------------------
+  // 2) 언마운트 시 상태 저장
+  // ---------------------------
   useEffect(() => {
     return () => {
       sessionStorage.setItem(
-        'venueListState',
+        SESSION_KEY,
         JSON.stringify({
           scrollY: window.scrollY,
           selectedRegions,
@@ -66,53 +57,56 @@ function ListVenue() {
     };
   }, [selectedRegions, venues, page]);
 
-  // API 호출 함수
-  const loadVenues = useCallback(async (pageNum) => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      const regionParam = selectedRegions.includes('전체') ? undefined : selectedRegions;
-      const data = await fetchVenueList({ page: pageNum, size, region: regionParam });
+  // ---------------------------
+  // 3) API 호출
+  // ---------------------------
+  const loadVenues = useCallback(
+    async (pageNum) => {
+      if (loading) return;
+      setLoading(true);
+      try {
+        const regionParam =
+          selectedRegions.includes('전체') ? undefined : selectedRegions;
 
-      const venueList = Array.isArray(data?.content)
-        ? data.content
-        : Array.isArray(data)
-        ? data
-        : [];
+        const data = await fetchVenueList({ page: pageNum, size, region: regionParam });
 
-      if (pageNum === 1) {
-        setVenues(venueList);
-      } else {
-        setVenues(prev => [...prev, ...venueList]);
+        const venueList = Array.isArray(data?.content)
+          ? data.content
+          : Array.isArray(data)
+          ? data
+          : [];
+
+        setVenues((prev) => (pageNum === 1 ? venueList : [...prev, ...venueList]));
+        setHasMore(venueList.length >= size);
+        setPage(pageNum + 1);
+      } catch (err) {
+        console.error('공연장 목록 API 호출 실패:', err);
+        if (pageNum === 1) setVenues([]);
+      } finally {
+        setLoading(false);
       }
+    },
+    [selectedRegions, size, loading]
+  );
 
-      // 20개 미만이면 더 이상 데이터 없음
-      setHasMore(venueList.length >= size);
-      setPage(pageNum + 1);
-    } catch (err) {
-      console.error('공연장 목록 API 호출 실패:', err);
-      if (pageNum === 1) {
-        setVenues([]);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedRegions, size, loading]);
-
-  // 지역 변경 시 첫 페이지부터 다시 로드
+  // ---------------------------
+  // 4) 지역 변경 시 리로드
+  // ---------------------------
   useEffect(() => {
     setPage(1);
     setHasMore(true);
     loadVenues(1);
   }, [selectedRegions]);
 
-  // 무한 스크롤 센티넬
+  // ---------------------------
+  // 5) 무한 스크롤
+  // ---------------------------
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;
 
     const observer = new IntersectionObserver(
-      entries => {
+      (entries) => {
         if (entries[0].isIntersecting && hasMore && !loading) {
           loadVenues(page);
         }
@@ -124,6 +118,9 @@ function ListVenue() {
     return () => observer.disconnect();
   }, [page, hasMore, loading, loadVenues]);
 
+  // ---------------------------
+  // 6) 지역 선택 처리
+  // ---------------------------
   const handleSelectRegion = (region) => {
     if (region === '전체') {
       setSelectedRegions(['전체']);
@@ -142,10 +139,13 @@ function ListVenue() {
       <Header title="공연장" initialSearchTab="공연/공연장" />
       <div style={{ height: '16px' }} />
 
-      <RegionSelectButton onClick={() => setIsSheetOpen(true)} selectedRegions={selectedRegions} />
-      
+      <RegionSelectButton
+        onClick={() => setIsSheetOpen(true)}
+        selectedRegions={selectedRegions}
+      />
+
       <ScrollableList>
-        {Array.isArray(venues) && venues.length > 0 ? (
+        {venues.length > 0 ? (
           <>
             {venues.map((venue) => (
               <VenueItem
@@ -176,7 +176,6 @@ function ListVenue() {
 export default ListVenue;
 
 const PageWrapper = styled.div`
-  height: 100vh;
   height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -189,23 +188,21 @@ const ScrollableList = styled.div`
   box-sizing: border-box;
 
   &::-webkit-scrollbar {
-    display: none; 
+    display: none;
   }
-
-  -ms-overflow-style: none; 
+  -ms-overflow-style: none;
   scrollbar-width: none;
-
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
 `;
 
 const EmptyMessage = styled.div`
-  padding: 16px 16px;
+  padding: 16px;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ theme }) => theme.colors.darkGray};
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
   margin-top: 32px;
 `;
@@ -213,6 +210,6 @@ const EmptyMessage = styled.div`
 const Loader = styled.div`
   padding: 16px 0;
   text-align: center;
-  color: ${({ theme }) => theme.colors?.darkGray || '#666'};
-  font-size: ${({ theme }) => theme.fontSizes?.sm || '14px'};
+  color: ${({ theme }) => theme.colors.darkGray || '#666'};
+  font-size: ${({ theme }) => theme.fontSizes.sm || '14px'};
 `;
