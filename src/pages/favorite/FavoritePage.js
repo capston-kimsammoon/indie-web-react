@@ -224,7 +224,7 @@ export default function FavoritePage() {
                     />
                   ))}
                   {!perfHasMore && perfList.length > 0 && (
-                    <Empty>마지막 공연입니다.</Empty>
+                    <<Empty style={{ marginTop: '-16px' }}>마지막 공연입니다.</Empty>
                   )}
                 </>
               ) : (
