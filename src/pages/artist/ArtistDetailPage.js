@@ -117,7 +117,13 @@ export default function ArtistDetailPage() {
               <Label>스포티파이</Label>
               <Value>
                 {artist.spotify ? (
-                  <a href={artist.spotify} target="_blank" rel="noreferrer">바로가기</a>
+                  <a
+                    href={`https://open.spotify.com/artist/${artist.spotify}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    바로가기
+                  </a>
                 ) : '정보 없음'}
               </Value>
             </LabelRow>
