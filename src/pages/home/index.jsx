@@ -257,7 +257,7 @@ export default HomePage;
 
 const HeaderWrapper = styled.div`
   img {
-    height: 20px !important;
+    height: 16px !important;
     width: auto;
   }
 `;
