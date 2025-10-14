@@ -209,9 +209,9 @@ export default function FavoritePage() {
       </TabRow>
 
       <ScrollableList onScroll={onScroll} ref={scrollRef}>
-        <List>
+        <FavoriteSection padded={selectedTab === 'performance'}>
           {selectedTab === 'performance' && (
-            <div style={{ paddingTop: '16px' }}>
+            <div>
               {perfList.length ? (
                 <>
                   {perfList.map((performance) => (
@@ -255,7 +255,7 @@ export default function FavoritePage() {
             ) : (
               !artistLoading && <Empty>찜한 아티스트가 없습니다.</Empty>
             ))}
-        </List>
+        </FavoriteSection>
       </ScrollableList>
     </PageWrapper>
   );
@@ -286,11 +286,6 @@ const TabButton = styled.button`
   background-color: transparent;
   cursor: pointer;
   font-family: inherit; 
-`;
-
-const List = styled.div`
-  display: flex;
-  flex-direction: column;
 `;
 
 const Empty = styled.div`
@@ -324,4 +319,10 @@ const ScrollableList = styled.div`
 
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
+`;
+
+const FavoriteSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding-top: ${({ padded }) => (padded ? '16px' : '0')};
 `;
