@@ -66,7 +66,7 @@ export default function FavoritePage() {
     const load = async () => {
       try {
         setArtistLoading(true);
-        const res = await fetchLikedArtists({ page: 1, size: PAGE_SIZE, authToken });
+        const res = await fetchLikedArtists(1, PAGE_SIZE, authToken);
         const items = res.artists ?? [];
         setArtistList(items);
         const page = res.page ?? 1;
@@ -115,7 +115,7 @@ export default function FavoritePage() {
     setArtistLoading(true);
     try {
       const next = (artistPageInfo.page ?? 1) + 1;
-      const res = await fetchLikedArtists({ page: next, size: PAGE_SIZE, authToken });
+      const res = await fetchLikedArtists(next, PAGE_SIZE, authToken);
       const items = res.artists ?? [];
       setArtistList((prev) => [...prev, ...items]);
 
@@ -209,9 +209,9 @@ export default function FavoritePage() {
       </TabRow>
 
       <ScrollableList onScroll={onScroll} ref={scrollRef}>
-        <List>
+        <FavoriteSection padded={selectedTab === 'performance'}>
           {selectedTab === 'performance' && (
-            <div style={{ paddingTop: '16px' }}>
+            <div>
               {perfList.length ? (
                 <>
                   {perfList.map((performance) => (
@@ -223,9 +223,8 @@ export default function FavoritePage() {
                       }
                     />
                   ))}
-                  {/* ✅ 마지막 표기 */}
                   {!perfHasMore && perfList.length > 0 && (
-                    <Empty>마지막 공연입니다.</Empty>
+                    <Empty style={{ marginTop: '-16px' }}>마지막 공연입니다.</Empty>
                   )}
                 </>
               ) : (
@@ -233,7 +232,7 @@ export default function FavoritePage() {
               )}
             </div>
           )}
-
+      
           {selectedTab === 'artist' &&
             (artistList.length ? (
               <>
@@ -244,10 +243,11 @@ export default function FavoritePage() {
                     onToggleLike={(id) =>
                       toggleArtistLike(id, artist.isLiked ?? true)
                     }
-                    onToggleAlarm={(id, enabled) => toggleArtistAlarm(id, enabled)}
+                    onToggleAlarm={(id, enabled) =>
+                      toggleArtistAlarm(id, enabled)
+                    }
                   />
                 ))}
-                {/* ✅ 마지막 표기 */}
                 {!artistHasMore && artistList.length > 0 && (
                   <Empty>마지막 아티스트입니다.</Empty>
                 )}
@@ -255,7 +255,7 @@ export default function FavoritePage() {
             ) : (
               !artistLoading && <Empty>찜한 아티스트가 없습니다.</Empty>
             ))}
-        </List>
+        </FavoriteSection>
       </ScrollableList>
     </PageWrapper>
   );
@@ -268,9 +268,12 @@ const Container = styled.div`
 `;
 
 const TabRow = styled.div`
+  padding-top: 0.75rem;
   display: flex;
   justify-content: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineGray};
+  position: sticky;
+  top: 0;            
 `;
 
 const TabButton = styled.button`
@@ -324,4 +327,10 @@ const ScrollableList = styled.div`
 
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
+`;
+
+const FavoriteSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding-top: ${({ padded }) => (padded ? '16px' : '0')};
 `;

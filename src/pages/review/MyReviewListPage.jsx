@@ -18,7 +18,7 @@ const SubBar = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 24px;
   margin-bottom: 12px;
   flex-wrap: wrap;
 `;
@@ -141,7 +141,7 @@ export default function MyReviewListPage() {
 
   const mergeDedupe = (prev, next) => {
     const m = new Map();
-    [...next, ...prev].forEach(it => it?.id != null && m.set(it.id, it));
+    [...prev, ...next].forEach(it => it?.id != null && m.set(it.id, it));
     return [...m.values()];
   };
 
