@@ -7,10 +7,12 @@ import styles from './home.module.css';
 // import iconCalendar from '../../assets/icons/icon_calendar_hyunjin.svg'; // [DISABLED] 캘린더 아이콘 임포트 (렌더 비활성화)
 import Sidebar from '../../components/sidebar/Sidebar';
 import { useNavigate } from 'react-router-dom';
+import modieHeaderLogo from '../../assets/icons/modie_header.png';
 import Header from '../../components/layout/Header';
 import { ReactComponent as IconWeb } from '../../assets/icons/icon_heart_outline.svg';   // ← 좌측 웹아이콘(임시)
 import { ReactComponent as IconSearch } from '../../assets/icons/icon_y_search.svg';      // ← 검색
 import { ReactComponent as IconNotify } from '../../assets/icons/icon_notify_on.svg';     // ← 알림
+
 import PickCard from '../../components/performance/Pick/PickCard';
 import MoodSection from '../../components/performance/mood/MoodSection';
 import PopularConcertList from '../../components/performance/popular/PopularConcertList';
@@ -191,7 +193,9 @@ const HomePage = () => {
 
   return (
     <>
-      <Header title="홈" />
+      <HeaderWrapper>
+        <Header logoSrc={modieHeaderLogo} />
+      </HeaderWrapper>
       <div style={{ height: "16px" }} />
 
       <ScrollableContent>
@@ -250,6 +254,13 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
+const HeaderWrapper = styled.div`
+  img {
+    height: 18px !important;
+    width: auto;
+  }
+`;
 
 const ScrollableContent = styled.div`
   height: calc(100dvh - 56px); 

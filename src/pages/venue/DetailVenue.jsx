@@ -492,9 +492,10 @@ const DetailVenue = () => {
                     <ReviewCardWrapper key={r.id}>
                       <ReviewCard
                         review={r}
-                        variant="compact"     
+                        variant="venueDetail"   
                         isLoggedIn={false}    
                         isOwner={false}
+                        hideImages={true}
                       />
                     </ReviewCardWrapper>
                   ))}
