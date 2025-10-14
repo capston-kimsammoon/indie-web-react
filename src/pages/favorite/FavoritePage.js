@@ -16,6 +16,7 @@ import {
 } from '../../api/likeApi';
 
 const PAGE_SIZE = 20;
+왜이래
 
 export default function FavoritePage() {
   const [selectedTab, setSelectedTab] = useState('performance'); // 'performance' | 'artist'
