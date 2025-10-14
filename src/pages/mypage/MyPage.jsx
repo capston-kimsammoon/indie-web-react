@@ -214,7 +214,7 @@ function MyPage() {
           <div className="footer-actions">
             <button 
               className="logout__button" 
-              onClick={() => navigate('/notice')}
+              onClick={() => navigate('/support')}
             >
               고객센터
             </button>
