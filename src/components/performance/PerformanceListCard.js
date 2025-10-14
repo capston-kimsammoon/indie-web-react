@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import HeartButton from '../common/HeartButton';
+import { formatKoreanDateTime } from '../../utils/dateUtils'; 
 
 // ---- helpers ----
 const toAbs = (url) => {
@@ -28,6 +29,8 @@ export default function PerformanceListCard({ performance, onToggleLike }) {
     navigate(`/performance/${performance.id}`);
   };
 
+  const formattedDate = formatKoreanDateTime(date);
+
   return (
     <Card onClick={handleClick}>
       <LeftSection>
@@ -42,7 +45,7 @@ export default function PerformanceListCard({ performance, onToggleLike }) {
         <Info>
           <Title>{title}</Title>
           <Venue>{venue}</Venue>
-          <Date>{date}</Date>
+          <Date>{formattedDate}</Date>
         </Info>
       </LeftSection>
 
