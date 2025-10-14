@@ -270,6 +270,7 @@ const Container = styled.div`
 const TabRow = styled.div`
   display: flex;
   justify-content: center;
+  height: 80px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineGray};
   position: sticky;
   top: 0;            
@@ -278,7 +279,6 @@ const TabRow = styled.div`
 const TabButton = styled.button`
   flex: 1;
   padding: 0.75rem 1rem;
-  height: 48px;
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ active, theme }) =>
@@ -317,7 +317,6 @@ const ScrollableList = styled.div`
   padding-bottom: 109px;
   flex-grow: 1;
   overflow-y: auto;
-  min-height: calc(100vh - 60px);
 
   &::-webkit-scrollbar {
     display: none; 
