@@ -147,18 +147,18 @@ const Title = styled.div`
 `;
 
 const PickerRow = styled.div`
+  position: relative; 
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-top: 16px; 
-  gap: 8px;
+  justify-content: space-between; 
+  margin-top: 16px;
 `;
 
 const PickerGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1;
+  width: 40%; 
 `;
 
 const Picker = styled.div`
@@ -198,10 +198,11 @@ const SelectWrapper = styled.div`
 `;
 
 const Divider = styled.span`
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.semibold};
   color: ${({ theme }) => theme.colors.darkGray};
-  margin: 0 20px;
-  flex-shrink: 0;
 `;
 
