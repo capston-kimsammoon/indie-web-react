@@ -268,10 +268,11 @@ const Container = styled.div`
 `;
 
 const TabRow = styled.div`
-  height: 50px;
   display: flex;
   justify-content: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineGray};
+  position: sticky;
+  top: 0;            
 `;
 
 const TabButton = styled.button`
