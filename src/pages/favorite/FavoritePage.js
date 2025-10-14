@@ -66,7 +66,7 @@ export default function FavoritePage() {
     const load = async () => {
       try {
         setArtistLoading(true);
-        const res = await fetchLikedArtists({ page: 1, size: PAGE_SIZE, authToken });
+        const res = await fetchLikedArtists(1, PAGE_SIZE, authToken);
         const items = res.artists ?? [];
         setArtistList(items);
         const page = res.page ?? 1;
@@ -115,7 +115,7 @@ export default function FavoritePage() {
     setArtistLoading(true);
     try {
       const next = (artistPageInfo.page ?? 1) + 1;
-      const res = await fetchLikedArtists({ page: next, size: PAGE_SIZE, authToken });
+      const res = await fetchLikedArtists(next, PAGE_SIZE, authToken);
       const items = res.artists ?? [];
       setArtistList((prev) => [...prev, ...items]);
 
