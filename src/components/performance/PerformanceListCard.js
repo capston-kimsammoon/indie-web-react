@@ -145,7 +145,7 @@ const Venue = styled.div`
 const Date = styled.div`
   margin-top: 0.5rem;
   font-size: ${({ theme }) => theme.fontSizes.sm};
-  font-weight: ${({ theme }} => theme.fontWeights.regular};
+  font-weight: ${({ theme }) => theme.fontWeights.regular};
   color: ${({ theme }) => theme.colors.darkGray};
 `;
 
