@@ -216,7 +216,7 @@ function MyPage() {
               className="logout__button" 
               onClick={() => navigate('/notice')}
             >
-              고객센
+              고객센터
             </button>
           </div>
         </div>
