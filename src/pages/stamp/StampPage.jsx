@@ -192,7 +192,7 @@ export default function StampPage() {
           <img
             src={StampButtonIcon}
             alt="스탬프 찍기"
-            style={{ height: '8px', width: 'auto' }}
+            style={{ height: '10px', width: 'auto' }}
           />
         </StampButton>
 
