@@ -168,7 +168,7 @@ function ListVenue() {
         selectedRegions={selectedRegions}
       />
 
-      <ScrollableList>
+      <ScrollableList ref={scrollContainerRef}>
         {venues.length > 0 ? (
           <>
             {venues.map((venue) => (
