@@ -17,55 +17,48 @@ function ListVenue() {
   const [loading, setLoading] = useState(false);
   const size = 20;
   const sentinelRef = useRef(null);
-  const scrollContainerRef = useRef(null);
 
-  const SESSION_KEY = 'venueListState';
-  const PAGE_NAME = 'venueListPage';
-
-  const getScrollPosition = () => {
-    return JSON.parse(sessionStorage.getItem(PAGE_NAME) || '0');
-  };
-  
-  const setScrollPosition = (position) => {
-    sessionStorage.setItem(PAGE_NAME, JSON.stringify(position));
-  };
-
-  // ---------------------------
-  // 1) 마운트 시 상태 복원
-  // ---------------------------
+  // ✅ 상태 복원
   useEffect(() => {
     const saved = sessionStorage.getItem('venueListState');
     if (saved) {
-      const { selectedRegions: savedRegions, venues: savedVenues, page: savedPage } = JSON.parse(saved);
-      setSelectedRegions(savedRegions || ['전체']);
-      setVenues(savedVenues || []);
-      setPage(savedPage || 1);
-      setHasMore(savedVenues && savedVenues.length >= size);
-      
-      // ❌ 여기서 window.scrollTo 제거
+      const { scrollY, selectedRegions, venues, page } = JSON.parse(saved);
+      setSelectedRegions(selectedRegions || ['전체']);
+      setVenues(venues || []);
+      setPage(page || 1);
+
+      // 스크롤 복원 (렌더 이후)
+      setTimeout(() => {
+        window.scrollTo(0, scrollY || 0);
+      }, 0);
     } else {
+      // 저장된 상태가 없을 때만 새로 로드
       loadVenues(1);
     }
   }, []);
 
+  // ✅ 스크롤 복원용 useEffect (리스트 로드 완료 후 실행)
   useEffect(() => {
-    if (venues.length > 0 && scrollContainerRef.current) {
-      const prevScrollPosition = getScrollPosition();
-      scrollContainerRef.current.scrollTop = prevScrollPosition;
+    const saved = sessionStorage.getItem('venueListState');
+    if (!saved) return;
+
+    const { scrollY } = JSON.parse(saved);
+
+    // venues가 실제로 렌더링된 후 복원
+    if (venues.length > 0) {
+      setTimeout(() => {
+        window.scrollTo(0, scrollY || 0);
+      }, 50); // 살짝 지연 (렌더 타이밍 맞추기)
     }
   }, [venues]);
 
-  // ---------------------------
-  // 2) 언마운트 시 상태 저장
-  // ---------------------------
+  // ✅ 언마운트 시 상태 저장
   useEffect(() => {
     return () => {
-      if (scrollContainerRef.current) {
-        setScrollPosition(scrollContainerRef.current.scrollTop);
-      }
       sessionStorage.setItem(
         'venueListState',
         JSON.stringify({
+          scrollY: window.scrollY,
           selectedRegions,
           venues,
           page,
@@ -74,18 +67,20 @@ function ListVenue() {
     };
   }, [selectedRegions, venues, page]);
 
-  // ---------------------------
-  // 3) API 호출
-  // ---------------------------
+  // API 호출 함수
   const loadVenues = useCallback(
     async (pageNum) => {
       if (loading) return;
       setLoading(true);
       try {
-        const regionParam =
-          selectedRegions.includes('전체') ? undefined : selectedRegions;
-
-        const data = await fetchVenueList({ page: pageNum, size, region: regionParam });
+        const regionParam = selectedRegions.includes('전체')
+          ? undefined
+          : selectedRegions;
+        const data = await fetchVenueList({
+          page: pageNum,
+          size,
+          region: regionParam,
+        });
 
         const venueList = Array.isArray(data?.content)
           ? data.content
@@ -93,12 +88,20 @@ function ListVenue() {
           ? data
           : [];
 
-        setVenues((prev) => (pageNum === 1 ? venueList : [...prev, ...venueList]));
+        if (pageNum === 1) {
+          setVenues(venueList);
+        } else {
+          setVenues((prev) => [...prev, ...venueList]);
+        }
+
+        // 20개 미만이면 더 이상 데이터 없음
         setHasMore(venueList.length >= size);
         setPage(pageNum + 1);
       } catch (err) {
         console.error('공연장 목록 API 호출 실패:', err);
-        if (pageNum === 1) setVenues([]);
+        if (pageNum === 1) {
+          setVenues([]);
+        }
       } finally {
         setLoading(false);
       }
@@ -106,25 +109,14 @@ function ListVenue() {
     [selectedRegions, size, loading]
   );
 
-  // ---------------------------
-  // 4) 지역 변경 시 리로드
-  // ---------------------------
+  // 지역 변경 시 첫 페이지부터 다시 로드
   useEffect(() => {
     setPage(1);
     setHasMore(true);
-    setVenues([]);
     loadVenues(1);
-    
-    // ✅ 지역 변경 시 스크롤 초기화 추가
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = 0;
-      setScrollPosition(0);
-    }
   }, [selectedRegions]);
 
-  // ---------------------------
-  // 5) 무한 스크롤
-  // ---------------------------
+  // 무한 스크롤 센티넬
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;
@@ -142,9 +134,6 @@ function ListVenue() {
     return () => observer.disconnect();
   }, [page, hasMore, loading, loadVenues]);
 
-  // ---------------------------
-  // 6) 지역 선택 처리
-  // ---------------------------
   const handleSelectRegion = (region) => {
     if (region === '전체') {
       setSelectedRegions(['전체']);
@@ -153,6 +142,7 @@ function ListVenue() {
       let updated = alreadySelected
         ? selectedRegions.filter((r) => r !== region)
         : selectedRegions.filter((r) => r !== '전체').concat(region);
+
       if (updated.length === 0) updated = ['전체'];
       setSelectedRegions(updated);
     }
@@ -162,14 +152,12 @@ function ListVenue() {
     <PageWrapper>
       <Header title="공연장" initialSearchTab="공연/공연장" />
       <div style={{ height: '16px' }} />
-
       <RegionSelectButton
         onClick={() => setIsSheetOpen(true)}
         selectedRegions={selectedRegions}
       />
-
-      <ScrollableList ref={scrollContainerRef}>
-        {venues.length > 0 ? (
+      <ScrollableList>
+        {Array.isArray(venues) && venues.length > 0 ? (
           <>
             {venues.map((venue) => (
               <VenueItem
@@ -185,7 +173,6 @@ function ListVenue() {
           <EmptyMessage>해당되는 공연장이 없습니다.</EmptyMessage>
         )}
       </ScrollableList>
-
       {isSheetOpen && (
         <RegionSelectSheet
           selectedRegions={selectedRegions}
@@ -199,7 +186,9 @@ function ListVenue() {
 
 export default ListVenue;
 
+/* ===== 스타일 ===== */
 const PageWrapper = styled.div`
+  height: 100vh;
   height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -216,12 +205,13 @@ const ScrollableList = styled.div`
   }
   -ms-overflow-style: none;
   scrollbar-width: none;
+
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
 `;
 
 const EmptyMessage = styled.div`
-  padding: 16px;
+  padding: 16px 16px;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ theme }) => theme.colors.darkGray};
@@ -234,6 +224,6 @@ const EmptyMessage = styled.div`
 const Loader = styled.div`
   padding: 16px 0;
   text-align: center;
-  color: ${({ theme }) => theme.colors.darkGray || '#666'};
-  font-size: ${({ theme }) => theme.fontSizes.sm || '14px'};
+  color: ${({ theme }) => theme.colors?.darkGray || '#666'};
+  font-size: ${({ theme }) => theme.fontSizes?.sm || '14px'};
 `;
