@@ -7,7 +7,7 @@ import Header from "../../components/layout/Header";
 import StampLogin from "../../components/stamp/StampLogin";
 import { fetchUserInfo } from "../../api/userApi";
 import PeriodModal from "../../components/modals/PeriodModal";
-import StampButtonIcon from "../../assets/icons/icon_stamp.svg";
+import StampButtonIcon from "../../assets/icons/modie_stamp.png";
 import FilterButtonNone from "../../components/common/FilterButtonNone";
 import StampPopup from "../../components/stamp/StampPopup";
 import StampPopupSmall from "../../components/stamp/StampPopupSmall";
@@ -192,7 +192,7 @@ export default function StampPage() {
           <img
             src={StampButtonIcon}
             alt="스탬프 찍기"
-            style={{ transform: 'rotate(20deg)', marginLeft: '2px', marginBottom: '4px' }}
+            style={{ height: '8px', width: 'auto' }}
           />
         </StampButton>
 
