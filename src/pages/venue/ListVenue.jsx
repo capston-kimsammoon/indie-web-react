@@ -17,38 +17,55 @@ function ListVenue() {
   const [loading, setLoading] = useState(false);
   const size = 20;
   const sentinelRef = useRef(null);
+  const scrollContainerRef = useRef(null);
 
   const SESSION_KEY = 'venueListState';
+  const PAGE_NAME = 'venueListPage';
+
+  const getScrollPosition = () => {
+    return JSON.parse(sessionStorage.getItem(PAGE_NAME) || '0');
+  };
+  
+  const setScrollPosition = (position) => {
+    sessionStorage.setItem(PAGE_NAME, JSON.stringify(position));
+  };
 
   // ---------------------------
   // 1) 마운트 시 상태 복원
   // ---------------------------
   useEffect(() => {
-    const saved = sessionStorage.getItem(SESSION_KEY);
+    const saved = sessionStorage.getItem('venueListState');
     if (saved) {
-      const { scrollY, selectedRegions, venues, page } = JSON.parse(saved);
-      setSelectedRegions(selectedRegions || ['전체']);
-      setVenues(venues || []);
-      setPage(page || 1);
-
-      // venues 렌더 후 스크롤 복원
-      setTimeout(() => {
-        window.scrollTo(0, scrollY || 0);
-      }, 0);
+      const { selectedRegions: savedRegions, venues: savedVenues, page: savedPage } = JSON.parse(saved);
+      setSelectedRegions(savedRegions || ['전체']);
+      setVenues(savedVenues || []);
+      setPage(savedPage || 1);
+      setHasMore(savedVenues && savedVenues.length >= size);
+      
+      // ❌ 여기서 window.scrollTo 제거
     } else {
       loadVenues(1);
     }
   }, []);
+
+  useEffect(() => {
+    if (venues.length > 0 && scrollContainerRef.current) {
+      const prevScrollPosition = getScrollPosition();
+      scrollContainerRef.current.scrollTop = prevScrollPosition;
+    }
+  }, [venues]);
 
   // ---------------------------
   // 2) 언마운트 시 상태 저장
   // ---------------------------
   useEffect(() => {
     return () => {
+      if (scrollContainerRef.current) {
+        setScrollPosition(scrollContainerRef.current.scrollTop);
+      }
       sessionStorage.setItem(
-        SESSION_KEY,
+        'venueListState',
         JSON.stringify({
-          scrollY: window.scrollY,
           selectedRegions,
           venues,
           page,
@@ -95,7 +112,14 @@ function ListVenue() {
   useEffect(() => {
     setPage(1);
     setHasMore(true);
+    setVenues([]);
     loadVenues(1);
+    
+    // ✅ 지역 변경 시 스크롤 초기화 추가
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+      setScrollPosition(0);
+    }
   }, [selectedRegions]);
 
   // ---------------------------
