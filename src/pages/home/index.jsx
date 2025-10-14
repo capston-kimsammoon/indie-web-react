@@ -11,6 +11,7 @@ import Header from '../../components/layout/Header';
 import { ReactComponent as IconWeb } from '../../assets/icons/icon_heart_outline.svg';   // ← 좌측 웹아이콘(임시)
 import { ReactComponent as IconSearch } from '../../assets/icons/icon_y_search.svg';      // ← 검색
 import { ReactComponent as IconNotify } from '../../assets/icons/icon_notify_on.svg';     // ← 알림
+import modieHeaderLogo from '../../assets/icons/modie_header.png';
 import PickCard from '../../components/performance/Pick/PickCard';
 import MoodSection from '../../components/performance/mood/MoodSection';
 import PopularConcertList from '../../components/performance/popular/PopularConcertList';
@@ -191,7 +192,7 @@ const HomePage = () => {
 
   return (
     <>
-      <Header title="홈" />
+      <Header logoSrc={modieHeaderLogo} />
       <div style={{ height: "16px" }} />
 
       <ScrollableContent>
