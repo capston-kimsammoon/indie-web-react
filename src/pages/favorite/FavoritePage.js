@@ -20,6 +20,8 @@ const PAGE_SIZE = 20;
 export default function FavoritePage() {
   const [selectedTab, setSelectedTab] = useState('performance'); // 'performance' | 'artist'
   const authToken = localStorage.getItem('accessToken');
+  const tabScrollPositions = useRef({ performance: 0, artist: 0 });
+  const canLoadMoreByPage = (info) => (info?.page ?? 1) < (info?.totalPages ?? 1);
 
   // 공연/아티스트 각각 응답 배열로 상태 분리
   const [perfList, setPerfList] = useState([]);
@@ -33,6 +35,37 @@ export default function FavoritePage() {
   const [artistHasMore, setArtistHasMore] = useState(true);
 
   const scrollRef = useRef(null);
+  const onScroll = (e) => {
+    const el = e.currentTarget;
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 120; // 임계치
+    if (!nearBottom) return;
+
+    if (selectedTab === 'performance') {
+      if (!perfLoading && perfHasMore) loadMorePerformances();
+    } else {
+      if (!artistLoading && artistHasMore) loadMoreArtists();
+    }
+  };
+  const handleTabChange = (nextTab) => {
+    // 1) 현재 스크롤 저장
+    const el = scrollRef.current;
+    if (el) {
+      tabScrollPositions.current[selectedTab] = el.scrollTop || 0;
+    }
+
+    // 2) 탭 변경
+    setSelectedTab(nextTab);
+
+    // 3) 탭 변경 후 (렌더가 끝난 뒤) 복원
+    // requestAnimationFrame을 사용하면 브라우저가 렌더를 끝낸 뒤 실행되므로 안정적
+    requestAnimationFrame(() => {
+      const el2 = scrollRef.current;
+      if (el2) {
+        const to = tabScrollPositions.current[nextTab] || 0;
+        el2.scrollTop = to;
+      }
+    });
+  };
 
   /* ---------- 공통: 더 로드 가능 여부 ---------- */
   const canLoadMoreByPage = (info) => (info?.page ?? 1) < (info?.totalPages ?? 1);
@@ -198,12 +231,12 @@ export default function FavoritePage() {
       <TabRow>
         <TabButton
           active={selectedTab === 'performance'}
-          onClick={() => setSelectedTab('performance')}>
+          onClick={() => handleTabChange('performance')}>
           공연
         </TabButton>
         <TabButton
           active={selectedTab === 'artist'}
-          onClick={() => setSelectedTab('artist')}>
+          onClick={() => handleTabChange('artist')}>
           아티스트
         </TabButton>
       </TabRow>
