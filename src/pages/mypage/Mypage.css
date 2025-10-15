@@ -188,6 +188,7 @@
   display: flex;
   align-items: center;
   padding: 8px; 
+  margin-right: -8px;
 }
 .chev-button .chev { 
   width: 18px; 
