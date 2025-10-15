@@ -1,7 +1,7 @@
 // src/pages/performance/PerformanceListPage.jsx
-import React, { useState, useEffect, useRef } from 'react'; // ✅ 추가 (useRef)
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'; // ✅ 추가: useRef, useLayoutEffect
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useNavigationType } from 'react-router-dom'; // ✅ 추가: useLocation, useNavigationType
 import Header from '../../components/layout/Header';
 import PerformanceListCard from '../../components/performance/PerformanceListCard';
 import RegionSelectButton from '../venue/components/RegionSelectButton';
@@ -48,7 +48,10 @@ export default function PerformanceListPage() {
   const [hasMore, setHasMore] = useState(true);
   const size = 15;
 
-  const scrollRef = useRef(null); // ✅ 추가
+  // ✅ 추가: 내부 스크롤 컨테이너 ref + 라우팅 정보
+  const scrollRef = useRef(null);
+  const location = useLocation();
+  const navigationType = useNavigationType();
 
   const handleSelectRegion = (region) => {
     if (region === '전체') {
@@ -103,42 +106,35 @@ export default function PerformanceListPage() {
   };
 
   useEffect(() => {
-    // ✅ 저장된 상태 복원 (스크롤 + 리스트 데이터)
-    const savedData = sessionStorage.getItem('performanceListState');
-    if (savedData) {
-      const { performances, page, sortOption, selectedRegions, scrollY } = JSON.parse(savedData);
-      setPerformances(performances || []);
-      setPage(page || 1);
-      setSortOption(sortOption || 'latest');
-      setSelectedRegions(selectedRegions || ['전체']);
-
-      // 스크롤 복원 (렌더 완료 후)
-      setTimeout(() => {
-        if (scrollRef.current) {
-          scrollRef.current.scrollTo(0, scrollY || 0);
-        }
-      }, 150);
-      sessionStorage.removeItem('performanceListState');
-      return;
-    }
-
     loadPerformances(page > 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortOption, selectedRegions, page]);
 
-  // ✅ 언마운트 시 현재 상태 저장
+  // ✅ 추가 1: 언마운트(다른 페이지로 이동) 시 내부 스크롤 위치 저장
   useEffect(() => {
     return () => {
-      const stateToSave = {
-        performances,
-        page,
-        sortOption,
-        selectedRegions,
-        scrollY: scrollRef.current ? scrollRef.current.scrollTop : 0,
-      };
-      sessionStorage.setItem('performanceListState', JSON.stringify(stateToSave));
+      try {
+        const key = location.key || `perf-${location.pathname}`;
+        const top = scrollRef.current ? scrollRef.current.scrollTop : 0;
+        sessionStorage.setItem(`perf-scroll-${key}`, String(top));
+      } catch (_) {}
     };
-  }, [performances, page, sortOption, selectedRegions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  // ✅ 추가 2: 뒤로/앞으로(POP)로 돌아왔을 때 페인트 전에 즉시 복원(깜빡임 방지)
+  useLayoutEffect(() => {
+    if (navigationType === 'POP') {
+      try {
+        const key = location.key || `perf-${location.pathname}`;
+        const saved = sessionStorage.getItem(`perf-scroll-${key}`);
+        if (saved && scrollRef.current) {
+          scrollRef.current.scrollTop = parseInt(saved, 10) || 0;
+        }
+      } catch (_) {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.key]);
 
   return (
     <>
@@ -163,7 +159,7 @@ export default function PerformanceListPage() {
           <CalendarIconButton onClick={() => navigate('/calendar')} />
         </FilterBar>
 
-        <ScrollableContent ref={scrollRef}> {/* ✅ ref 추가 */}
+        <ScrollableContent ref={scrollRef}> {/* ✅ 추가: ref 연결 */}
           {performances.length > 0 ? (
             <>
               {performances.map((p) => (
