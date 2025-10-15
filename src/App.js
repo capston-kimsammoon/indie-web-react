@@ -7,7 +7,8 @@ import  { Toaster } from 'react-hot-toast';
 function App() {
   return (
     <>
-      <ScrollToTop />
+            {/* <ScrollToTop /> ⬅️ 주석 처리 */}
+
       <Routes>
         {routes.map(({ path, element }, idx) => (
           <Route key={idx} path={path} element={element} />
