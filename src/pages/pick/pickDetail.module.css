@@ -25,7 +25,7 @@
 .hr {
   height: 1px;
   background: #ededed;
-  margin: 0 0 0 0;
+  margin-bottom: -20px;
   border: 0;
 }
 
@@ -41,7 +41,7 @@
   font-size: 14px;
   line-height: 1.8;
   color: #2F2F2F;
-  padding: -20px 0 19px 0;
+  padding-bottom: 27px;
   white-space: pre-wrap;
 }
 
