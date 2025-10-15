@@ -136,7 +136,20 @@ export default function PerformanceListPage() {
   }, [sortOption, selectedRegions, page]);
 
   // ====================================================================
-  // ✅ 스크롤 위치 복원 로직 수정 (핵심 수정 부분)
+  // ✅ 1. JS: body 스크롤 비활성화/활성화 로직 추가 (다른 페이지에 영향 없음)
+  // ====================================================================
+  useEffect(() => {
+    // 마운트 시 body 스크롤 숨기기
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      // 언마운트 시 body 스크롤 다시 활성화 (다른 페이지는 body 스크롤 사용)
+      document.body.style.overflow = '';
+    };
+  }, []);
+
+  // ====================================================================
+  // ✅ 2. 스크롤 위치 복원 로직
   // ====================================================================
 
   // ✅ 추가 1: 언마운트(다른 페이지로 이동) 시 내부 스크롤 위치 및 상태 저장
@@ -145,7 +158,8 @@ export default function PerformanceListPage() {
       try {
         // 스크롤 위치 저장 (라우팅 키를 사용)
         const key = location.key || `perf-${location.pathname}`;
-        const top = scrollRef.current ? scrollRef.current.scrollTop : 0;
+        // ✅ 이제 scrollRef.current.scrollTop이 정확한 값을 반환합니다.
+        const top = scrollRef.current ? scrollRef.current.scrollTop : 0; 
         sessionStorage.setItem(`${SCROLL_KEY}-${key}`, String(top));
         
         // 상태 저장 (현재 페이지, 필터/정렬)
@@ -274,8 +288,8 @@ const Container = styled.div`
 `;
 
 const ScrollableContent = styled.div`
-  height: 100vh
-  height: 100dvh; 
+  /* ❌ 기존 height: 100vh, height: 100dvh 제거/주석 처리 */
+  flex-grow: 1; /* ✅ 3. CSS: 남은 공간을 모두 차지하도록 수정 */
   padding-bottom: 68px;
   overflow-y: auto;
   
