@@ -332,5 +332,5 @@ const ScrollableList = styled.div`
 const FavoriteSection = styled.div`
   display: flex;
   flex-direction: column;
-  padding-top: ${({ padded }) => (padded ? '16px' : '0')};
+  padding-top: ${({ padded }) => (padded ? '16px' : '4px')};
 `;
