@@ -71,34 +71,61 @@ function NotificationPage() {
   };
 
   return (
-    <>
+    <PageWrapper>
       <Header title="알림" showBack showSearch={false} />
       <div style={{ height: 30 }} />
-      <div className={styles.container}>
-        {loading ? (
-          <div className={styles.empty}>불러오는 중…</div>
-        ) : notifications.length === 0 ? (
-          <EmptyMessage>새 알림이 없습니다.</EmptyMessage>
-        ) : (
-          <div className={styles.list}>
-            {notifications.map((n) => (
-              <NotificationCard
-                key={n.id}
-                content={n.body} // 본문
-                highlight={n.title} // 파란 굵은 텍스트
-                isRead={!!n.is_read} // 읽음 스타일
-                onClick={() => handleClick(n)} // 카드 클릭 → 이동
-                onRemove={() => handleRemove(n.id)} // X 클릭 → 삭제
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    </>
+
+      <ScrollableList>
+        <div className={styles.container}>
+          {loading ? (
+            <div className={styles.empty}>불러오는 중…</div>
+          ) : notifications.length === 0 ? (
+            <EmptyMessage>새 알림이 없습니다.</EmptyMessage>
+          ) : (
+            <div className={styles.list}>
+              {notifications.map((n) => (
+                <NotificationCard
+                  key={n.id}
+                  content={n.body} // 본문
+                  highlight={n.title} // 파란 굵은 텍스트
+                  isRead={!!n.is_read} // 읽음 스타일
+                  onClick={() => handleClick(n)} // 카드 클릭 → 이동
+                  onRemove={() => handleRemove(n.id)} // X 클릭 → 삭제
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </ScrollableList>
+    </PageWrapper>
   );
 }
 
 export default NotificationPage;
+
+const PageWrapper = styled.div`
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ScrollableList = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 100px;
+  box-sizing: border-box;
+
+  &::-webkit-scrollbar {
+    display: none; 
+  }
+
+  -ms-overflow-style: none; 
+  scrollbar-width: none;
+
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+`;
 
 const EmptyMessage = styled.div`
   padding: 16px 16px;
