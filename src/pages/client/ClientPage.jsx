@@ -25,7 +25,7 @@ function ClientPage() {
 export default ClientPage;
 
 const EmptyMessage = styled.div`
-  padding: 16px 16px;
+  padding: 16px 0;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ theme }) => theme.colors.darkGray};
