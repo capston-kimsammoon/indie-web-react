@@ -148,7 +148,7 @@ Modie는 인디 씬의 중심을 ‘사람’—아티스트와 팬—으로 되
 팬은 Modie를 통해 새로운 아티스트를 발견하고 즉시 예매로 연결할 수 있다.  
 `,
 
-    imageUrl:'https://ibb.co/60Zf1L6y',
+imageUrl: 'https://i.ibb.co/VYNPQ5XL/image.png',
     author: 'Modie 관리자',
     createdAt: '2025-10-15',
   };
