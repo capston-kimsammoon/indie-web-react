@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import Header from '../../components/layout/Header';
 import Sidebar from '../../components/sidebar/Sidebar';
+import styled from 'styled-components';
 import styles from './pickDetail.module.css';
 
 // ✅ 매거진 API 연결
@@ -116,76 +117,103 @@ const PickDetailPage = () => {
     : [];
 
   return (
-    <>
+    <PageWrapper>
       <Header title="modie 추천공연" onMenuClick={() => setIsSidebarOpen(true)} />
       {isSidebarOpen && <Sidebar onClose={() => setIsSidebarOpen(false)} />}
 
-      <main className={styles.page}>
-        {/* 제목 */}
-        <h1 className={styles.title}>{pick.title}</h1>
-
-        {/* 메타 + 구분선 */}
-        <div className={styles.meta}>
-          {formatKST(pick.createdAt)} {pick.author}
-        </div>
-        <div className={styles.hr} />
-
-        {/* ✅ 블록을 순서대로 그대로 렌더링 */}
-        {sortedBlocks.length > 0 && (
-          <section className={styles.blocks}>
-            {sortedBlocks.map((b) => {
-              const type = b?.type;
-
-              if (type === 'image') {
-                const src = b?.imageUrl || b?.image_url;
-                if (!src) return null;
-                const align = (b?.align ?? b?.meta?.align ?? 'center').toLowerCase();
-                return (
-                  <figure
-                    key={`img-${b.id}`}
-                    className={styles.blockImage}
-                    data-align={['left', 'center', 'right'].includes(align) ? align : 'center'}
-                  >
-                    <img src={src} alt={b?.caption ?? pick.title} />
-                  </figure>
-                );
-              }
-
-              if (type === 'text' && b?.text) {
-                return (
-                  <div key={`txt-${b.id}`} className={styles.blockText}>
-                    {renderParagraphs(b.text, `txt-${b.id}`)}
-                  </div>
-                );
-              }
-
-              if (type === 'quote' && b?.text) {
-                return (
-                  <blockquote key={`q-${b.id}`} className={styles.blockQuote}>
-                    “{b.text}”
-                  </blockquote>
-                );
-              }
-
-              if (type === 'divider') {
-                return <hr key={`hr-${b.id}`} className={styles.blockDivider} />;
-              }
-
-              // embed 등은 필요 시 확장
-              return null;
-            })}
-          </section>
-        )}
-
-        {/* (선택) 과거 content 필드도 계속 표시 */}
-        {pick.content && (
-          <article className={styles.content}>
-            {renderParagraphs(pick.content, 'content')}
-          </article>
-        )}
-      </main>
-    </>
+      <ScrollableList>
+        <main className={styles.page}>
+          {/* 제목 */}
+          <h1 className={styles.title}>{pick.title}</h1>
+  
+          {/* 메타 + 구분선 */}
+          <div className={styles.meta}>
+            {formatKST(pick.createdAt)} {pick.author}
+          </div>
+          <div className={styles.hr} />
+  
+          {/* ✅ 블록을 순서대로 그대로 렌더링 */}
+          {sortedBlocks.length > 0 && (
+            <section className={styles.blocks}>
+              {sortedBlocks.map((b) => {
+                const type = b?.type;
+  
+                if (type === 'image') {
+                  const src = b?.imageUrl || b?.image_url;
+                  if (!src) return null;
+                  const align = (b?.align ?? b?.meta?.align ?? 'center').toLowerCase();
+                  return (
+                    <figure
+                      key={`img-${b.id}`}
+                      className={styles.blockImage}
+                      data-align={['left', 'center', 'right'].includes(align) ? align : 'center'}
+                    >
+                      <img src={src} alt={b?.caption ?? pick.title} />
+                    </figure>
+                  );
+                }
+  
+                if (type === 'text' && b?.text) {
+                  return (
+                    <div key={`txt-${b.id}`} className={styles.blockText}>
+                      {renderParagraphs(b.text, `txt-${b.id}`)}
+                    </div>
+                  );
+                }
+  
+                if (type === 'quote' && b?.text) {
+                  return (
+                    <blockquote key={`q-${b.id}`} className={styles.blockQuote}>
+                      “{b.text}”
+                    </blockquote>
+                  );
+                }
+  
+                if (type === 'divider') {
+                  return <hr key={`hr-${b.id}`} className={styles.blockDivider} />;
+                }
+  
+                // embed 등은 필요 시 확장
+                return null;
+              })}
+            </section>
+          )}
+  
+          {/* (선택) 과거 content 필드도 계속 표시 */}
+          {pick.content && (
+            <article className={styles.content}>
+              {renderParagraphs(pick.content, 'content')}
+            </article>
+          )}
+        </main>
+      </ScrollableList>
+    </PageWrapper>
   );
 };
+
+
+const PageWrapper = styled.div`
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ScrollableList = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 100px;
+  box-sizing: border-box;
+
+  &::-webkit-scrollbar {
+    display: none; 
+  }
+
+  -ms-overflow-style: none; 
+  scrollbar-width: none;
+
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+`;
 
 export default PickDetailPage;
