@@ -1,5 +1,5 @@
 // src/pages/performance/PerformanceListPage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; // ✅ 추가 (useRef)
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/layout/Header';
@@ -47,6 +47,8 @@ export default function PerformanceListPage() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const size = 15;
+
+  const scrollRef = useRef(null); // ✅ 추가
 
   const handleSelectRegion = (region) => {
     if (region === '전체') {
@@ -101,9 +103,42 @@ export default function PerformanceListPage() {
   };
 
   useEffect(() => {
+    // ✅ 저장된 상태 복원 (스크롤 + 리스트 데이터)
+    const savedData = sessionStorage.getItem('performanceListState');
+    if (savedData) {
+      const { performances, page, sortOption, selectedRegions, scrollY } = JSON.parse(savedData);
+      setPerformances(performances || []);
+      setPage(page || 1);
+      setSortOption(sortOption || 'latest');
+      setSelectedRegions(selectedRegions || ['전체']);
+
+      // 스크롤 복원 (렌더 완료 후)
+      setTimeout(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTo(0, scrollY || 0);
+        }
+      }, 150);
+      sessionStorage.removeItem('performanceListState');
+      return;
+    }
+
     loadPerformances(page > 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortOption, selectedRegions, page]);
+
+  // ✅ 언마운트 시 현재 상태 저장
+  useEffect(() => {
+    return () => {
+      const stateToSave = {
+        performances,
+        page,
+        sortOption,
+        selectedRegions,
+        scrollY: scrollRef.current ? scrollRef.current.scrollTop : 0,
+      };
+      sessionStorage.setItem('performanceListState', JSON.stringify(stateToSave));
+    };
+  }, [performances, page, sortOption, selectedRegions]);
 
   return (
     <>
@@ -128,7 +163,7 @@ export default function PerformanceListPage() {
           <CalendarIconButton onClick={() => navigate('/calendar')} />
         </FilterBar>
 
-        <ScrollableContent>
+        <ScrollableContent ref={scrollRef}> {/* ✅ ref 추가 */}
           {performances.length > 0 ? (
             <>
               {performances.map((p) => (

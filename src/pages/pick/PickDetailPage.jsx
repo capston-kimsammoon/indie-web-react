@@ -117,7 +117,7 @@ const PickDetailPage = () => {
 
   return (
     <>
-      <Header title="김삼문 pick !" onMenuClick={() => setIsSidebarOpen(true)} />
+      <Header title="modie 추천공연" onMenuClick={() => setIsSidebarOpen(true)} />
       {isSidebarOpen && <Sidebar onClose={() => setIsSidebarOpen(false)} />}
 
       <main className={styles.page}>
