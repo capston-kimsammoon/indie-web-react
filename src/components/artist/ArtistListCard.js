@@ -60,8 +60,12 @@ const Row = styled.div`
   align-items: center;
   gap: 12px;
   padding: 12px 0;
+  padding-top: 16px;
   background: ${({ theme }) => theme.colors.bgWhite};
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineGray};
+  &:last-child {
+    border-bottom: none; 
+  }
 `;
 
 const Left = styled.div`
