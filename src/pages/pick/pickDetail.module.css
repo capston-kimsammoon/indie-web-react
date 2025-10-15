@@ -3,6 +3,7 @@
 .page {
   padding-top: 20px;
   background: #ffffff;
+  padding: 0 8px;
 }
 
 .title {
@@ -40,7 +41,7 @@
   font-size: 14px;
   line-height: 1.8;
   color: #2F2F2F;
-  margin: 0 0 0 0;
+  padding: -20px 0 19px 0;
   white-space: pre-wrap;
 }
 
