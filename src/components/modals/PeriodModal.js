@@ -158,7 +158,6 @@ const PickerGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 40%; 
 `;
 
 const Picker = styled.div`
@@ -204,5 +203,6 @@ const Divider = styled.span`
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.semibold};
   color: ${({ theme }) => theme.colors.darkGray};
+  pointer-events: none;
 `;
 
