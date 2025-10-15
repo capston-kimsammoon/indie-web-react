@@ -12,6 +12,7 @@ import Header from '../../components/layout/Header';
 import { ReactComponent as IconWeb } from '../../assets/icons/icon_heart_outline.svg';   // ← 좌측 웹아이콘(임시)
 import { ReactComponent as IconSearch } from '../../assets/icons/icon_y_search.svg';      // ← 검색
 import { ReactComponent as IconNotify } from '../../assets/icons/icon_notify_on.svg';     // ← 알림
+import modieIcon from '../../assets/icons/modie_icon.png';
 
 import PickCard from '../../components/performance/Pick/PickCard';
 import MoodSection from '../../components/performance/mood/MoodSection';
@@ -111,12 +112,45 @@ const HomePage = () => {
   // ✅ [PICK] 더미 폴백 (API가 비었을 때만 사용)
   const PICK_FALLBACK = {
     id: 1,
-    title: 'Wow, Rich한 자신감으로 돌아온 aespa의 [Rich Man]',
-    content:
-      '낙엽과 함께 듣기 좋은 톤의 독립 음반 4선을 소개합니다. 따뜻하고 담백한 보컬, 그리고 가벼운 리듬.',
+    title: '“인디의 모든 순간을 한눈에” — 공연부터 예매까지, 인디 플랫폼 Modie의 등장',
+  
+    content: `
+(서울, 2025년) — “공연 정보를 찾으려면 인스타그램을 뒤지고, 티켓 예매는 또 다른 사이트에서 해야 했던” 인디 팬들의 불편함을 없애줄 플랫폼이 등장했다.  
+독립음악 전용 데이터 플랫폼 **Modie (modie.com)** 은 흩어진 인디 공연 정보를 한곳에 모아주는 신개념 서비스다.  
+Modie는 단순한 공연 정보 모음 사이트가 아니다. 운영팀이 직접 공연장·아티스트의 데이터를 수집하고 정제해, 사용자가 손쉽게 인디 공연 정보를 탐색할 수 있도록 만든다.  
+
+> “원래 인디 공연 정보를 얻으려면 인스타그램에서 공연장 계정을 하나하나 찾아봐야 했죠.  
+> 우리는 그 과정을 완전히 없앴습니다.”  
+> — Modie 개발팀 인터뷰 중  
+
+이 말처럼, Modie는 전국의 공연장, 아티스트, 티켓 판매 링크, 가격, 날짜 정보를 직접 크롤링·정리하여 제공한다.  
+덕분에 사용자는 검색 한 번으로 **공연 일정**, **예매 링크**, **Spotify 아티스트 페이지**, **포스터 이미지**까지 한눈에 확인할 수 있다.  
+
+**“오늘 뭐 볼까?” — 날짜별 공연 캘린더**  
+
+Modie의 핵심 기능 중 하나는 **‘공연 캘린더(Calendar)’**다.  
+매일, 매주 어떤 공연이 열리는지 직관적인 달력 인터페이스로 보여주며, 사용자는 클릭 한 번으로 세부 정보를 바로 열람할 수 있다.  
+뿐만 아니라 **“예매 임박순”**, **“가장 인기 있는 공연”**, **“오늘 열리는 공연”** 등으로 자동 정렬되어, 지금 당장 볼 수 있는 공연을 손쉽게 찾을 수 있다.  
+
+ **“오늘의 무드에 맞는 공연 추천”**  
+
+Modie는 단순한 정보 집계 사이트를 넘어, **공연 무드 기반 추천 시스템**을 제공한다.  
+‘따뜻한’, ‘신나는’, ‘몽환적인’ 등 감정 키워드에 따라 어울리는 공연을 추천해주며,  
+사용자는 기분이나 날씨에 맞는 공연을 쉽게 발견할 수 있다.  
+
+이러한 기능은 단순한 데이터 필터링이 아닌, **Modie가 자체적으로 구축한 공연 분위기 태깅 시스템**을 기반으로 작동한다.  
+덕분에 사용자 경험은 “공연 정보 검색”이 아닌 “취향 맞춤 탐색”에 가까워진다.  
+
+ **아티스트 중심, 팬 중심**  
+
+Modie는 인디 씬의 중심을 ‘사람’—아티스트와 팬—으로 되돌리는 것을 목표로 한다.  
+플랫폼에는 각 아티스트의 **Spotify 링크**, **Instagram 계정**, **공연 이력**, **사진**이 정리되어 있으며,  
+팬은 Modie를 통해 새로운 아티스트를 발견하고 즉시 예매로 연결할 수 있다.  
+`,
+
     imageUrl: 'https://image.inews24.com/v1/dd35d151442f69.jpg',
-    author: '김삼문관리자',
-    createdAt: '2025-09-10T14:36:00+09:00',
+    author: 'Modie 관리자',
+    createdAt: '2025-10-15',
   };
 
   useEffect(() => {
