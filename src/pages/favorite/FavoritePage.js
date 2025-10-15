@@ -20,8 +20,6 @@ const PAGE_SIZE = 20;
 export default function FavoritePage() {
   const [selectedTab, setSelectedTab] = useState('performance'); // 'performance' | 'artist'
   const authToken = localStorage.getItem('accessToken');
-  const tabScrollPositions = useRef({ performance: 0, artist: 0 });
-  const canLoadMoreByPage = (info) => (info?.page ?? 1) < (info?.totalPages ?? 1);
 
   // 공연/아티스트 각각 응답 배열로 상태 분리
   const [perfList, setPerfList] = useState([]);
@@ -35,37 +33,6 @@ export default function FavoritePage() {
   const [artistHasMore, setArtistHasMore] = useState(true);
 
   const scrollRef = useRef(null);
-  const onScroll = (e) => {
-    const el = e.currentTarget;
-    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 120; // 임계치
-    if (!nearBottom) return;
-
-    if (selectedTab === 'performance') {
-      if (!perfLoading && perfHasMore) loadMorePerformances();
-    } else {
-      if (!artistLoading && artistHasMore) loadMoreArtists();
-    }
-  };
-  const handleTabChange = (nextTab) => {
-    // 1) 현재 스크롤 저장
-    const el = scrollRef.current;
-    if (el) {
-      tabScrollPositions.current[selectedTab] = el.scrollTop || 0;
-    }
-
-    // 2) 탭 변경
-    setSelectedTab(nextTab);
-
-    // 3) 탭 변경 후 (렌더가 끝난 뒤) 복원
-    // requestAnimationFrame을 사용하면 브라우저가 렌더를 끝낸 뒤 실행되므로 안정적
-    requestAnimationFrame(() => {
-      const el2 = scrollRef.current;
-      if (el2) {
-        const to = tabScrollPositions.current[nextTab] || 0;
-        el2.scrollTop = to;
-      }
-    });
-  };
 
   /* ---------- 공통: 더 로드 가능 여부 ---------- */
   const canLoadMoreByPage = (info) => (info?.page ?? 1) < (info?.totalPages ?? 1);
@@ -78,9 +45,11 @@ export default function FavoritePage() {
         const res = await fetchLikedPerformances(1, PAGE_SIZE, authToken);
         const items = res.performances ?? [];
         setPerfList(items);
+
         const page = res.page ?? 1;
         const totalPages = res.totalPages ?? 1;
         setPerfPageInfo({ page, totalPages });
+
         // totalPages 가 없다면 길이로 판정
         setPerfHasMore(totalPages > 1 || items.length === PAGE_SIZE);
       } catch (e) {
@@ -91,7 +60,6 @@ export default function FavoritePage() {
       }
     };
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken]);
 
   /* ---------- 초기 로드: 아티스트 ---------- */
@@ -102,6 +70,7 @@ export default function FavoritePage() {
         const res = await fetchLikedArtists(1, PAGE_SIZE, authToken);
         const items = res.artists ?? [];
         setArtistList(items);
+
         const page = res.page ?? 1;
         const totalPages = res.totalPages ?? 1;
         setArtistPageInfo({ page, totalPages });
@@ -114,12 +83,12 @@ export default function FavoritePage() {
       }
     };
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken]);
 
   /* ---------- 더 불러오기: 공연 ---------- */
   const loadMorePerformances = async () => {
     if (perfLoading || !perfHasMore) return;
+
     setPerfLoading(true);
     try {
       const next = (perfPageInfo.page ?? 1) + 1;
@@ -145,6 +114,7 @@ export default function FavoritePage() {
   /* ---------- 더 불러오기: 아티스트 ---------- */
   const loadMoreArtists = async () => {
     if (artistLoading || !artistHasMore) return;
+
     setArtistLoading(true);
     try {
       const next = (artistPageInfo.page ?? 1) + 1;
@@ -226,17 +196,19 @@ export default function FavoritePage() {
   return (
     <PageWrapper>
       <Header title="찜 리스트" />
-      <div style={{ height: "16px" }} />
+      <div style={{ height: '16px' }} />
 
       <TabRow>
         <TabButton
           active={selectedTab === 'performance'}
-          onClick={() => handleTabChange('performance')}>
+          onClick={() => setSelectedTab('performance')}
+        >
           공연
         </TabButton>
         <TabButton
           active={selectedTab === 'artist'}
-          onClick={() => handleTabChange('artist')}>
+          onClick={() => setSelectedTab('artist')}
+        >
           아티스트
         </TabButton>
       </TabRow>
@@ -257,7 +229,9 @@ export default function FavoritePage() {
                     />
                   ))}
                   {!perfHasMore && perfList.length > 0 && (
-                    <Empty style={{ marginTop: '-16px' }}>마지막 공연입니다.</Empty>
+                    <Empty style={{ marginTop: '-16px' }}>
+                      마지막 공연입니다.
+                    </Empty>
                   )}
                 </>
               ) : (
@@ -265,7 +239,7 @@ export default function FavoritePage() {
               )}
             </div>
           )}
-      
+
           {selectedTab === 'artist' &&
             (artistList.length ? (
               <>
@@ -306,7 +280,7 @@ const TabRow = styled.div`
   justify-content: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineGray};
   position: sticky;
-  top: 0;            
+  top: 0;
 `;
 
 const TabButton = styled.button`
@@ -321,7 +295,7 @@ const TabButton = styled.button`
     active ? `1.5px solid ${theme.colors.themeGreen}` : theme.colors.lightGray};
   background-color: transparent;
   cursor: pointer;
-  font-family: inherit; 
+  font-family: inherit;
 `;
 
 const List = styled.div`
@@ -335,8 +309,8 @@ const Empty = styled.div`
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ theme }) => theme.colors.darkGray};
   display: flex;
-  justify-content: center; 
-  align-items: center;    
+  justify-content: center;
+  align-items: center;
 `;
 
 const PageWrapper = styled.div`
@@ -352,10 +326,10 @@ const ScrollableList = styled.div`
   overflow-y: auto;
 
   &::-webkit-scrollbar {
-    display: none; 
+    display: none;
   }
 
-  -ms-overflow-style: none; 
+  -ms-overflow-style: none;
   scrollbar-width: none;
 
   overscroll-behavior: none;
