@@ -97,7 +97,7 @@
   border: none;
   border-radius: 4px;
   padding: 4px 8px;
-  height: calc(100% + 2px);
+  height: calc(100% + 20px);
   cursor: pointer;
   flex-shrink: 0;
 }
