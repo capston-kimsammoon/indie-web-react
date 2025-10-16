@@ -353,8 +353,6 @@ const SectionTitle = styled.div`
 `;
 
 const SurveyButton = styled.div`
-  width: 100vw;              
-  box-sizing: border-box;
   padding: 16px 0; 
   font-size: ${({ theme }) => theme.fontSizes.xs}; 
   font-weight: ${({ theme }) => theme.fontWeights.regular}; 
