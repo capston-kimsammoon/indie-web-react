@@ -178,13 +178,6 @@ const PickDetailPage = () => {
               })}
             </section>
           )}
-  
-          {/* (선택) 과거 content 필드도 계속 표시 */}
-          {pick.content && (
-            <article className={styles.content}>
-              {renderParagraphs(pick.content, 'content')}
-            </article>
-          )}
         </main>
       </ScrollableList>
     </PageWrapper>
