@@ -253,6 +253,10 @@ imageUrl: 'https://i.ibb.co/VYNPQ5XL/image.png',
           }}
         />
 
+        <SurveyButton onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSeJvWeIGEMKfXN1-7vMDrZ3f43aREMs_GBN5Xl5QJF2mtlP7A/viewform?usp=dialog', '_blank')}>
+          ▶  만족도 조사 설문 부탁드립니다 ! 추첨으로 커피 기프티콘 증정 !
+        </SurveyButton>
+
         <FullWidthSectionBack>
           <SectionTitle>인기 많은 공연</SectionTitle>
           <PopularConcertList performances={popularPerformances} />
@@ -347,3 +351,17 @@ const SectionTitle = styled.div`
   cursor: default;           
   color: ${({ theme }) => theme.colors.darkblack};
 `;
+
+const SurveyButton = styled.div`
+  padding: 16px 16px; 
+  font-size: ${({ theme }) => theme.fontSizes.xs}; 
+  font-weight: ${({ theme }) => theme.fontWeights.regular}; 
+  color: ${({ theme }) => theme.colors.lightGray}; 
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  cursor: pointer;
+  text-decoration: underline;  
+  margin: 16px;
+`;
+
