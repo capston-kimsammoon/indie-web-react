@@ -353,7 +353,7 @@ const SectionTitle = styled.div`
 `;
 
 const SurveyButton = styled.div`
-  padding: 16px 16px; 
+  padding: 16px 0px; 
   font-size: ${({ theme }) => theme.fontSizes.xs}; 
   font-weight: ${({ theme }) => theme.fontWeights.regular}; 
   color: ${({ theme }) => theme.colors.lightGray}; 
