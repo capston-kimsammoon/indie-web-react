@@ -34,29 +34,7 @@ const Card = styled.div`
   margin-bottom: 16px;
   border: 1px solid ${({ theme }) => theme.colors.outlineGray};
   border-radius: 10px;
-  padding: 8px; /* 기존 border용 padding 유지 */
-
-  &::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 1px;
-    background-color: ${({ theme }) => theme.colors.outlineGray};
-  }
-
-  &:last-child {
-    padding-bottom: 8px;
-    margin-bottom: 16px;
-    &::after {
-      display: none;
-    }
-  }
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.bgLightGray};
-  }
+  padding: 8px; 
 `;
 
 const LeftSection = styled.div`

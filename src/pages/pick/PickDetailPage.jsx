@@ -178,8 +178,6 @@ const PickDetailPage = () => {
               })}
             </section>
           )}
-  
-          
         </main>
       </ScrollableList>
     </PageWrapper>
