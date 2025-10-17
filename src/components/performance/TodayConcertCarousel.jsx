@@ -134,6 +134,8 @@ const StyledSlider = styled(Slider)`
     display: flex !important;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
+    max-width: 100%;
     white-space: nowrap;  
     overflow: hidden;     
     padding: 0 16px;      
