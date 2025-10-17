@@ -155,7 +155,7 @@ const ProgressBarBg = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: ${({ theme }) => theme.colors.outlineGray || '#ddd'};
+  background-color: ${({ theme }) => theme.colors.outlineGray || theme.colors.darkGray};
   border-radius: 1px;
 `;
 
