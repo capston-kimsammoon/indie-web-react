@@ -1,7 +1,7 @@
 /* ✅ src/pages/pick/pickDetail.module.css */
 
 .page {
-  padding-top: 20px;
+  padding-top: 16px;
   background: #ffffff;
   padding-left: 8px;
   padding-right: 8px;
@@ -26,7 +26,7 @@
 .hr {
   height: 1px;
   background: #ededed;
-  margin-bottom: -20px;
+  margin-bottom: -16px;
   border: 0;
 }
 
