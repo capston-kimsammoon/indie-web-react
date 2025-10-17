@@ -195,7 +195,7 @@ const PageWrapper = styled.div`
 const ScrollableList = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 93px;
+  padding-bottom: 108px;
   box-sizing: border-box;
 
   &::-webkit-scrollbar {
