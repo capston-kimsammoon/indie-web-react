@@ -133,12 +133,10 @@ const StyledSlider = styled(Slider)`
   .slick-dots {
     display: flex !important;
     justify-content: center;
-    align-items: center;
     flex-wrap: wrap;
     max-width: 100%;
-    white-space: nowrap;  
-    overflow: hidden;     
-    padding: 0 16px;      
+    white-space: nowrap;
+    overflow: hidden;    
   }
 
   .slick-dots li {
