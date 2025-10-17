@@ -1,5 +1,5 @@
 // src/components/performance/TodayConcertCarousel.jsx
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import styled from 'styled-components';
 import Slider from 'react-slick';
 import TodayConcertCard from './TodayConcertCard';
@@ -9,7 +9,7 @@ import { theme } from '../../styles/theme';
 
 const TodayConcertCarousel = forwardRef(({ performances = [], onClickPerformance }, ref) => {
   const sliderRef = useRef();
-  const [currentSlide, setCurrentSlide] = React.useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useImperativeHandle(ref, () => ({
     next: () => sliderRef.current?.slickNext(),
@@ -140,28 +140,31 @@ const StyledSlider = styled(Slider)`
     font-size: 24px;
     color: ${({ theme }) => theme.colors.outlineGray}; 
   }
+`;
 
-  .slick-dots {
-    display: flex !important;
-    justify-content: center;
-    align-items: center;
-    white-space: nowrap;
-    overflow: hidden;
-    padding: 0 20px;
-  }
+const ProgressBarContainer = styled.div`
+  position: relative;
+  width: calc(100% - 64px);
+  margin: 16px auto 0;
+  height: 2px;
+`;
 
-  .slick-dots li {
-    margin: 0 2px;
-    display: inline-block;
-  }
-  
-  .slick-dots li button:before {
-    font-size: 4px;          
-    color: ${({ theme }) => theme.colors.black}; 
-    opacity: 0.3;            
-  }
-  .slick-dots li.slick-active button:before {
-    color: ${({ theme }) => theme.colors.black}; 
-    opacity: 0.6;
-  }
+const ProgressBarBg = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: ${({ theme }) => theme.colors.outlineGray || '#ddd'};
+  border-radius: 1px;
+`;
+
+const ProgressBarActive = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: ${({ theme }) => theme.colors.black || '#000'};
+  border-radius: 1px;
+  transition: transform 0.4s ease;
 `;
