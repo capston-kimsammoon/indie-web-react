@@ -130,6 +130,15 @@ const StyledSlider = styled(Slider)`
     color: ${({ theme }) => theme.colors.outlineGray}; 
   }
 
+  .slick-dots {
+    display: flex !important;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;    
+  }
+
   .slick-dots li {
     margin: 0 0
   }
