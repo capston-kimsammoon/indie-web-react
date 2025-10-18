@@ -131,7 +131,11 @@ export default function PerformanceDetailPage() {
             </LabelRow>
             <LabelRow>
               <Label>티켓 오픈</Label>
-              <Value>{formatKoreanFromParts(performance.ticket_open_date, performance.ticket_open_time)}</Value>
+              <Value>
+                {performance.ticket_open_date || performance.ticket_open_time
+                  ? formatKoreanFromParts(performance.ticket_open_date, performance.ticket_open_time)
+                  : '정보 없음'}
+              </Value>
             </LabelRow>
             <LabelRow>
               <Label>상세 정보</Label>
@@ -353,4 +357,3 @@ const ScrollableList = styled.div`
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
 `;
-
