@@ -128,7 +128,7 @@ const PickDetailPage = () => {
   
           {/* 메타 + 구분선 */}
           <div className={styles.meta}>
-            {formatKST(pick.createdAt)} {pick.author}
+            {formatKST(pick.createdAt)}
           </div>
           <div className={styles.hr} />
   
@@ -178,8 +178,6 @@ const PickDetailPage = () => {
               })}
             </section>
           )}
-  
-          
         </main>
       </ScrollableList>
     </PageWrapper>
@@ -197,7 +195,7 @@ const PageWrapper = styled.div`
 const ScrollableList = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 100px;
+  padding-bottom: 108px;
   box-sizing: border-box;
 
   &::-webkit-scrollbar {

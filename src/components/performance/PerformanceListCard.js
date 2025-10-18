@@ -1,4 +1,3 @@
-// src/components/performance/PerformanceListCard.js
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
@@ -18,10 +17,28 @@ const toAbs = (url) => {
 const pickPoster = (p) =>
   p?.thumbnail || p?.posterUrl || p?.poster_url || p?.image || p?.image_url || '';
 
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  
+  try {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    const dayOfWeek = ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
+    
+    return `${year}-${month}-${day} (${dayOfWeek}) ${hours}:${minutes}`;
+  } catch (e) {
+    return dateString;
+  }
+};
+
 export default function PerformanceListCard({ performance, onToggleLike }) {
   const navigate = useNavigate();
   const location = useLocation();
-
   const posterSrc = toAbs(pickPoster(performance));
   const { title, venue, date, isLiked } = performance;
 
@@ -56,7 +73,6 @@ export default function PerformanceListCard({ performance, onToggleLike }) {
           <Date>{formattedDate}</Date>
         </Info>
       </LeftSection>
-
       {location.pathname === '/favorite' && (
         <RightSectionWrapper onClick={(e) => e.stopPropagation()}>
           <HeartButton isLiked={isLiked} onClick={() => onToggleLike(performance.id)} />
@@ -75,7 +91,6 @@ const Card = styled.div`
   position: relative;
   padding-bottom: 16px;
   margin-bottom: 16px;
-
   &::after {
     content: '';
     position: absolute;

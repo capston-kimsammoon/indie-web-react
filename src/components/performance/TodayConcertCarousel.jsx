@@ -1,5 +1,5 @@
 // src/components/performance/TodayConcertCarousel.jsx
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import styled from 'styled-components';
 import Slider from 'react-slick';
 import TodayConcertCard from './TodayConcertCard';
@@ -9,18 +9,17 @@ import { theme } from '../../styles/theme';
 
 const TodayConcertCarousel = forwardRef(({ performances = [], onClickPerformance }, ref) => {
   const sliderRef = useRef();
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useImperativeHandle(ref, () => ({
     next: () => sliderRef.current?.slickNext(),
   }));
 
-  // ✅ 외부 placeholder 도메인이나 빈 값 방어: 항상 정상 이미지가 뜨도록 치환
   const safePoster = (url, seed) =>
     !url || /placeholder\.com/i.test(url)
       ? `https://picsum.photos/seed/${encodeURIComponent(seed || 'today')}/300/400`
       : url;
 
-  // ✅ 공연이 없을 때: 빈 상태 박스 렌더 (null 반환 대신)
   if (!performances || performances.length === 0) {
     const border = theme?.colors?.gray200 ?? '#eee';
     const text = theme?.colors?.gray500 ?? '#666';
@@ -32,7 +31,7 @@ const TodayConcertCarousel = forwardRef(({ performances = [], onClickPerformance
           marginTop: '16px',
           width: '100%',
           overflow: 'visible',
-          minHeight: '200px', // ✅ 높이 유지
+          minHeight: '200px',
         }}
       >
         <div
@@ -56,7 +55,7 @@ const TodayConcertCarousel = forwardRef(({ performances = [], onClickPerformance
   }
 
   const settings = {
-    dots: performances.length > 1,
+    dots: false,
     infinite: performances.length > 1,
     speed: 400,
     slidesToShow: 1,
@@ -67,7 +66,8 @@ const TodayConcertCarousel = forwardRef(({ performances = [], onClickPerformance
     centerPadding: '24px',     
     autoplay: true,          
     autoplaySpeed: 3000,     
-    pauseOnHover: true, 
+    pauseOnHover: true,
+    beforeChange: (current, next) => setCurrentSlide(next),
   };
 
   return (
@@ -76,7 +76,7 @@ const TodayConcertCarousel = forwardRef(({ performances = [], onClickPerformance
         marginTop: '16px',
         width: '100%',
         overflow: 'visible',
-        minHeight: '200px', // ✅ 밑변 잘림 방지
+        minHeight: '200px',
       }}
     >
       {performances.length === 1 ? (
@@ -91,20 +91,31 @@ const TodayConcertCarousel = forwardRef(({ performances = [], onClickPerformance
           onClick={() => onClickPerformance?.(performances[0].id)}
         />
       ) : (
-        <StyledSlider {...settings} ref={sliderRef}>
-          {performances.map((item) => (
-            <TodayConcertCard
-              key={item.id}
-              title={item.title}
-              posterUrl={safePoster(item.posterUrl, item.id || item.title)} 
-              place={item.venue}
-              date={item.date}
-              placeColor={theme.colors.gray600}  
-              dateColor={theme.colors.gray400}  
-              onClick={() => onClickPerformance?.(item.id)}
+        <>
+          <StyledSlider {...settings} ref={sliderRef}>
+            {performances.map((item) => (
+              <TodayConcertCard
+                key={item.id}
+                title={item.title}
+                posterUrl={safePoster(item.posterUrl, item.id || item.title)} 
+                place={item.venue}
+                date={item.date}
+                placeColor={theme.colors.gray600}  
+                dateColor={theme.colors.gray400}  
+                onClick={() => onClickPerformance?.(item.id)}
+              />
+            ))}
+          </StyledSlider>
+          <ProgressBarContainer>
+            <ProgressBarBg />
+            <ProgressBarActive 
+              style={{
+                width: `${(100 / performances.length)}%`,
+                transform: `translateX(${currentSlide * 100}%)`
+              }}
             />
-          ))}
-        </StyledSlider>
+          </ProgressBarContainer>
+        </>
       )}
     </div>
   );
@@ -129,17 +140,31 @@ const StyledSlider = styled(Slider)`
     font-size: 24px;
     color: ${({ theme }) => theme.colors.outlineGray}; 
   }
+`;
 
-  .slick-dots li {
-    margin: 0 0
-  }
-  .slick-dots li button:before {
-    font-size: 4px;          
-    color: ${({ theme }) => theme.colors.black}; 
-    opacity: 0.3;            
-  }
-  .slick-dots li.slick-active button:before {
-    color: ${({ theme }) => theme.colors.black}; 
-    opacity: 0.6;
-  }
+const ProgressBarContainer = styled.div`
+  position: relative;
+  width: calc(100% - 64px);
+  margin: 16px auto 0;
+  height: 2px;
+`;
+
+const ProgressBarBg = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: ${({ theme }) => theme.colors.outlineGray};
+  border-radius: 1px;
+`;
+
+const ProgressBarActive = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: ${({ theme }) => theme.colors.darkGray};
+  border-radius: 1px;
+  transition: transform 0.4s ease;
 `;

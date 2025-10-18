@@ -118,7 +118,7 @@ export default function ArtistDetailPage() {
               <Value>
                 {artist.spotify ? (
                   <a
-                    href={`https://open.spotify.com/artist/${artist.spotify}`}
+                    href={`https://open.spotify.com/artist/${artist.spotify_url}`}
                     target="_blank"
                     rel="noreferrer"
                   >
