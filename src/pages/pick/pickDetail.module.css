@@ -37,18 +37,18 @@
   margin: 8px 0 16px 0;
 }
 
-.content p {
-  font-size: 14px;
+.blockText p {
+  font-size: 13px;        
   line-height: 1.8;
-  color: #2F2F2F;
-  padding-bottom: 12px;
+  color: #4B4B4B;         
+  padding-bottom: 10px;   
   white-space: pre-wrap;
 }
 
 .spacer {
   height: 10px;
 }
-/* ✅ 이미지 블록 정렬 처리 */
+/* 이미지 블록 정렬 처리 */
 .blockImage[data-align="center"] {
   text-align: center;
 }
@@ -65,7 +65,7 @@
 .blockImage img {
   display: block;
   width: 100%;         /* 부모 폭 기준으로 꽉 채움 */
-  max-width: 600px;    /* ✅ 모든 이미지를 최대 600px 폭으로 통일 */
+  max-width: 600px;    /* 모든 이미지를 최대 600px 폭으로 통일 */
   height: auto;        /* 세로는 비율에 따라 자동 */
   border-radius: 16px; /* 모서리 둥글게 (값 조절 가능) */
   margin-left: auto;
