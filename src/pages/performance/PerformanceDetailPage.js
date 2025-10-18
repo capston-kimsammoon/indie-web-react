@@ -28,6 +28,7 @@ export default function PerformanceDetailPage() {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isAlarmed, setIsAlarmed] = useState(false); // ✅ 알림
+  const [showModal, setShowModal] = useState(false);
 
    const displayPerformanceDateTime =
    formatKoreanFromParts(performance?.date, performance?.time) ||
@@ -89,7 +90,10 @@ export default function PerformanceDetailPage() {
         <ScrollableList>
           <PosterSection>
             <PosterWrapper>
-              <Poster src={performance.posterUrl || performance.thumbnail || ''} alt="poster" />
+              <Poster src={performance.posterUrl || performance.thumbnail || ''} 
+                alt="poster" 
+                onClick={() => setShowModal(true)}
+                style={{ cursor: 'pointer' }}/>
               <LikeButton onClick={toggleLike}>
                 <HeartIcon $isLiked={isLiked} />
                 <LikeCount>{likeCount}</LikeCount>
@@ -192,6 +196,16 @@ export default function PerformanceDetailPage() {
           </InfoSection>
         </ScrollableList>
       </PageWrapper>
+
+      {showModal && (
+        <ModalOverlay onClick={() => setShowModal(false)}>
+          <ModalImage 
+            src={performance.posterUrl || performance.thumbnail || ''} 
+            alt="poster"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </ModalOverlay>
+      )}
     </>
   );
 }
@@ -212,6 +226,32 @@ const PosterWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 0 40px;
+`;
+
+const ModalImage = styled.img`
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 5px;
+
+  @media (min-width: 768px) {
+    max-width: 400px;
+    max-height: 600px;
+  }
 `;
 
 const Poster = styled.img`
