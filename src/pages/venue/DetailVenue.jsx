@@ -83,7 +83,7 @@ const InnerWrapper = styled.div`
 const LabelRow = styled.div`
   display: grid;
   grid-template-columns: 6rem 1fr;
-  align-items: center;
+  align-items: start;
 `;
 
 const Label = styled.div`
