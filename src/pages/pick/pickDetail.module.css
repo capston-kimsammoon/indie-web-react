@@ -1,8 +1,10 @@
 /* ✅ src/pages/pick/pickDetail.module.css */
 
 .page {
-  padding: 20px 16px 40px;
+  padding-top: 16px;
   background: #ffffff;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .title {
@@ -24,7 +26,6 @@
 .hr {
   height: 1px;
   background: #ededed;
-  margin: 0 0 16px 0;
   border: 0;
 }
 
@@ -36,11 +37,11 @@
   margin: 8px 0 16px 0;
 }
 
-.content p {
-  font-size: 13px;
-  line-height: 1.6;
-  color: #4a4a4a;
-  margin: 0 0 14px 0;
+.blockText p {
+  font-size: 13px;        
+  line-height: 1.8;
+  color: #4B4B4B;         
+  padding-bottom: 10px;   
   white-space: pre-wrap;
 }
 
