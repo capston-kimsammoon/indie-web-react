@@ -70,7 +70,7 @@ const PrimaryBtn = styled(ModalBtn)`
 `;
 
 const DangerBtn = styled(ModalBtn)`
-  background: #fff; color: #d32f2f; border: 1px solid #ef9a9a;
+  background: #fff; color: #3c9c68; border: 1px solid #ef9a9a;
   &:hover { background: #fff5f5; }
 `;
 
