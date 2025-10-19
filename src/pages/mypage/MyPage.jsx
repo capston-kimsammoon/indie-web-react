@@ -70,7 +70,7 @@ const PrimaryBtn = styled(ModalBtn)`
 `;
 
 const DangerBtn = styled(ModalBtn)`
-  background: #fff; color: #d32f2f; border: 1px solid #ef9a9a;
+  background: #fff; color: #3c9c68; border: 1px solid #ef9a9a;
   &:hover { background: #fff5f5; }
 `;
 
@@ -212,7 +212,12 @@ function MyPage() {
           </button>
           <p className="guest__message">로그인 후 이용 가능합니다.</p>
           <div className="footer-actions">
-            <button className="logout__button" onClick={handleLogout}>공지사항</button>
+            <button 
+              className="logout__button" 
+              onClick={() => navigate('/support')}
+            >
+              고객센터
+            </button>
           </div>
         </div>
       ) : (
