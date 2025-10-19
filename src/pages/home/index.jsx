@@ -165,9 +165,9 @@ imageUrl: 'https://i.ibb.co/VYNPQ5XL/image.png',
         const todayData = await fetchTodayPerformances();
 
         // 2) NEW 업로드 (API 우선, 비면 폴백)
-        let recentData = await fetchRecentPerformances(6);
+        let recentData = await fetchRecentPerformances(10);
         if (toArray(recentData).length === 0) {
-          recentData = await fetchRecentFallback(6);
+          recentData = await fetchRecentFallback(10);
         }
 
         // 3) 티켓 오픈 예정 (API 우선, 비면 폴백)
