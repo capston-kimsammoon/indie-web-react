@@ -39,14 +39,20 @@ const ImageWrapper = styled.div`
   height: 4rem;
   border-radius: 50%;
   overflow: hidden;
+  border: 1px solid ${({ theme }) => theme.colors.outlineGray};
+  box-sizing: border-box;
 `;
 
 const ProfileImage = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center; 
   display: block;
-  border: 1px solid ${({ theme }) => theme.colors.outlineGray};
+  border: none;
+  box-sizing: border-box;
+  transform: translateZ(0); 
+  -webkit-backface-visibility: hidden;
 `;
 
 const Name = styled.div`
