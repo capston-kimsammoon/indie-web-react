@@ -403,7 +403,7 @@ const ScrollableList = styled.div`
 
 const MoreMessage = styled.div`
   position: absolute;
-  margin-top: 4px;
+  margin-top: 2px;
   font-size: ${({ theme }) => theme.fontSizes.xxs};
   font-weight: ${({ theme }) => theme.fontWeights.regular};
   color: ${({ theme }) => theme.colors.lightGray};
