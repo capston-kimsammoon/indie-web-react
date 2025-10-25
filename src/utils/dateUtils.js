@@ -80,9 +80,30 @@ export function formatKoreanFlexible(dateStr, timeStr) {
 /* date + time이 분리되어 오는 경우 */
 export function formatKoreanFromParts(dateStr, timeStr) {
   if (!dateStr) return '';
-  if (typeof dateStr === 'string' && dateStr.includes('T')) {
-    return formatKoreanDateTime(dateStr);
+
+  // 내부 헬퍼: 시/분 포맷
+  function _formatFromNumbers(hourNum, minuteNum) {
+    if (Number.isNaN(hourNum) || Number.isNaN(minuteNum)) return '';
+
+    const ampm = hourNum >= 12 ? '오후' : '오전';
+    const displayHour = hourNum % 12 || 12;
+
+    // 분이 0이면 생략, 0이 아니면 그대로 표시
+    const minutePart = minuteNum > 0 ? ` ${minuteNum}분` : '';
+
+    return `${ampm} ${displayHour}시${minutePart}`;
   }
-  const t = normalizeTime(timeStr);              
-  return formatKoreanDateTime(`${dateStr}T${t}`);
+
+  // dateStr이 ISO 문자열(T 포함)이면 시/분만 사용
+  if (typeof dateStr === 'string' && dateStr.includes('T')) {
+    const dt = parseDateTime(dateStr);
+    if (!dt) return '';
+    return _formatFromNumbers(dt.getHours(), dt.getMinutes());
+  }
+
+  // timeStr 처리
+  const t = normalizeTime(timeStr); // "HH:MM:SS"
+  const [hour, minute] = t.split(':').map((v) => parseInt(v, 10));
+
+  return _formatFromNumbers(hour, minute);
 }
