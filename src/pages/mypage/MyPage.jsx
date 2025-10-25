@@ -15,11 +15,12 @@ import {
   removeProfileImage,
   logout,
 } from '../../api/userApi';
+import { withdrawAccount } from '../../api/authApi'
 
 
 // 파일 상단 import 아래에 추가
 const ModalBackdrop = styled.div`
-  position: fixed; inset: 0; z-index: 1000;
+  position: fixed; inset: 0; z-index: 9999;
   background: rgba(0,0,0,0.45);
   backdrop-filter: blur(2px);
   display: flex; align-items: center; justify-content: center;
@@ -88,6 +89,8 @@ function MyPage() {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const fileInputRef = useRef(null);
+  const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
+  const [withdrawing, setWithdrawing] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -163,24 +166,6 @@ function MyPage() {
     }
   };
 
-  const handleSettingChange = async (key, value) => {
-    const prevAlarm = alarmEnabled;
-    const prevLoc = locationEnabled;
-
-    const nextAlarm = key === 'alarm' ? value : alarmEnabled;
-    const nextLoc = key === 'location' ? value : locationEnabled;
-
-    setAlarmEnabled(nextAlarm);
-    setLocationEnabled(nextLoc);
-    try {
-      await updateUserSettings(nextAlarm, nextLoc);
-    } catch (err) {
-      console.error('[MyPage] 설정 실패:', err);
-      setAlarmEnabled(prevAlarm);
-      setLocationEnabled(prevLoc);
-    }
-  };
-
   const handleLogout = async () => {
   try {
     await logout(); // 쿠키/세션 초기화
@@ -190,6 +175,22 @@ function MyPage() {
     navigate('/home', { replace: true }); // 홈으로 이동
   }
 }; 
+
+const handleWithdraw = async () => {
+  if (withdrawing) return;
+  setWithdrawing(true);
+  try {
+    await withdrawAccount();
+    await logout(); // 기존 userApi의 logout 재사용
+    navigate('/login', { replace: true }); // 로그인 페이지로 이동
+  } catch (err) {
+    console.error('[MyPage] 회원 탈퇴 오류:', err);
+    alert(err?.response?.data?.detail || '탈퇴 처리 중 문제가 발생했습니다.');
+  } finally {
+    setWithdrawing(false);
+    setWithdrawModalOpen(false);
+  }
+};
 
   if (loading) {
     return (
@@ -289,7 +290,32 @@ function MyPage() {
                  </ModalButtons>
             </ModalCard>
           </ModalBackdrop>
-)}
+          )}
+          {withdrawModalOpen && (
+           <ModalBackdrop
+            onClick={() => setWithdrawModalOpen(false)}
+            onKeyDown={(e) => e.key === 'Escape' && setWithdrawModalOpen(false)}
+            role="dialog" aria-modal="true" aria-labelledby="withdraw-modal-title"
+           >
+            <ModalCard onClick={(e) => e.stopPropagation()}>
+              <ModalHeader>
+                <ModalTitle id="withdraw-modal-title">회원 탈퇴</ModalTitle>
+                <ModalDesc>
+                  정말 탈퇴하시겠습니까?<br />
+                  모든 데이터가 영구적으로 삭제됩니다.
+                </ModalDesc>
+              </ModalHeader>
+              <ModalButtons>
+                <DangerBtn onClick={handleWithdraw} disabled={withdrawing}>
+                  {withdrawing ? '탈퇴 처리 중...' : '탈퇴하기'}
+                </DangerBtn>
+                <ModalBtn onClick={() => setWithdrawModalOpen(false)} disabled={withdrawing}>
+                  취소
+                </ModalBtn>
+              </ModalButtons>
+            </ModalCard>
+          </ModalBackdrop>
+          )}
 
 
           {/* 🔹 퀵 메뉴 3개 */}
@@ -339,7 +365,9 @@ function MyPage() {
           <div className="footer-actions">
             <button className="logout__button" onClick={handleLogout}>로그아웃</button>
             <span style={{ color: '#B0B0B0', fontSize: '12px' }}> | </span>
-            <div className="withdraw">탈퇴하기</div>
+           <div className="withdraw" onClick={() => setWithdrawModalOpen(true)}>
+           탈퇴하기
+          </div>
           </div>
         </ScrollableList>
       )}
