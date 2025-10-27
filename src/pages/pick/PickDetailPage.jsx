@@ -179,8 +179,8 @@ const PickDetailPage = () => {
               })}
             </section>
           )}
+          <PickGo magazineId={pick.id} performanceId={pick.content} />
         </main>
-        <PickGo magazineId={pick.id} performanceId={pick.content} />
       </ScrollableList>
     </PageWrapper>
   );
