@@ -5,6 +5,7 @@ import Header from '../../components/layout/Header';
 import Sidebar from '../../components/sidebar/Sidebar';
 import styled from 'styled-components';
 import styles from './pickDetail.module.css';
+import PickGo from '../../components/pick/PickGo';
 
 // ✅ 매거진 API 연결
 import { fetchMagazineDetail } from '../../api/magazineApi';
@@ -128,7 +129,7 @@ const PickDetailPage = () => {
   
           {/* 메타 + 구분선 */}
           <div className={styles.meta}>
-            {formatKST(pick.createdAt)}
+            {formatKST(pick.createdAt)} {pick.author}
           </div>
           <div className={styles.hr} />
   
@@ -178,7 +179,15 @@ const PickDetailPage = () => {
               })}
             </section>
           )}
+  
+          {/* (선택) 과거 content 필드도 계속 표시 */}
+          {pick.content && (
+            <article className={styles.content}>
+              {renderParagraphs(pick.content, 'content')}
+            </article>
+          )}
         </main>
+        <PickGo magazineId={pick.id} />
       </ScrollableList>
     </PageWrapper>
   );
@@ -195,7 +204,7 @@ const PageWrapper = styled.div`
 const ScrollableList = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 108px;
+  padding-bottom: 100px;
   box-sizing: border-box;
 
   &::-webkit-scrollbar {
