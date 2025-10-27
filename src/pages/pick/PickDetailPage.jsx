@@ -162,14 +162,6 @@ const PickDetailPage = () => {
                   );
                 }
   
-                if (type === 'quote' && b?.text) {
-                  return (
-                    <blockquote key={`q-${b.id}`} className={styles.blockQuote}>
-                      “{b.text}”
-                    </blockquote>
-                  );
-                }
-  
                 if (type === 'divider') {
                   return <hr key={`hr-${b.id}`} className={styles.blockDivider} />;
                 }
