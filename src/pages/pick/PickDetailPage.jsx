@@ -73,7 +73,7 @@ const PickDetailPage = () => {
             '',
           // 블록 전체를 그대로 저장 (순서/정렬/타입 그대로)
           blocks: Array.isArray(data?.blocks) ? data.blocks : [],
-          content: prev.content,
+          content: data?.content ?? prev.content,
         }));
       } catch (err) {
         console.error('📛 매거진 상세 조회 실패:', err);
@@ -180,7 +180,7 @@ const PickDetailPage = () => {
             </section>
           )}
         </main>
-        <PickGo magazineId={pick.id} />
+        <PickGo magazineId={pick.id} performanceId={pick.content} />
       </ScrollableList>
     </PageWrapper>
   );
