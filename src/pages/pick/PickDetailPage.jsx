@@ -154,11 +154,11 @@ const PickDetailPage = () => {
                   );
                 }
   
-                if (type === 'text' && b?.text) {
+                if (type === 'quote' && b?.text) {
                   return (
-                    <div key={`txt-${b.id}`} className={styles.blockText}>
-                      {renderParagraphs(b.text, `txt-${b.id}`)}
-                    </div>
+                    <blockquote key={`q-${b.id}`} className={styles.blockQuote}>
+                      “{b.text}”
+                    </blockquote>
                   );
                 }
   
