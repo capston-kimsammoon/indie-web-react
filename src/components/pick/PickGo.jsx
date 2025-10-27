@@ -4,27 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { fetchMagazineList } from "../../api/magazineApi";
 import { fetchPerformanceDetail } from "../../api/performanceApi";
 
-export default function PickGo({ magazineId }) {
+export default function PickGo({ magazineId, performanceId }) {
   const [item, setItem] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const magazines = await fetchMagazineList();
-        const currentMagazine = magazines.find((m) => m.id === magazineId);
-
-        if (!currentMagazine) {
-          return; 
+        if (!performanceId) {
+          return; // 조용히 종료
         }
 
-        const perfId = currentMagazine.content;
-
-        if (!perfId) {
-          return; 
-        }
-
-        const perf = await fetchPerformanceDetail(Number(perfId));
+        const perf = await fetchPerformanceDetail(Number(performanceId));
 
         const formatDate = (dateStr) => {
           if (!dateStr) return "";
@@ -43,12 +34,11 @@ export default function PickGo({ magazineId }) {
       }
     };
 
-    if (magazineId) {
+    if (performanceId) {
       loadData();
     }
-  }, [magazineId]);
+  }, [performanceId]);
 
-  // ✅ item이 없으면 아무것도 렌더링하지 않음 (에러 없이 숨김)
   if (!item) return null;
 
   return (
