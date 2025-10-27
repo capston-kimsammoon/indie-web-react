@@ -154,6 +154,14 @@ const PickDetailPage = () => {
                   );
                 }
   
+                if (type === 'text' && b?.text) {
+                  return (
+                    <div key={`txt-${b.id}`} className={styles.blockText}>
+                      {renderParagraphs(b.text, `txt-${b.id}`)}
+                    </div>
+                  );
+                }
+  
                 if (type === 'quote' && b?.text) {
                   return (
                     <blockquote key={`q-${b.id}`} className={styles.blockQuote}>
@@ -170,13 +178,6 @@ const PickDetailPage = () => {
                 return null;
               })}
             </section>
-          )}
-  
-          {/* (선택) 과거 content 필드도 계속 표시 */}
-          {pick.content && (
-            <article className={styles.content}>
-              {renderParagraphs(pick.content, 'content')}
-            </article>
           )}
         </main>
         <PickGo magazineId={pick.id} />
