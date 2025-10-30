@@ -17,6 +17,17 @@ const Container = styled.div`
   box-sizing: border-box;
 `;
 
+const CounterRow = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+`;
+
+const CharCount = styled.span`
+  font-size: 12px;
+  color: #3C9C68;   
+`;
+
 const Field = styled.div`
   margin-top: 16px;
   display: flex;
@@ -40,7 +51,7 @@ const Textarea = styled.textarea`
   outline: none;
   resize: none;
   font-size: 14px;
-  box-sizing: border-box;   /*  내용+패딩 포함 */
+  box-sizing: border-box;   
 `;
 
 const AttachRow = styled.div`
@@ -123,13 +134,13 @@ const SubmitBtn = styled.button`
   border: none;
   cursor: pointer;
   margin-top: 16px;
-  box-shadow: none;    /* ✅ 그림자 제거 */
-  outline: none;       /* ✅ 포커스시 외곽선 제거 */
+  box-shadow: none;    
+  outline: none;       
 
   &:disabled {
     background: #a6d5bd;
     cursor: not-allowed;
-    box-shadow: none;  /* ✅ 비활성화시에도 그림자 제거 */
+    box-shadow: none;  
   }
 `;
 
@@ -143,15 +154,17 @@ export default function ReviewWritePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [content, setContent] = useState('');
-  const [files, setFiles] = useState([]);      // File[]
-  const [previews, setPreviews] = useState([]); // string[]
+  const [files, setFiles] = useState([]);      
+  const [previews, setPreviews] = useState([]); 
   const [submitting, setSubmitting] = useState(false);
 
   const fileRef = useRef(null);
   const MAX_FILES = 6;
   const MIN_LEN = 1;
 
-  // 로그인/공연장명 로드
+  const MAX_CHARS = 300;
+
+
   useEffect(() => {
     (async () => {
       try {
@@ -195,7 +208,7 @@ export default function ReviewWritePage() {
     ];
     setPreviews(nextPreviews);
 
-    // 파일 인풋 초기화 (같은 파일 다시 선택 가능)
+    // 파일 인풋 초기화 (같은 파일 다시 선택 가능..)
     e.target.value = '';
   };
 
@@ -236,7 +249,7 @@ export default function ReviewWritePage() {
               placeholder="공연장에 대한 솔직한 후기를 남겨주세요."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              maxLength={2000}
+              maxLength={300}
             />
             <AttachRow>
               <AttachIconButton
@@ -274,6 +287,10 @@ export default function ReviewWritePage() {
               ))}
             </PreviewGrid>
           )}
+
+          <CounterRow>
+            <CharCount>{content.trim().length}/{MAX_CHARS}</CharCount>
+          </CounterRow>
 
           <SubmitBtn type="button" onClick={onSubmit} disabled={!canSubmit}>
             {submitting ? '등록 중…' : '등록'}
