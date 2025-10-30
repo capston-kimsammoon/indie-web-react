@@ -364,4 +364,3 @@ const SurveyButton = styled.div`
   text-decoration: underline;  
   margin: 16px;
 `;
-
