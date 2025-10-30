@@ -271,7 +271,12 @@ imageUrl: 'https://i.ibb.co/VYNPQ5XL/image.png',
         </FullWidthSection>
         {pickItem && (
           <>
-            <SectionTitle>modie 추천공연</SectionTitle>
+            <SectionHeader>
+              <span>modie 추천공연</span>
+              <MoreButton onClick={() => navigate('/picks')}>
+                ›
+              </MoreButton>
+            </SectionHeader>
             <PickCard
               id={pickItem.id}
               title={pickItem.title}
@@ -350,6 +355,7 @@ const SectionTitle = styled.div`
   text-align: center;       
   cursor: default;           
   color: ${({ theme }) => theme.colors.darkblack};
+  flex: 1;
 `;
 
 const SurveyButton = styled.div`
@@ -365,3 +371,33 @@ const SurveyButton = styled.div`
   margin: 16px;
 `;
 
+const SectionHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  gap: 8px;  /* 제목과 아이콘 사이 8px */
+  
+  span {
+    font-size: ${({ theme }) => theme.fontSizes.lg};            
+    font-weight: ${({ theme }) => theme.fontWeights.regular};           
+    color: ${({ theme }) => theme.colors.darkblack};
+  }
+`;
+
+const MoreButton = styled.button`
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: ${({ theme }) => theme.fontSizes.xl};            
+  color: ${({ theme }) => theme.colors.lightGray}; 
+  font-weight: ${({ theme }) => theme.fontWeights.light};           
+  line-height: 1;
+  
+  &:active {
+    opacity: 0.7;
+  }
+`;
