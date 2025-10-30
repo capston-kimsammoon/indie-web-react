@@ -64,6 +64,9 @@ export const fetchMagazineList = async ({ limit, page, size } = {}) => {
     if (size) params.append('size', size);
 
     const { data } = await axios.get(`${baseUrl}/magazine`, { params });
+    
+    console.log("🔍 목록 API 원본 응답:", data); // 🔍 추가
+    
     const list = safeArray(data).map(normalizeMagazineCard);
     return Array.isArray(list) ? list : [];
   } catch (error) {
@@ -81,6 +84,7 @@ export const fetchMagazineDetail = async (idOrSlug) => {
   try {
     const { data } = await axios.get(`${baseUrl}/magazine/${idOrSlug}`);
 
+    console.log("🔍 원본 API 응답 (magazineApi):", data);
     // 서버 응답이 다른 키를 쓸 수 있으므로 유연 매핑
     const rawBlocks = data?.blocks ?? data?.magazine_blocks ?? data?.contentBlocks ?? [];
 
@@ -97,6 +101,7 @@ export const fetchMagazineDetail = async (idOrSlug) => {
         null,
       createdAt: data?.created_at ?? data?.createdAt ?? null,
       blocks: normalizeBlocks(rawBlocks),
+      content: data?.content ?? data?.performance_id ?? data?.performanceId ?? null,
     };
   } catch (error) {
     console.error('📛 매거진 상세 조회 실패:', error?.response?.data || error.message);

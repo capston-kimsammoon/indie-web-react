@@ -29,9 +29,9 @@ const SubBar = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-top: 19px;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-top: 16px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
 `;
 
@@ -54,7 +54,7 @@ const Controls = styled.div`
   gap: 8px;
   align-items: center;
 
-  select, button {
+  select {
     border: 1px solid #e5e7eb;
     background: #fff;
     padding: 6px 10px;
@@ -62,6 +62,24 @@ const Controls = styled.div`
     font-size: 13px;
     color: #374151;
     cursor: pointer;
+    min-width: 100px;
+  }
+`;
+
+const WriteButton = styled.button`
+  background-color: #3C9C68;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 80px;
+  height: 32px;
+
+  &:hover {
+    background-color: #36b05b;
   }
 `;
 
@@ -310,6 +328,19 @@ export default function AllReview({
             <option value="desc">최신순</option>
             <option value="asc">오래된순</option>
           </select>
+
+          <WriteButton
+            type="button"
+            onClick={() => {
+              if (!isLoggedIn) {
+                navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
+                return;
+              }
+              navigate('/review/write/select');
+            }}
+          >
+            작성하기
+          </WriteButton>
         </Controls>
       </SubBar>
 

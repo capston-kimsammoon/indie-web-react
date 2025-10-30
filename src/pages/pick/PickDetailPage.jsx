@@ -5,6 +5,7 @@ import Header from '../../components/layout/Header';
 import Sidebar from '../../components/sidebar/Sidebar';
 import styled from 'styled-components';
 import styles from './pickDetail.module.css';
+import PickGo from '../../components/pick/PickGo';
 
 // ✅ 매거진 API 연결
 import { fetchMagazineDetail } from '../../api/magazineApi';
@@ -72,7 +73,7 @@ const PickDetailPage = () => {
             '',
           // 블록 전체를 그대로 저장 (순서/정렬/타입 그대로)
           blocks: Array.isArray(data?.blocks) ? data.blocks : [],
-          content: prev.content,
+          content: data?.content ?? prev.content,
         }));
       } catch (err) {
         console.error('📛 매거진 상세 조회 실패:', err);
@@ -128,7 +129,7 @@ const PickDetailPage = () => {
   
           {/* 메타 + 구분선 */}
           <div className={styles.meta}>
-            {formatKST(pick.createdAt)}
+            {formatKST(pick.createdAt)} {pick.author}
           </div>
           <div className={styles.hr} />
   
@@ -178,6 +179,7 @@ const PickDetailPage = () => {
               })}
             </section>
           )}
+          <PickGo magazineId={pick.id} performanceId={pick.content} />
         </main>
       </ScrollableList>
     </PageWrapper>
@@ -195,7 +197,7 @@ const PageWrapper = styled.div`
 const ScrollableList = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding-bottom: 108px;
+  padding-bottom: 116px;
   box-sizing: border-box;
 
   &::-webkit-scrollbar {

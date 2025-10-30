@@ -326,6 +326,12 @@ const Date = styled.div`
   color: ${({ theme }) => theme.colors.lightGray};
 `;
 
+const Intro = styled.div`
+  font-size: ${({ theme }) => theme.fontSizes.xs};
+  font-weight: ${({ theme }) => theme.fontWeights.regular};
+  color: ${({ theme }) => theme.colors.lightGray};
+`;
+
 const DetailVenue = () => {
   const { id } = useParams();
   const venueId = Number(id);
@@ -394,7 +400,7 @@ const DetailVenue = () => {
             </ProfileWrapper>
             <ProfileInfo>
               <VenueName>{venue.name || '공연장 이름 없음'}</VenueName>
-            </ProfileInfo>
+{venue.description && <Intro>{venue.description}</Intro>}            </ProfileInfo>
           </ProfileSection>
 
           <Divider style={{ marginTop: '16px', marginBottom: '16px' }} />

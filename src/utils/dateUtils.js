@@ -80,9 +80,39 @@ export function formatKoreanFlexible(dateStr, timeStr) {
 /* date + time이 분리되어 오는 경우 */
 export function formatKoreanFromParts(dateStr, timeStr) {
   if (!dateStr) return '';
-  if (typeof dateStr === 'string' && dateStr.includes('T')) {
-    return formatKoreanDateTime(dateStr);
+
+  const dt = parseDateTime(dateStr);
+  if (!dt) return '';
+
+  const weekdays = ['일','월','화','수','목','금','토'];
+  const yyyy = dt.getFullYear();
+  const mm = String(dt.getMonth() + 1).padStart(2, '0');
+  const dd = String(dt.getDate()).padStart(2, '0');
+  const weekday = weekdays[dt.getDay()];
+
+  // 내부 헬퍼: 시/분 포맷
+  function _formatFromNumbers(hourNum, minuteNum) {
+    if (Number.isNaN(hourNum) || Number.isNaN(minuteNum)) return '';
+
+    const ampm = hourNum >= 12 ? '오후' : '오전';
+    const displayHour = hourNum % 12 || 12;
+
+    // 분이 0이면 생략, 0이 아니면 그대로 표시
+    const minutePart = minuteNum > 0 ? ` ${minuteNum}분` : '';
+
+    return `${ampm} ${displayHour}시${minutePart}`;
   }
-  const t = normalizeTime(timeStr);              
-  return formatKoreanDateTime(`${dateStr}T${t}`);
+
+  // dateStr이 ISO 문자열(T 포함)이면 시/분만 사용
+  if (typeof dateStr === 'string' && dateStr.includes('T')) {
+    const dtIso = parseDateTime(dateStr);
+    if (!dtIso) return '';
+    return `${yyyy}-${mm}-${dd} (${weekday}) ` + _formatFromNumbers(dtIso.getHours(), dtIso.getMinutes());
+  }
+
+  // timeStr 처리
+  const t = normalizeTime(timeStr); // "HH:MM:SS"
+  const [hour, minute] = t.split(':').map((v) => parseInt(v, 10));
+
+  return `${yyyy}-${mm}-${dd} (${weekday}) ` + _formatFromNumbers(hour, minute);
 }

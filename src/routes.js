@@ -24,6 +24,8 @@ import StampsPage from "./pages/stamp/StampPage";
 import MyStampPage from "./pages/mypage/MyStampPage";
 import MyReviewListPage from './pages/review/MyReviewListPage';
 import PickDetailPage from './pages/pick/PickDetailPage';
+import PickListPage from './pages/pick/PickListPage';
+import ReviewVenueSelectPage from './pages/review/ReviewVenueSelectPage';
 import AllReview from './pages/review/AllReview';
 import AnnouncePage from './pages/announce/AnnouncePage';
 import ClientPage from './pages/client/ClientPage';
@@ -55,10 +57,12 @@ const routes = [
   { path: '/venue/:id', element: <DetailVenue /> },
   { path: '/login/success', element: <LoginSuccess /> }, 
   { path: '/venue/:id/review', element: <VenueReviewListPage /> },
+  { path: '/review/write/select', element: <ReviewVenueSelectPage /> },
   { path: '/venue/:id/review/write', element: <ReviewWritePage /> },
   { path: '/stamps', element: <StampsPage /> },
   { path: '/stamp', element: <Navigate to="/stamps" replace /> },
   { path: '/venue/my/review', element: <MyReviewListPage /> },
+  { path: '/picks', element: <PickListPage /> },
   { path: '/pick/:id', element: <PickDetailPage /> },
   { path: '/notice', element: <AnnouncePage /> },
   { path: '/support', element: <ClientPage /> },

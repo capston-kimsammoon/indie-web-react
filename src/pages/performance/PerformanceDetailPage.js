@@ -141,58 +141,61 @@ export default function PerformanceDetailPage() {
                   : '정보 없음'}
               </Value>
             </LabelRow>
-            <LabelRow>
+            <LabelRow style={{ position: 'relative' }}>
               <Label>상세 정보</Label>
               <LinkValue>
-              {performance.shortcode ? (
-                <a
-                href={`https://www.instagram.com/p/${performance.shortcode}/`}
-                target="_blank"
-                rel="noreferrer"
-                onClick={() =>
-                  trackOutboundDetailLink({
-                    performance_id: performance.id,
-                    performance_title: performance.title,
-                    venue_id: performance.venueId,
-                    venue_name: performance.venue,
-                    link_url: `https://www.instagram.com/p/${performance.shortcode}/`,
-                    source: 'performance_detail_instagram',
-                  })
-                }
-              >
-                공연 상세 페이지 바로가기
-              </a>
-            ) : (
-              <span>상세 정보 없음</span>
-            )}
-            </LinkValue>
+                {performance.shortcode ? (
+                  <>
+                    <a
+                      href={`https://www.instagram.com/p/${performance.shortcode}/`}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={() =>
+                        trackOutboundDetailLink({
+                          performance_id: performance.id,
+                          performance_title: performance.title,
+                          venue_id: performance.venueId,
+                          venue_name: performance.venue,
+                          link_url: `https://www.instagram.com/p/${performance.shortcode}/`,
+                          source: 'performance_detail_instagram',
+                        })
+                      }
+                    >
+                      공연 상세 페이지 바로가기
+                    </a>
+                  <MoreMessage>＊ 상세 페이지에서 더 많은 정보를 확인해보세요</MoreMessage>
+                </>
+                ) : (
+                  <span>상세 정보 없음</span>
+                )}
+              </LinkValue>
             </LabelRow>
             <LabelRow>
-            <Label>예매 링크</Label>
-            <LinkValue>
-              {performance.detailLink ? (
-                <a
-                  href={performance.detailLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() =>
-                    trackOutboundDetailLink({
-                      performance_id: performance.id,
-                      performance_title: performance.title,
-                      venue_id: performance.venueId,
-                      venue_name: performance.venue,
-                      link_url: performance.detailLink,
-                      source: 'performance_detail_ticket',
-                    })
-                  }
-                >
-                  예매 사이트 바로가기
-                </a>
-              ) : (
-                <Value>정보 없음</Value>
-              )}
-            </LinkValue>
-          </LabelRow>
+              <Label>예매 링크</Label>
+              <LinkValue>
+                {performance.detailLink ? (
+                  <a
+                    href={performance.detailLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() =>
+                      trackOutboundDetailLink({
+                        performance_id: performance.id,
+                        performance_title: performance.title,
+                        venue_id: performance.venueId,
+                        venue_name: performance.venue,
+                        link_url: performance.detailLink,
+                        source: 'performance_detail_ticket',
+                      })
+                    }
+                  >
+                    예매 사이트 바로가기
+                  </a>
+                ) : (
+                  <Value>정보 없음</Value>
+                )}
+              </LinkValue>
+            </LabelRow>
           </InfoSection>
         </ScrollableList>
       </PageWrapper>
@@ -396,4 +399,12 @@ const ScrollableList = styled.div`
 
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
+`;
+
+const MoreMessage = styled.div`
+  position: absolute;
+  margin-top: 2px;
+  font-size: ${({ theme }) => theme.fontSizes.xxs};
+  font-weight: ${({ theme }) => theme.fontWeights.regular};
+  color: ${({ theme }) => theme.colors.lightGray};
 `;

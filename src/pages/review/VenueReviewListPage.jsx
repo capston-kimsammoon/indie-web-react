@@ -1,4 +1,4 @@
-// ✅ src/pages/review/VenueReviewListPage.jsx
+// src/pages/review/VenueReviewListPage.jsx
 import styled from 'styled-components';
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
