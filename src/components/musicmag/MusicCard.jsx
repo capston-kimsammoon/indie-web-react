@@ -104,4 +104,3 @@ const Content = styled.p`
   -webkit-box-orient: vertical;
   overflow: hidden;
 `;
-
