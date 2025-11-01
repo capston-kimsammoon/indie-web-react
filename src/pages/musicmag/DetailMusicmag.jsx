@@ -1,13 +1,14 @@
+// src/pages/musicmag/DetailMusicmag.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import Header from '../../components/layout/Header';
+import MusicGo from '../../components/musicmag/MusicGo';
 import { fetchMusicMagazineDetail } from '../../api/musicMagazineApi';
-import theme from '../../styles/theme';
+import { fetchArtistDetail } from '../../api/artistApi';
 
 const DetailMusicmag = () => {
   const { id } = useParams();
-
   const [magazine, setMagazine] = useState({
     id,
     title: '',
@@ -16,31 +17,66 @@ const DetailMusicmag = () => {
     coverImageUrl: '',
     blocks: [],
   });
+  const [artistMap, setArtistMap] = useState({}); 
 
   useEffect(() => {
-    if (!id) return;
-    let mounted = true;
+  if (!id) return;
+  let mounted = true;
 
-    (async () => {
-      try {
-        const data = await fetchMusicMagazineDetail(id);
-        if (!mounted) return;
+  (async () => {
+    try {
+      const data = await fetchMusicMagazineDetail(id);
+      if (!mounted) return;
 
-        setMagazine({
-          id: data.id,
-          title: data.title,
-          author: data.author,
-          createdAt: data.createdAt,
-          coverImageUrl: data.coverImageUrl,
-          blocks: data.blocks,
-        });
-      } catch (err) {
-        console.error('📛 매거진 상세 조회 실패:', err);
-      }
-    })();
+      console.log('🔍 매거진 데이터:', data);
+      console.log('🔍 blocks:', data.blocks);
 
-    return () => { mounted = false; };
-  }, [id]);
+      setMagazine({
+        id: data.id,
+        title: data.title,
+        author: data.author,
+        createdAt: data.createdAt,
+        coverImageUrl: data.coverImageUrl,
+        blocks: data.blocks || [],
+      });
+    } catch (err) {
+      console.error('📛 매거진 상세 조회 실패:', err);
+    }
+  })();
+
+  return () => { mounted = false; };
+}, [id]);
+
+  // CTA 아티스트 정보 미리 fetch
+ useEffect(() => {
+  const ctaBlocks = magazine.blocks.filter(b => b.type === 'cta' && b.artistId); 
+  const ids = ctaBlocks.map(b => b.artistId); 
+
+  console.log('🔍 CTA 블록들:', ctaBlocks);
+  console.log('🔍 아티스트 IDs:', ids);
+
+  if (!ids.length) return;
+
+  let mounted = true;
+
+  const fetchAllArtists = async () => {
+    try {
+      const results = await Promise.all(ids.map(id => fetchArtistDetail(id)));
+      if (!mounted) return;
+
+      const map = {};
+      results.forEach(a => { map[a.id] = a; });
+      console.log('🔍 artistMap 완성:', map);
+      setArtistMap(map);
+    } catch (err) {
+      console.error('📛 CTA 아티스트 조회 실패', err);
+    }
+  };
+
+  fetchAllArtists();
+
+  return () => { mounted = false; };
+}, [magazine.blocks]);
 
   const formatKST = (d) => {
     try {
@@ -53,8 +89,6 @@ const DetailMusicmag = () => {
   };
 
   const blocks = magazine.blocks || [];
-
-  // ✅ map 밖에서 한 번만 계산
   const semititleBlocks = blocks.filter(b => b.type === 'text' && b.semititle && !b.value);
   const firstSemititleOrder = semititleBlocks.length
     ? Math.min(...semititleBlocks.map(b => b.display_order))
@@ -72,7 +106,7 @@ const DetailMusicmag = () => {
         {blocks.map((b) => {
           const type = b.type;
 
-          // 🔹 이미지
+          // 이미지
           if (type === 'image' && b.imageUrl) {
             return (
               <ImageBlock key={b.id} align={b.align ?? 'center'}>
@@ -81,22 +115,27 @@ const DetailMusicmag = () => {
             );
           }
 
-          // 🔹 텍스트 (세미타이틀만 있는 경우)
+          // 텍스트 본문
+          if (type === 'text' && b.value) {
+            return <TextBlock key={b.id}>{b.value}</TextBlock>;
+          }
+
+          // 세미타이틀
           if (type === 'text' && b.semititle && !b.value) {
             const addMarginTop = b.display_order !== firstSemititleOrder;
             return <Semititle key={b.id} addMarginTop={addMarginTop}>{b.semititle}</Semititle>;
           }
 
-          // 🔹 텍스트 (본문)
-          if (type === 'text' && b.value && !b.semititle) {
-            return <TextBlock key={b.id}>{b.value}</TextBlock>;
+          // CTA (아티스트)
+          if (type === 'cta' && b.artistId) { 
+            console.log('🔍 CTA 블록 발견:', b);
+            console.log('🔍 artistId:', b.artistId);
+            console.log('🔍 artistMap:', artistMap);
+            console.log('🔍 해당 아티스트:', artistMap[b.artistId]); 
+            
+            const artist = artistMap[b.artistId]; 
+            return <MusicGo key={b.id} artist={artist} />;
           }
-
-          // 🔹 구분선
-          if (type === 'divider') {
-            return <Divider key={b.id} />;
-          }
-
           return null;
         })}
       </ScrollableList>
@@ -118,7 +157,6 @@ const ScrollableList = styled.div`
   overflow-y: auto;
   padding: 20px 8px 128px 8px;
   box-sizing: border-box;
-
   &::-webkit-scrollbar { display: none; }
   -ms-overflow-style: none; 
   scrollbar-width: none;
