@@ -20,6 +20,8 @@ import MapPage from './pages/map/MapPage';
 import ListVenue from './pages/venue/ListVenue';
 import DetailVenue from './pages/venue/DetailVenue';
 import LoginSuccess from './pages/login/LoginSuccess';
+import PickListPage from './pages/pick/PickListPage';
+
 const routes = [
   { path: '/', element: <HomePage /> },
   { path: '/notification', element: <NotificationPage /> },
@@ -41,7 +43,9 @@ const routes = [
   { path: '/map', element: <MapPage /> },
   { path: '/venue', element: <ListVenue /> },
   { path: '/venue/:id', element: <DetailVenue /> },
+  { path: '/picks', element: <PickListPage /> },
   {path: '/login/success', element: <LoginSuccess/>}, 
 ];
 
 export default routes;
+
