@@ -128,13 +128,12 @@ const DetailMusicmag = () => {
 
           // CTA (아티스트)
           if (type === 'cta' && b.artistId) { 
-            console.log('🔍 CTA 블록 발견:', b);
-            console.log('🔍 artistId:', b.artistId);
-            console.log('🔍 artistMap:', artistMap);
-            console.log('🔍 해당 아티스트:', artistMap[b.artistId]); 
-            
             const artist = artistMap[b.artistId]; 
-            return <MusicGo key={b.id} artist={artist} />;
+            return (
+              <MusicGoWrapper key={b.id}>
+                <MusicGo artist={artist} />
+              </MusicGoWrapper>
+            );
           }
           return null;
         })}
@@ -155,7 +154,7 @@ const PageWrapper = styled.div`
 const ScrollableList = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 20px 8px 128px 8px;
+  padding: 20px 8px 108px 8px;
   box-sizing: border-box;
   &::-webkit-scrollbar { display: none; }
   -ms-overflow-style: none; 
@@ -214,4 +213,8 @@ const ImageBlock = styled.figure`
     margin-left: auto;
     margin-right: auto;
   }
+`;
+
+const MusicGoWrapper = styled.div`
+  margin-bottom: 36px;
 `;
