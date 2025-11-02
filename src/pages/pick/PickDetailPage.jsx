@@ -129,7 +129,7 @@ const PickDetailPage = () => {
   
           {/* 메타 + 구분선 */}
           <div className={styles.meta}>
-            {formatKST(pick.createdAt)} {pick.author}
+            {formatKST(pick.createdAt)} 
           </div>
           <div className={styles.hr} />
   
