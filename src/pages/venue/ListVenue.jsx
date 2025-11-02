@@ -4,12 +4,11 @@ import Header from '../../components/layout/Header';
 import VenueItem from './components/VenueItem';
 import RegionSelectButton from './components/RegionSelectButton';
 import RegionSelectSheet from './components/RegionSelectSheet';
-import { useNavigate, useLocation } from 'react-router-dom'; // ✅ useLocation 추가
+import { useNavigate } from 'react-router-dom';
 import { fetchVenueList } from '../../api/venueApi';
 
 function ListVenue() {
   const navigate = useNavigate();
-  const location = useLocation(); // ✅ useLocation 훅 사용
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedRegions, setSelectedRegions] = useState(['전체']);
   const [venues, setVenues] = useState([]);
@@ -22,20 +21,9 @@ function ListVenue() {
   // ✅ 추가: 초기 로딩/복원 상태를 추적하는 플래그
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // 1. ✅ 상태 복원 및 초기 로드 (수정됨: 초기화 로직 추가)
+  // 1. ✅ 상태 복원 및 초기 로드 (수정됨)
   useEffect(() => {
-    // 브라우저 탐색 타입 확인 (back_forward가 아니면 새로 진입으로 간주)
-    const navigationType = window.performance.getEntriesByType("navigation")[0]?.type;
-    const isRestoring = navigationType === 'back_forward'; // 뒤로가기/앞으로가기 시 복원
-
-    let saved = sessionStorage.getItem('venueListState');
-    
-    // 🚩 상태 초기화 조건: 뒤로가기가 아닌데(새로운 메뉴 진입) 저장된 상태가 있다면 초기화
-    if (!isRestoring && saved) {
-      sessionStorage.removeItem('venueListState');
-      saved = null; 
-    }
-
+    const saved = sessionStorage.getItem('venueListState');
     if (saved) {
       const { scrollY, selectedRegions, venues, page } = JSON.parse(saved);
       setSelectedRegions(selectedRegions || ['전체']);
@@ -50,13 +38,14 @@ function ListVenue() {
       // 복원 후에는 초기 로드가 끝났음을 표시
       setIsInitialLoad(false); 
     } else {
-      // 저장된 상태가 없거나 초기화된 경우 새로 로드
+      // 저장된 상태가 없을 때만 새로 로드
       loadVenues(1);
       setIsInitialLoad(false); // 초기 로드 시작 후 플래그 변경
     }
   }, []);
 
-  // 2. ✅ 스크롤 복원용 useEffect (기존 코드 유지)
+  // 2. ✅ 스크롤 복원용 useEffect (리스트 로드 완료 후 실행)
+  // 이 부분은 기존 코드를 유지합니다.
   useEffect(() => {
     const saved = sessionStorage.getItem('venueListState');
     if (!saved) return;
@@ -71,7 +60,7 @@ function ListVenue() {
     }
   }, [venues]);
 
-  // 3. ✅ 언마운트 시 상태 저장 (기존 코드 유지)
+  // 3. ✅ 언마운트 시 상태 저장 (기존 코드를 유지합니다.)
   useEffect(() => {
     return () => {
       sessionStorage.setItem(
@@ -86,7 +75,7 @@ function ListVenue() {
     };
   }, [selectedRegions, venues, page]);
 
-  // API 호출 함수 (기존 코드 유지)
+  // API 호출 함수 (기존 코드를 유지합니다.)
   const loadVenues = useCallback(
     async (pageNum) => {
       if (loading) return;
@@ -128,7 +117,9 @@ function ListVenue() {
     [selectedRegions, size, loading]
   );
 
-  // 4. ✅ 지역 변경 시 첫 페이지부터 다시 로드 (수정됨: 복원 시 재로드 방지)
+  // 4. ✅ 지역 변경 시 첫 페이지부터 다시 로드 (수정됨)
+  // isInitialLoad가 true일 때는 상태 복원 과정이므로 데이터 로드를 건너뜁니다.
+  // isInitialLoad가 false가 된 이후, selectedRegions가 변경되었을 때만 실행됩니다.
   useEffect(() => {
     if (isInitialLoad) {
         return;
@@ -136,9 +127,9 @@ function ListVenue() {
     setPage(1);
     setHasMore(true);
     loadVenues(1);
-  }, [selectedRegions, isInitialLoad]);
+  }, [selectedRegions, isInitialLoad]); // isInitialLoad를 의존성 배열에 추가
 
-  // 5. ✅ 무한 스크롤 센티넬 (기존 코드 유지)
+  // 5. ✅ 무한 스크롤 센티넬 (기존 코드를 유지합니다.)
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;
