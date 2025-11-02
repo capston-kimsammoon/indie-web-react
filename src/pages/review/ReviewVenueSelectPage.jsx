@@ -65,6 +65,10 @@ const VenueCard = styled.button`
   transition: all 0.2s;
   min-height: 140px;
   height: auto;
+  color: #2F2F2F;
+  background: none; 
+  appearance: none; 
+  outline: none;
 
   &:hover {
     background-color: #f3f9f5;
