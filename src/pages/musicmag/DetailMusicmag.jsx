@@ -96,12 +96,12 @@ const DetailMusicmag = () => {
 
   return (
     <PageWrapper>
-      <Header title="음악 매거진" />
+      <Header title="모디의 디깅" />
 
       <ScrollableList>
         <Title>{magazine.title}</Title>
         <Time>{formatKST(magazine.createdAt)} {magazine.author}</Time>
-        <Divider />
+        <Divider style={{ marginBottom: "-32px" }} />
 
         {blocks.map((b) => {
           const type = b.type;
