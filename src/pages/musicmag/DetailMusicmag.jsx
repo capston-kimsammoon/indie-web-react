@@ -101,7 +101,7 @@ const DetailMusicmag = () => {
       <ScrollableList>
         <Title>{magazine.title}</Title>
         <Time>{formatKST(magazine.createdAt)} {magazine.author}</Time>
-        <Divider style={{ marginBottom: "-20px" }} />
+        <Divider style={{ marginTop: "12px", marginBottom: "-20px" }} />
 
         {blocks.map((b) => {
           const type = b.type;
