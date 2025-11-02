@@ -30,6 +30,7 @@ import AllReview from './pages/review/AllReview';
 import AnnouncePage from './pages/announce/AnnouncePage';
 import ClientPage from './pages/client/ClientPage';
 import DetailMusicmag from './pages/musicmag/DetailMusicmag'
+import MusicmagListPage from './pages/musicmag/MusicmagListPage';
 
 const routes = [
   // ✅ 홈 화면: 주소창에 /home 없이 / 로 표시
@@ -68,6 +69,7 @@ const routes = [
   { path: '/notice', element: <AnnouncePage /> },
   { path: '/support', element: <ClientPage /> },
   { path: '/musicmagazine/:id', element: <DetailMusicmag />},
+  { path: '/musicmagazines', element: <MusicmagListPage />},
 ];
 
 export default routes;
