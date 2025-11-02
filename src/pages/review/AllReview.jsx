@@ -21,8 +21,8 @@ const PageWrapper = styled.div`
 const SubBar = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 16px;
+  gap: 4px;
+  margin-top: 28px;
 `;
 
 const Stat = styled.span`
@@ -43,7 +43,7 @@ const Controls = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 16px;
+  padding-bottom: 8px;
 `;
 
 const OrderSelect = styled.select`
