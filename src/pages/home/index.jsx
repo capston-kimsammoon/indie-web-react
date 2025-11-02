@@ -3,24 +3,20 @@ import styled from 'styled-components';
 import TodayConcertCarousel from '../../components/performance/TodayConcertCarousel';
 import NewConcertList from '../../components/performance/NewConcertList';
 import TicketOpenList from '../../components/performance/TicketOpenList';
-import styles from './home.module.css';
-// import iconCalendar from '../../assets/icons/icon_calendar_hyunjin.svg'; // [DISABLED] 캘린더 아이콘 임포트 (렌더 비활성화)
-import Sidebar from '../../components/sidebar/Sidebar';
 import { useNavigate } from 'react-router-dom';
 import modieHeaderLogo from '../../assets/icons/modie_header.png';
 import Header from '../../components/layout/Header';
-import { ReactComponent as IconWeb } from '../../assets/icons/icon_heart_outline.svg';   // ← 좌측 웹아이콘(임시)
-import { ReactComponent as IconSearch } from '../../assets/icons/icon_y_search.svg';      // ← 검색
-import { ReactComponent as IconNotify } from '../../assets/icons/icon_notify_on.svg';     // ← 알림
-import modieIcon from '../../assets/icons/modie_icon.png';
 
 import PickCard from '../../components/performance/Pick/PickCard';
+import MusicCard from '../../components/musicmag/MusicCard';
 import MoodSection from '../../components/performance/mood/MoodSection';
 import PopularConcertList from '../../components/performance/popular/PopularConcertList';
 import HomeNaviBar from '../../components/home_navibar/HomeNaviBar';
 import axios from 'axios';
 import { baseUrl } from '../../api/config';
-import { fetchMagazineList } from '../../api/magazineApi';
+import { fetchMagazineList, fetchMagazineDetail } from '../../api/magazineApi';
+import { fetchMusicMagazineList, fetchMusicMagazineDetail } from '../../api/musicMagazineApi';
+
 import {
   fetchTodayPerformances,
   fetchRecentPerformances,
@@ -29,7 +25,6 @@ import {
 } from '../../api/performanceApi';
 
 const HomePage = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const carouselRef = useRef();
 
@@ -38,6 +33,7 @@ const HomePage = () => {
   const [ticketOpenPerformances, setTicketOpenPerformances] = useState([]);
   const [popularPerformances, setPopularPerformances] = useState([]);
   const [pickItem, setPickItem] = useState(null);
+  const [musicMagazine, setMusicMagazine] = useState(null);
   const fetchedRef = useRef(false);
 
   const now = new Date();
@@ -46,7 +42,6 @@ const HomePage = () => {
     if (carouselRef.current) carouselRef.current.slickNext();
   };
 
-  // ---- 날짜 로컬(KST) 기준으로 계산 (UTC 밀림 방지)
   const pad2 = (n) => (n < 10 ? `0${n}` : `${n}`);
   const formatLocalYMD = (d) => {
     const y = d.getFullYear();
@@ -63,7 +58,6 @@ const HomePage = () => {
     return { today, sevenDaysLater };
   };
 
-  // ---- 배열 정규화 유틸 (홈 내부 전용)
   const toArray = (data) => {
     if (Array.isArray(data)) return data;
     if (data && typeof data === 'object') {
@@ -79,7 +73,6 @@ const HomePage = () => {
     return [];
   };
 
-  // ✅ 공통 스키마로 표준화 (섹션 컴포넌트가 posterUrl/venue/date만 읽어도 동작)
   const normalizePerf = (p) => ({
     ...p,
     posterUrl:
@@ -93,7 +86,6 @@ const HomePage = () => {
     date: p?.date || p?.performance_date || p?.start_date || p?.show_date || '',
   });
 
-  // ---- 폴백 요청: API가 0건 줄 때만 직접 호출해서 items 등도 수용
   const fetchRecentFallback = async (limit) => {
     const res = await axios.get(`${baseUrl}/performance/home/recent`, {
       params: { limit },
@@ -103,54 +95,26 @@ const HomePage = () => {
 
   const fetchTicketOpeningFallback = async (startDate, endDate) => {
     const res = await axios.get(`${baseUrl}/performance/home/ticket-opening`, {
-      // 서버가 snake/camel 어느 쪽을 받든 걸리게 둘 다 보냄
       params: { startDate, endDate, start_date: startDate, end_date: endDate },
     });
     return toArray(res.data);
   };
 
-  // ✅ [PICK] 더미 폴백 (API가 비었을 때만 사용)
   const PICK_FALLBACK = {
     id: 1,
-    title: '“인디의 모든 순간을 한눈에” — 공연부터 예매까지, 인디 플랫폼 Modie의 등장',
-  
-    content: `
-(서울, 2025년) — “공연 정보를 찾으려면 인스타그램을 뒤지고, 티켓 예매는 또 다른 사이트에서 해야 했던” 인디 팬들의 불편함을 없애줄 플랫폼이 등장했다.  
-독립음악 전용 데이터 플랫폼 **Modie (modie.com)** 은 흩어진 인디 공연 정보를 한곳에 모아주는 신개념 서비스다.  
-Modie는 단순한 공연 정보 모음 사이트가 아니다. 운영팀이 직접 공연장·아티스트의 데이터를 수집하고 정제해, 사용자가 손쉽게 인디 공연 정보를 탐색할 수 있도록 만든다.  
-
-> “원래 인디 공연 정보를 얻으려면 인스타그램에서 공연장 계정을 하나하나 찾아봐야 했죠.  
-> 우리는 그 과정을 완전히 없앴습니다.”  
-> — Modie 개발팀 인터뷰 중  
-
-이 말처럼, Modie는 전국의 공연장, 아티스트, 티켓 판매 링크, 가격, 날짜 정보를 직접 크롤링·정리하여 제공한다.  
-덕분에 사용자는 검색 한 번으로 **공연 일정**, **예매 링크**, **Spotify 아티스트 페이지**, **포스터 이미지**까지 한눈에 확인할 수 있다.  
-
-**“오늘 뭐 볼까?” — 날짜별 공연 캘린더**  
-
-Modie의 핵심 기능 중 하나는 **‘공연 캘린더(Calendar)’**다.  
-매일, 매주 어떤 공연이 열리는지 직관적인 달력 인터페이스로 보여주며, 사용자는 클릭 한 번으로 세부 정보를 바로 열람할 수 있다.  
-뿐만 아니라 **“예매 임박순”**, **“가장 인기 있는 공연”**, **“오늘 열리는 공연”** 등으로 자동 정렬되어, 지금 당장 볼 수 있는 공연을 손쉽게 찾을 수 있다.  
-
- **“오늘의 무드에 맞는 공연 추천”**  
-
-Modie는 단순한 정보 집계 사이트를 넘어, **공연 무드 기반 추천 시스템**을 제공한다.  
-‘따뜻한’, ‘신나는’, ‘몽환적인’ 등 감정 키워드에 따라 어울리는 공연을 추천해주며,  
-사용자는 기분이나 날씨에 맞는 공연을 쉽게 발견할 수 있다.  
-
-이러한 기능은 단순한 데이터 필터링이 아닌, **Modie가 자체적으로 구축한 공연 분위기 태깅 시스템**을 기반으로 작동한다.  
-덕분에 사용자 경험은 “공연 정보 검색”이 아닌 “취향 맞춤 탐색”에 가까워진다.  
-
- **아티스트 중심, 팬 중심**  
-
-Modie는 인디 씬의 중심을 ‘사람’—아티스트와 팬—으로 되돌리는 것을 목표로 한다.  
-플랫폼에는 각 아티스트의 **Spotify 링크**, **Instagram 계정**, **공연 이력**, **사진**이 정리되어 있으며,  
-팬은 Modie를 통해 새로운 아티스트를 발견하고 즉시 예매로 연결할 수 있다.  
-`,
-
-imageUrl: 'https://i.ibb.co/VYNPQ5XL/image.png',
+    title: '"인디의 모든 순간을 한눈에" — 공연부터 예매까지, 인디 플랫폼 Modie의 등장',
+    content: `(서울, 2025년) — "공연 정보를 찾으려면 인스타그램을 뒤지고, 티켓 예매는 또 다른 사이트에서 해야 했던" 인디 팬들의 불편함을 없애줄 플랫폼이 등장했다.  
+독립음악 전용 데이터 플랫폼 **Modie (modie.com)** 은 흩어진 인디 공연 정보를 한곳에 모아주는 신개념 서비스다.`,
+    imageUrl: 'https://i.ibb.co/VYNPQ5XL/image.png',
     author: 'Modie 관리자',
     createdAt: '2025-10-15',
+  };
+
+  const MUSIC_MAGAZINE_FALLBACK = {
+    id: 1,
+    title: '이달의 음악 매거진',
+    text: '최신 인디 음악 트렌드와 아티스트 인터뷰를 만나보세요.',
+    coverImageUrl: 'https://i.ibb.co/VYNPQ5XL/image.png',
   };
 
   useEffect(() => {
@@ -164,13 +128,13 @@ imageUrl: 'https://i.ibb.co/VYNPQ5XL/image.png',
         // 1) 오늘 공연
         const todayData = await fetchTodayPerformances();
 
-        // 2) NEW 업로드 (API 우선, 비면 폴백)
+        // 2) NEW 업로드
         let recentData = await fetchRecentPerformances(6);
         if (toArray(recentData).length === 0) {
           recentData = await fetchRecentFallback(6);
         }
 
-        // 3) 티켓 오픈 예정 (API 우선, 비면 폴백)
+        // 3) 티켓 오픈 예정
         let ticketOpeningData = await fetchTicketOpeningPerformances(
           today,
           sevenDaysLater
@@ -182,16 +146,15 @@ imageUrl: 'https://i.ibb.co/VYNPQ5XL/image.png',
           );
         }
 
-        // ✅ 4) 인기 많은 공연 (6개)
+        // 4) 인기 많은 공연
         const popularData = await fetchPopularPerformances(6);
 
-        // ✅ 여기서만 표준화해서 섹션에 내려줌
         setTodayPerformances(toArray(todayData).map(normalizePerf));
         setRecentPerformances(toArray(recentData).map(normalizePerf));
         setTicketOpenPerformances(toArray(ticketOpeningData));
         setPopularPerformances(toArray(popularData).map(normalizePerf));
 
-        // ✅ [PICK] 매거진 최신 1건 로드 (빈 배열이면 더미 사용)
+        // 5) [PICK] 매거진 최신 1건
         try {
           const magazines = await fetchMagazineList({ limit: 1 });
           const arr = toArray(magazines);
@@ -210,20 +173,49 @@ imageUrl: 'https://i.ibb.co/VYNPQ5XL/image.png',
               createdAt: first.createdAt ?? null,
             });
           } else {
-            setPickItem(PICK_FALLBACK); // ✅ 폴백
+            setPickItem(PICK_FALLBACK);
           }
         } catch (err) {
           console.warn('[HomePage] 매거진 로딩 실패(폴백 사용):', err);
-          setPickItem(PICK_FALLBACK); // ✅ 폴백
+          setPickItem(PICK_FALLBACK);
         }
-      } catch (err) {
-        console.error('📛 홈 API 호출 중 오류 발생:', err);
-      }
-    };
 
-    loadHomeData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+        // 6) [음악 매거진] 최신 1건
+        try {
+          console.log('🔍 음악 매거진 API 호출 시작');
+          const musicMags = await fetchMusicMagazineList({ limit: 1 });
+          console.log('🔍 음악 매거진 API 응답:', musicMags);
+          
+          const arr = toArray(musicMags);
+          console.log('🔍 배열 변환 결과:', arr);
+          
+          if (arr.length > 0) {
+            const first = arr[0];
+            console.log('🔍 첫 번째 매거진:', first);
+            
+            setMusicMagazine({
+              id: first.id,
+              title: first.title ?? '',
+              text: first.excerpt ?? first.summary ?? '',
+              coverImageUrl: first.coverImageUrl ?? first.cover_image_url ?? null,
+            });
+          } else {
+            console.warn('⚠️ 음악 매거진 배열이 비어있음 - FALLBACK 사용');
+            setMusicMagazine(MUSIC_MAGAZINE_FALLBACK);
+          }
+        } catch (err) {
+          console.error('📛 음악 매거진 로딩 실패:', err);
+          console.error('📛 에러 상세:', err.response?.data);
+          setMusicMagazine(MUSIC_MAGAZINE_FALLBACK);
+        }
+
+    } catch (err) {
+      console.error('📛 홈 API 호출 중 오류 발생:', err);
+    }
+  };
+
+  loadHomeData();
+}, []);
 
   return (
     <>
@@ -269,6 +261,7 @@ imageUrl: 'https://i.ibb.co/VYNPQ5XL/image.png',
           <SectionTitle>티켓 오픈 예정</SectionTitle>
           <TicketOpenList performances={ticketOpenPerformances} />
         </FullWidthSection>
+
         {pickItem && (
           <>
             <SectionHeader>
@@ -286,6 +279,24 @@ imageUrl: 'https://i.ibb.co/VYNPQ5XL/image.png',
             />
           </>
         )}
+
+        {musicMagazine && (
+        <>
+          <SectionHeader>
+            <span>음악 매거진</span>
+            <MoreButton onClick={() => navigate('/musicmagazine')}>
+              ›
+            </MoreButton>
+          </SectionHeader>
+          <MusicCard
+            id={musicMagazine.id}
+            title={musicMagazine.title}
+            text={musicMagazine.text}
+            coverImageUrl={musicMagazine.coverImageUrl}
+            onClick={() => navigate(`/musicmagazine/${musicMagazine.id}`)}
+          />
+        </>
+      )}
 
         <FullWidthSection>
           <SectionTitle>키워드별 공연</SectionTitle>
@@ -330,7 +341,7 @@ const TodayTitle = styled.div`
 `;
 
 const TodaySection = styled.section`
-  margin: 4px 0 52px 0; // 8px
+  margin: 4px 0 52px 0;
   display: flow-root;
 `;
 
@@ -376,7 +387,7 @@ const SectionHeader = styled.div`
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
-  gap: 8px;  /* 제목과 아이콘 사이 8px */
+  gap: 8px;
   
   span {
     font-size: ${({ theme }) => theme.fontSizes.lg};            
@@ -389,6 +400,7 @@ const MoreButton = styled.button`
   background: none;
   border: none;
   padding: 0;
+  margin-top: -4px;
   cursor: pointer;
   display: flex;
   align-items: center;
