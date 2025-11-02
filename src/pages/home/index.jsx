@@ -182,16 +182,11 @@ const HomePage = () => {
 
         // 6) [음악 매거진] 최신 1건
         try {
-          console.log('🔍 음악 매거진 API 호출 시작');
           const musicMags = await fetchMusicMagazineList({ limit: 1 });
-          console.log('🔍 음악 매거진 API 응답:', musicMags);
-          
           const arr = toArray(musicMags);
-          console.log('🔍 배열 변환 결과:', arr);
           
           if (arr.length > 0) {
             const first = arr[0];
-            console.log('🔍 첫 번째 매거진:', first);
             
             setMusicMagazine({
               id: first.id,
@@ -200,12 +195,9 @@ const HomePage = () => {
               coverImageUrl: first.coverImageUrl ?? first.cover_image_url ?? null,
             });
           } else {
-            console.warn('⚠️ 음악 매거진 배열이 비어있음 - FALLBACK 사용');
             setMusicMagazine(MUSIC_MAGAZINE_FALLBACK);
           }
         } catch (err) {
-          console.error('📛 음악 매거진 로딩 실패:', err);
-          console.error('📛 에러 상세:', err.response?.data);
           setMusicMagazine(MUSIC_MAGAZINE_FALLBACK);
         }
 
@@ -279,6 +271,24 @@ const HomePage = () => {
             />
           </>
         )}
+
+        {musicMagazine && (
+        <>
+          <SectionHeader>
+            <span>음악 매거진</span>
+            <MoreButton onClick={() => navigate('/musicmagazine')}>
+              ›
+            </MoreButton>
+          </SectionHeader>
+          <MusicCard
+            id={musicMagazine.id}
+            title={musicMagazine.title}
+            text={musicMagazine.text}
+            coverImageUrl={musicMagazine.coverImageUrl}
+            onClick={() => navigate(`/musicmagazine/${musicMagazine.id}`)}
+          />
+        </>
+      )}
 
         <FullWidthSection>
           <SectionTitle>키워드별 공연</SectionTitle>
