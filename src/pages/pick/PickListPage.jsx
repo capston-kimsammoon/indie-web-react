@@ -188,10 +188,11 @@ const Pager = styled.div`
   align-items: center;
   gap: 8px;
   justify-content: center;
-  margin: 16px 0 8px;
+  margin-top: -4px;
+  margin-bottom: 12px;
 
   button {
-    min-width: 36px;  
+    min-width: 36px;
     height: 32px;
     border: 1px solid #3C9C68;
     border-radius: 8px;
