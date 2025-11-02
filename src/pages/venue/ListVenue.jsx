@@ -4,46 +4,26 @@ import Header from '../../components/layout/Header';
 import VenueItem from './components/VenueItem';
 import RegionSelectButton from './components/RegionSelectButton';
 import RegionSelectSheet from './components/RegionSelectSheet';
-import { useNavigate, useSearchParams } from 'react-router-dom'; // ✅ 추가
+import { useNavigate } from 'react-router-dom';
 import { fetchVenueList } from '../../api/venueApi';
 
 function ListVenue() {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams(); // ✅ URL용
-
-  // ✅ URL에서 지역 필터 초기값 복원 (?regions=경기,부산)
-  const initialRegionsFromUrl = (() => {
-    const raw = searchParams.get('regions');
-    if (!raw || raw.trim() === '') {
-      return ['전체'];
-    }
-    return raw
-      .split(',')
-      .map((r) => r.trim())
-      .filter((r) => r !== '');
-  })();
-
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedRegions, setSelectedRegions] = useState(initialRegionsFromUrl);
-
+  const [selectedRegions, setSelectedRegions] = useState(['전체']);
   const [venues, setVenues] = useState([]);
-  const [page, setPage] = useState(1); // 다음에 불러올 page 번호
-  const [hasMore, setHasMore] = useState(true); // 다음 페이지 더 있는지
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const size = 20;
   const sentinelRef = useRef(null);
 
-  // ✅ 상태 복원 (원본 로직 유지하되, URL 값이 있으면 그걸 우선으로 쓴다)
+  // ✅ 상태 복원
   useEffect(() => {
     const saved = sessionStorage.getItem('venueListState');
     if (saved) {
-      const { scrollY, selectedRegions: savedRegions, venues, page } = JSON.parse(saved);
-
-      // URL에 regions가 없을 때만 sessionStorage의 지역필터를 쓴다
-      if (!searchParams.get('regions')) {
-        setSelectedRegions(savedRegions || ['전체']);
-      }
-
+      const { scrollY, selectedRegions, venues, page } = JSON.parse(saved);
+      setSelectedRegions(selectedRegions || ['전체']);
       setVenues(venues || []);
       setPage(page || 1);
 
@@ -52,27 +32,27 @@ function ListVenue() {
         window.scrollTo(0, scrollY || 0);
       }, 0);
     } else {
-      // 저장된 상태가 없으면 첫 페이지 로드
+      // 저장된 상태가 없을 때만 새로 로드
       loadVenues(1);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ✅ 스크롤 복원 (원본)
+  // ✅ 스크롤 복원용 useEffect (리스트 로드 완료 후 실행)
   useEffect(() => {
     const saved = sessionStorage.getItem('venueListState');
     if (!saved) return;
 
     const { scrollY } = JSON.parse(saved);
 
+    // venues가 실제로 렌더링된 후 복원
     if (venues.length > 0) {
       setTimeout(() => {
         window.scrollTo(0, scrollY || 0);
-      }, 50);
+      }, 50); // 살짝 지연 (렌더 타이밍 맞추기)
     }
   }, [venues]);
 
-  // ✅ 언마운트 시 상태 저장 (원본)
+  // ✅ 언마운트 시 상태 저장
   useEffect(() => {
     return () => {
       sessionStorage.setItem(
@@ -87,17 +67,15 @@ function ListVenue() {
     };
   }, [selectedRegions, venues, page]);
 
-  // ✅ 실제 API 호출
+  // API 호출 함수
   const loadVenues = useCallback(
     async (pageNum) => {
       if (loading) return;
       setLoading(true);
-
       try {
         const regionParam = selectedRegions.includes('전체')
           ? undefined
           : selectedRegions;
-
         const data = await fetchVenueList({
           page: pageNum,
           size,
@@ -111,23 +89,18 @@ function ListVenue() {
           : [];
 
         if (pageNum === 1) {
-          // 첫 페이지 새로 로드
           setVenues(venueList);
         } else {
-          // 다음 페이지 이어붙이기
           setVenues((prev) => [...prev, ...venueList]);
         }
 
-        // 다음에 요청할 페이지 번호는 +1
-        setPage(pageNum + 1);
-
-        // 다음 페이지 있는지 여부 (20개 미만이면 false)
+        // 20개 미만이면 더 이상 데이터 없음
         setHasMore(venueList.length >= size);
+        setPage(pageNum + 1);
       } catch (err) {
         console.error('공연장 목록 API 호출 실패:', err);
         if (pageNum === 1) {
           setVenues([]);
-          setHasMore(false);
         }
       } finally {
         setLoading(false);
@@ -136,23 +109,21 @@ function ListVenue() {
     [selectedRegions, size, loading]
   );
 
-  // ✅ 지역 변경 시 첫 페이지부터 다시 로드 (원본 유지)
+  // 지역 변경 시 첫 페이지부터 다시 로드
   useEffect(() => {
-    // 지역 바뀌면 페이지/hasMore 리셋하고 첫 페이지 다시 불러
     setPage(1);
     setHasMore(true);
     loadVenues(1);
-  }, [selectedRegions, loadVenues]);
+  }, [selectedRegions]);
 
-  // ✅ 무한 스크롤
+  // 무한 스크롤 센티넬
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const first = entries[0];
-        if (first.isIntersecting && hasMore && !loading) {
+        if (entries[0].isIntersecting && hasMore && !loading) {
           loadVenues(page);
         }
       },
@@ -163,24 +134,9 @@ function ListVenue() {
     return () => observer.disconnect();
   }, [page, hasMore, loading, loadVenues]);
 
-  // ✅ URL 쿼리에 지역 필터 저장
-  const syncRegionsToUrl = (regionsArr) => {
-    if (!regionsArr || regionsArr.length === 0 || (regionsArr.length === 1 && regionsArr[0] === '전체')) {
-      // 전체면 쿼리 깔끔하게 제거
-      setSearchParams({});
-    } else {
-      setSearchParams({
-        regions: regionsArr.join(','), // ['경기','부산'] -> regions=경기,부산
-      });
-    }
-  };
-
-  // ✅ 지역 선택 핸들러
   const handleSelectRegion = (region) => {
     if (region === '전체') {
-      const updated = ['전체'];
-      setSelectedRegions(updated);
-      syncRegionsToUrl(updated);
+      setSelectedRegions(['전체']);
     } else {
       const alreadySelected = selectedRegions.includes(region);
       let updated = alreadySelected
@@ -188,9 +144,7 @@ function ListVenue() {
         : selectedRegions.filter((r) => r !== '전체').concat(region);
 
       if (updated.length === 0) updated = ['전체'];
-
       setSelectedRegions(updated);
-      syncRegionsToUrl(updated);
     }
   };
 
@@ -198,12 +152,10 @@ function ListVenue() {
     <PageWrapper>
       <Header title="공연장" initialSearchTab="공연/공연장" />
       <div style={{ height: '16px' }} />
-
       <RegionSelectButton
         onClick={() => setIsSheetOpen(true)}
         selectedRegions={selectedRegions}
       />
-
       <ScrollableList>
         {Array.isArray(venues) && venues.length > 0 ? (
           <>
@@ -215,18 +167,12 @@ function ListVenue() {
                 onClick={() => navigate(`/venue/${venue.id}`)}
               />
             ))}
-
-            {hasMore && (
-              <Loader ref={sentinelRef}>
-                {loading && page > 2 ? '더 불러오는 중...' : ''}
-              </Loader>
-            )}
+            {hasMore && <Loader ref={sentinelRef}>더 불러오는 중...</Loader>}
           </>
         ) : (
           <EmptyMessage>해당되는 공연장이 없습니다.</EmptyMessage>
         )}
       </ScrollableList>
-
       {isSheetOpen && (
         <RegionSelectSheet
           selectedRegions={selectedRegions}
