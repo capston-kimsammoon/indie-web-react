@@ -151,7 +151,11 @@ function ListVenue() {
 
   // ✅ URL에 지역 필터 반영하는 함수
   const syncRegionsToUrl = (regionsArr) => {
-    if (!regionsArr || regionsArr.length === 0 || (regionsArr.length === 1 && regionsArr[0] === '전체')) {
+    if (
+      !regionsArr ||
+      regionsArr.length === 0 ||
+      (regionsArr.length === 1 && regionsArr[0] === '전체')
+    ) {
       // 전체만 선택된 경우 쿼리 깔끔하게 비워줌
       setSearchParams({});
     } else {
@@ -166,11 +170,10 @@ function ListVenue() {
     if (region === '전체') {
       const updated = ['전체'];
       setSelectedRegions(updated);
-      syncRegionsToUrl(updated); // ✅ URL에도 반영
-       
-        // 🔥 이전 캐시 버리고 새 기준으로 다시 불러오게
+      syncRegionsToUrl(updated);
+
+      // 🔥 캐시 제거: 이전 잘려 있던 상태(venues/page 등) 무효화
       sessionStorage.removeItem('venueListState');
-    
     } else {
       const alreadySelected = selectedRegions.includes(region);
       let updated = alreadySelected
@@ -178,8 +181,12 @@ function ListVenue() {
         : selectedRegions.filter((r) => r !== '전체').concat(region);
 
       if (updated.length === 0) updated = ['전체'];
+
       setSelectedRegions(updated);
-      syncRegionsToUrl(updated); // ✅ URL에도 반영
+      syncRegionsToUrl(updated);
+
+      // 🔥 여기에도 캐시 제거 반드시 넣어야 함
+      sessionStorage.removeItem('venueListState');
     }
   };
 
@@ -202,7 +209,12 @@ function ListVenue() {
                 onClick={() => navigate(`/venue/${venue.id}`)}
               />
             ))}
-            {hasMore && <Loader ref={sentinelRef}>더 불러오는 중...</Loader>}
+
+            {hasMore && (
+              <Loader ref={sentinelRef}>
+                {loading && page > 1 ? '더 불러오는 중...' : ''}
+              </Loader>
+            )}
           </>
         ) : (
           <EmptyMessage>해당되는 공연장이 없습니다.</EmptyMessage>
