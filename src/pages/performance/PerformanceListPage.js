@@ -1,7 +1,7 @@
 // src/pages/performance/PerformanceListPage.jsx
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom'; // ✅ URL 쿼리 동기화를 위해 useSearchParams 추가
 import Header from '../../components/layout/Header';
 import PerformanceListCard from '../../components/performance/PerformanceListCard';
 import RegionSelectButton from '../venue/components/RegionSelectButton';
@@ -37,9 +37,20 @@ const normalizePoster = (p) => {
 
 export default function PerformanceListPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams(); // ✅ URL 쿼리 읽기/쓰기용 훅 추가
 
-  const [sortOption, setSortOption] = useState('latest');
-  const [selectedRegions, setSelectedRegions] = useState(['전체']);
+  // ✅ URL 쿼리에서 초기 sortOption 불러오기 (없으면 'latest')
+  const initialSortFromUrl = searchParams.get('sort') || 'latest';
+
+  // ✅ URL 쿼리에서 초기 지역 불러오기
+  // regions=서울,부산 이런 식으로 들어있다고 가정
+  const initialRegionsFromUrlRaw = searchParams.get('regions');
+  const initialRegionsFromUrl = initialRegionsFromUrlRaw
+    ? initialRegionsFromUrlRaw.split(',').filter((r) => r.trim() !== '')
+    : ['전체'];
+
+  const [sortOption, setSortOption] = useState(initialSortFromUrl);
+  const [selectedRegions, setSelectedRegions] = useState(initialRegionsFromUrl);
   const [isSortModalOpen, setIsSortModalOpen] = useState(false);
   const [isRegionSheetOpen, setIsRegionSheetOpen] = useState(false);
 
@@ -48,19 +59,49 @@ export default function PerformanceListPage() {
   const [hasMore, setHasMore] = useState(true);
   const size = 15;
 
+  // ✅ 정렬/지역 변경 시 URL 쿼리도 같이 업데이트해주는 유틸
+  const syncFiltersToUrl = (nextSortOption, nextSelectedRegions) => {
+    // nextSortOption / nextSelectedRegions 가 없으면 현재 state 값을 사용
+    const sortToSet = nextSortOption ?? sortOption;
+    const regionsToSet = nextSelectedRegions ?? selectedRegions;
+
+    const params = {};
+
+    // sort는 항상 넣어줌
+    params.sort = sortToSet;
+
+    // 지역이 ['전체']이면 regions 쿼리는 안 넣고, 특정 지역들이면 콤마로 합쳐서 넣음
+    if (!(regionsToSet.length === 1 && regionsToSet[0] === '전체')) {
+      params.regions = regionsToSet.join(',');
+    }
+
+    setSearchParams(params);
+  };
+
+  // ✅ 지역 선택 로직 수정: state 갱신 + URL 반영
   const handleSelectRegion = (region) => {
     if (region === '전체') {
-      setSelectedRegions(['전체']);
+      const updated = ['전체'];
+      setSelectedRegions(updated);
+      syncFiltersToUrl(undefined, updated); // sortOption은 그대로 두고 지역만 업데이트
     } else {
       const alreadySelected = selectedRegions.includes(region);
       let updated = alreadySelected
         ? selectedRegions.filter((r) => r !== region)
         : selectedRegions.filter((r) => r !== '전체').concat(region);
       if (updated.length === 0) updated = ['전체'];
+
       setSelectedRegions(updated);
+      syncFiltersToUrl(undefined, updated); // sortOption은 그대로 두고 지역만 업데이트
     }
   };
-  
+
+  // ✅ 정렬 선택 로직 수정: state 갱신 + URL 반영
+  const handleSelectSort = (option) => {
+    setSortOption(option);
+    syncFiltersToUrl(option, undefined); // region은 그대로 두고 sortOption만 업데이트
+  };
+
   const loadPerformances = async (append = false) => {
     try {
       const sortMapping = { latest: 'created_at', popular: 'likes', date: 'date' };
@@ -151,20 +192,26 @@ export default function PerformanceListPage() {
 
         {isSortModalOpen && (
           <ModalBackground onClick={() => setIsSortModalOpen(false)}>
+            {/* ✅ 기존 setSortOption 대신 handleSelectSort */}
             <SortModal
               selected={sortOption}
-              onSelect={setSortOption}
+              onSelect={handleSelectSort}
               onClose={() => setIsSortModalOpen(false)}
             />
           </ModalBackground>
         )}
+
         {isRegionSheetOpen && (
-          <RegionSelectSheet
-            selectedRegions={selectedRegions}
-            onSelectRegion={handleSelectRegion}
-            onClose={() => setIsRegionSheetOpen(false)}
-          />
+          <>
+            {/* ✅ 기존 handleSelectRegion 유지하지만 내부 로직이 URL도 반영하도록 변경됨 */}
+            <RegionSelectSheet
+              selectedRegions={selectedRegions}
+              onSelectRegion={handleSelectRegion}
+              onClose={() => setIsRegionSheetOpen(false)}
+            />
+          </>
         )}
+
       </Container>
     </>
   );
@@ -181,7 +228,7 @@ const Container = styled.div`
 `;
 
 const ScrollableContent = styled.div`
-  height: 100vh
+  height: 100vh;
   height: 100dvh; 
   padding-bottom: 68px;
   overflow-y: auto;
