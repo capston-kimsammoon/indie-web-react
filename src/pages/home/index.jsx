@@ -254,10 +254,12 @@ const HomePage = () => {
           <TicketOpenList performances={ticketOpenPerformances} />
         </FullWidthSection>
 
+        <DivideSectionBack />
+
         {pickItem && (
           <>
             <SectionHeader>
-              <span>modie 추천공연</span>
+              <span>모디 Pick 공연</span>
               <MoreButton onClick={() => navigate('/picks')}>
                 ›
               </MoreButton>
@@ -273,19 +275,24 @@ const HomePage = () => {
         )}
 
         {musicMagazine && (
-        <>
-          <SectionHeader>
-            <span>모두의 디깅</span>
-          </SectionHeader>
-          <MusicCard
-            id={musicMagazine.id}
-            title={musicMagazine.title}
-            text={musicMagazine.text}
-            coverImageUrl={musicMagazine.coverImageUrl}
-            onClick={() => navigate(`/musicmagazine/${musicMagazine.id}`)}
-          />
-        </>
-      )}
+          <>
+            <SectionHeader>
+              <span>모디의 디깅</span>
+              <MoreButton onClick={() => navigate('/musicmagazines')}>
+                ›
+              </MoreButton>
+            </SectionHeader>
+            <MusicCard
+              id={musicMagazine.id}
+              title={musicMagazine.title}
+              text={musicMagazine.text}
+              coverImageUrl={musicMagazine.coverImageUrl}
+              onClick={() => navigate(`/musicmagazine/${musicMagazine.id}`)}
+            />
+          </>
+        )}
+      
+        <DivideSectionBack style={{ marginTop: "-24px", marginBottom: "32px" }} />
 
         <FullWidthSection>
           <SectionTitle>키워드별 공연</SectionTitle>
@@ -346,6 +353,15 @@ const FullWidthSectionBack = styled.section`
   margin-top: 20px;
   margin-bottom: 32px;
   padding: 32px 0 8px 0;
+`;
+
+const DivideSectionBack = styled.section`
+  background-color: #F7F7F8;
+  margin-top: -24px;
+  margin-left: -16px;
+  margin-right: -16px;
+  margin-bottom: 32px;
+  padding-top: 8px;
 `;
 
 const SectionTitle = styled.div`
