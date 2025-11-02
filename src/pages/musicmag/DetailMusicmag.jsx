@@ -164,9 +164,9 @@ const ScrollableList = styled.div`
 `;
 
 const Title = styled.h1`
-  font-weight: ${({ theme }) => theme.fontWeights.semibold};
-  font-size: ${({ theme }) => theme.fontSizes.lg};
-  color: ${({ theme }) => theme.colors.darkblack};
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  color: ${({ theme }) => theme.colors.black};
   text-align: center;
   line-height: 1.1;
   margin: 8px 0 8px 0;
