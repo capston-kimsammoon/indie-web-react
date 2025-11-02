@@ -22,7 +22,7 @@ const SubBar = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-top: 28px;
+  margin-top: 24px;
 `;
 
 const Stat = styled.span`
