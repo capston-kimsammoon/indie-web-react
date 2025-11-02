@@ -166,28 +166,35 @@ function ListVenue() {
     }
   };
 
+  // ✅ 지역 선택 시: 필터 반영 + 캐시 폐기 + 상태 초기화
   const handleSelectRegion = (region) => {
-    if (region === '전체') {
-      const updated = ['전체'];
-      setSelectedRegions(updated);
-      syncRegionsToUrl(updated);
+    let updated;
 
-      // 🔥 캐시 제거: 이전 잘려 있던 상태(venues/page 등) 무효화
-      sessionStorage.removeItem('venueListState');
+    if (region === '전체') {
+      updated = ['전체'];
     } else {
       const alreadySelected = selectedRegions.includes(region);
-      let updated = alreadySelected
+      updated = alreadySelected
         ? selectedRegions.filter((r) => r !== region)
         : selectedRegions.filter((r) => r !== '전체').concat(region);
 
       if (updated.length === 0) updated = ['전체'];
-
-      setSelectedRegions(updated);
-      syncRegionsToUrl(updated);
-
-      // 🔥 여기에도 캐시 제거 반드시 넣어야 함
-      sessionStorage.removeItem('venueListState');
     }
+
+    // 1) 상태 반영
+    setSelectedRegions(updated);
+
+    // 2) URL 쿼리 반영
+    syncRegionsToUrl(updated);
+
+    // 3) 🔥 예전 페이지/스크롤/venues 중간상태 캐시 제거
+    sessionStorage.removeItem('venueListState');
+
+    // 4) 🔥 현재 메모리도 깨끗하게 초기화해서
+    //    이전 지역에서 받아 둔 중간 스냅샷이 섞이지 않게 함
+    setVenues([]);
+    setPage(1);
+    setHasMore(true);
   };
 
   return (
