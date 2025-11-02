@@ -4,7 +4,7 @@ import Header from '../../components/layout/Header';
 import VenueItem from './components/VenueItem';
 import RegionSelectButton from './components/RegionSelectButton';
 import RegionSelectSheet from './components/RegionSelectSheet';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { fetchVenueList } from '../../api/venueApi';
 
 function ListVenue() {
@@ -18,31 +18,19 @@ function ListVenue() {
   const size = 20;
   const sentinelRef = useRef(null);
 
-  // ✅ URL 쿼리 업데이트용 (초기값은 안 읽는다)
-  const [, setSearchParams] = useSearchParams();
-
-  // ✅ 현재 선택된 지역을 URL 쿼리로만 반영
-  const syncRegionsToUrl = (regionsArr) => {
-    if (
-      !regionsArr ||
-      regionsArr.length === 0 ||
-      (regionsArr.length === 1 && regionsArr[0] === '전체')
-    ) {
-      // '전체'만 선택이면 깔끔하게 쿼리 지움
-      setSearchParams({});
-    } else {
-      // 예: ['서울','경기'] -> ?regions=서울,경기
-      setSearchParams({
-        regions: regionsArr.join(','),
-      });
-    }
-  };
+  // ⭐ 초기 복구 중인지 표시하는 플래그
+  //    true인 동안에는 "selectedRegions 바뀌었다고 API 다시 불러" 효과를 막는다
+  const isRestoringRef = useRef(false);
 
   // ✅ 상태 복원
   useEffect(() => {
     const saved = sessionStorage.getItem('venueListState');
     if (saved) {
       const { scrollY, selectedRegions, venues, page } = JSON.parse(saved);
+
+      // ⭐ 복구 시작 플래그 ON
+      isRestoringRef.current = true;
+
       setSelectedRegions(selectedRegions || ['전체']);
       setVenues(venues || []);
       setPage(page || 1);
@@ -129,12 +117,19 @@ function ListVenue() {
     [selectedRegions, size, loading]
   );
 
-  // 지역 변경 시 첫 페이지부터 다시 로드
+  // ⭐ 지역 변경 시 첫 페이지부터 다시 로드
+  //    BUT: 복구 중일 때는 실행하지 말아야 함 (안 그러면 "경기" 복구 직후 "전체"로 다시 API 불러서 덮어씀)
   useEffect(() => {
+    if (isRestoringRef.current) {
+      // 복구 단계 한 번은 그냥 넘어가고, 다음부터는 정상 동작하게 플래그 off
+      isRestoringRef.current = false;
+      return;
+    }
+
     setPage(1);
     setHasMore(true);
     loadVenues(1);
-  }, [selectedRegions]);
+  }, [selectedRegions, loadVenues]);
 
   // 무한 스크롤 센티넬
   useEffect(() => {
@@ -156,9 +151,7 @@ function ListVenue() {
 
   const handleSelectRegion = (region) => {
     if (region === '전체') {
-      const updated = ['전체'];
-      setSelectedRegions(updated);
-      syncRegionsToUrl(updated); // ✅ URL에도 반영
+      setSelectedRegions(['전체']);
     } else {
       const alreadySelected = selectedRegions.includes(region);
       let updated = alreadySelected
@@ -167,7 +160,6 @@ function ListVenue() {
 
       if (updated.length === 0) updated = ['전체'];
       setSelectedRegions(updated);
-      syncRegionsToUrl(updated); // ✅ URL에도 반영
     }
   };
 
