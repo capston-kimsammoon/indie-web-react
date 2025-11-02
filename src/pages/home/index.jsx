@@ -280,24 +280,6 @@ const HomePage = () => {
           </>
         )}
 
-        {musicMagazine && (
-        <>
-          <SectionHeader>
-            <span>음악 매거진</span>
-            <MoreButton onClick={() => navigate('/musicmagazine')}>
-              ›
-            </MoreButton>
-          </SectionHeader>
-          <MusicCard
-            id={musicMagazine.id}
-            title={musicMagazine.title}
-            text={musicMagazine.text}
-            coverImageUrl={musicMagazine.coverImageUrl}
-            onClick={() => navigate(`/musicmagazine/${musicMagazine.id}`)}
-          />
-        </>
-      )}
-
         <FullWidthSection>
           <SectionTitle>키워드별 공연</SectionTitle>
           <MoodSection />
