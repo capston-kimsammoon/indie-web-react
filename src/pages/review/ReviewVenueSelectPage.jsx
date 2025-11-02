@@ -22,6 +22,9 @@ const VenueGrid = styled.div`
   gap: 12px;
   padding: 12px 0 120px 0;
 
+  overscroll-behavior: contain;  
+  -webkit-overflow-scrolling: touch;
+
   &::-webkit-scrollbar {
     display: none;
   }
