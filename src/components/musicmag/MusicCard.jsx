@@ -83,7 +83,7 @@ const Content = styled.p`
   margin: 0;
   padding-top: 8px;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 `;
