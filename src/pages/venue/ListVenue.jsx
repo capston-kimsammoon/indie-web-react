@@ -4,27 +4,13 @@ import Header from '../../components/layout/Header';
 import VenueItem from './components/VenueItem';
 import RegionSelectButton from './components/RegionSelectButton';
 import RegionSelectSheet from './components/RegionSelectSheet';
-import { useNavigate, useSearchParams } from 'react-router-dom'; // ✅ URL 쿼리 기반 필터 유지
+import { useNavigate } from 'react-router-dom';
 import { fetchVenueList } from '../../api/venueApi';
 
 function ListVenue() {
   const navigate = useNavigate();
-
-  // ✅ URL 쿼리 사용 준비
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  // ✅ URL 쿼리에서 초기 지역 필터 복원
-  // 예: /venues?regions=경기,부산
-  const initialRegionsFromUrlRaw = searchParams.get('regions');
-  const initialRegionsFromUrl = initialRegionsFromUrlRaw
-    ? initialRegionsFromUrlRaw
-        .split(',')
-        .map((r) => r.trim())
-        .filter((r) => r !== '')
-    : ['전체'];
-
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedRegions, setSelectedRegions] = useState(initialRegionsFromUrl);
+  const [selectedRegions, setSelectedRegions] = useState(['전체']);
   const [venues, setVenues] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -32,28 +18,54 @@ function ListVenue() {
   const size = 20;
   const sentinelRef = useRef(null);
 
-  // ⛔ sessionStorage를 이용한 상태/스크롤 복원 로직은 제거함
-  //    (스크롤 위치 기억 안 하고, 그냥 맨 위에서 다시 시작할 거라서)
-  //
-  // 기존에 있던:
-  // - 상태 복원 useEffect
-  // - 스크롤 복원용 useEffect
-  // - 언마운트 시 상태 저장 useEffect
-  // 전부 삭제하고 URL 쿼리만 상태의 근원으로 쓴다.
+  // ✅ 상태 복원
+  useEffect(() => {
+    const saved = sessionStorage.getItem('venueListState');
+    if (saved) {
+      const { scrollY, selectedRegions, venues, page } = JSON.parse(saved);
+      setSelectedRegions(selectedRegions || ['전체']);
+      setVenues(venues || []);
+      setPage(page || 1);
 
-  // ✅ URL 쿼리에 regions를 반영하는 헬퍼
-  const syncRegionsToUrl = (nextRegions) => {
-    const regionsToSet = nextRegions ?? selectedRegions;
-
-    // ['전체']만 선택된 상태라면 URL을 깔끔하게 유지 (쿼리 안 붙임)
-    if (regionsToSet.length === 1 && regionsToSet[0] === '전체') {
-      setSearchParams({});
+      // 스크롤 복원 (렌더 이후)
+      setTimeout(() => {
+        window.scrollTo(0, scrollY || 0);
+      }, 0);
     } else {
-      setSearchParams({
-        regions: regionsToSet.join(','),
-      });
+      // 저장된 상태가 없을 때만 새로 로드
+      loadVenues(1);
     }
-  };
+  }, []);
+
+  // ✅ 스크롤 복원용 useEffect (리스트 로드 완료 후 실행)
+  useEffect(() => {
+    const saved = sessionStorage.getItem('venueListState');
+    if (!saved) return;
+
+    const { scrollY } = JSON.parse(saved);
+
+    // venues가 실제로 렌더링된 후 복원
+    if (venues.length > 0) {
+      setTimeout(() => {
+        window.scrollTo(0, scrollY || 0);
+      }, 50); // 살짝 지연 (렌더 타이밍 맞추기)
+    }
+  }, [venues]);
+
+  // ✅ 언마운트 시 상태 저장
+  useEffect(() => {
+    return () => {
+      sessionStorage.setItem(
+        'venueListState',
+        JSON.stringify({
+          scrollY: window.scrollY,
+          selectedRegions,
+          venues,
+          page,
+        })
+      );
+    };
+  }, [selectedRegions, venues, page]);
 
   // API 호출 함수
   const loadVenues = useCallback(
@@ -102,7 +114,7 @@ function ListVenue() {
     setPage(1);
     setHasMore(true);
     loadVenues(1);
-  }, [selectedRegions, loadVenues]);
+  }, [selectedRegions]);
 
   // 무한 스크롤 센티넬
   useEffect(() => {
@@ -124,9 +136,7 @@ function ListVenue() {
 
   const handleSelectRegion = (region) => {
     if (region === '전체') {
-      const updated = ['전체'];
-      setSelectedRegions(updated);
-      syncRegionsToUrl(updated); // ✅ URL 동기화
+      setSelectedRegions(['전체']);
     } else {
       const alreadySelected = selectedRegions.includes(region);
       let updated = alreadySelected
@@ -134,9 +144,7 @@ function ListVenue() {
         : selectedRegions.filter((r) => r !== '전체').concat(region);
 
       if (updated.length === 0) updated = ['전체'];
-
       setSelectedRegions(updated);
-      syncRegionsToUrl(updated); // ✅ URL 동기화
     }
   };
 
