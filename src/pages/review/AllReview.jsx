@@ -11,7 +11,6 @@ import {
 } from '../../api/reviewApi'; // 경로는 프로젝트 구조에 맞게 조정
 import { fetchUserInfo } from '../../api/userApi';
 
-/* ===================== 스타일 ===================== */
 const PageWrapper = styled.div`
   height: 100vh;
   height: 100dvh;
@@ -19,20 +18,10 @@ const PageWrapper = styled.div`
   flex-direction: column;
 `;
 
-const Heading = styled.h1`
-  font-size: 20px;
-  font-weight: 700;
-  margin: 10 0 12px 0;
-`;
-
 const SubBar = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 16px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 8px;
 `;
 
 const Stat = styled.span`
@@ -51,35 +40,36 @@ const CountText = styled.span`
 
 const Controls = styled.div`
   display: flex;
-  gap: 8px;
+  justify-content: space-between;
   align-items: center;
+`;
 
-  select {
-    border: 1px solid #e5e7eb;
-    background: #fff;
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-size: 13px;
-    color: #374151;
-    cursor: pointer;
-    min-width: 100px;
-  }
+const OrderSelect = styled.select`
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #2F2F2F;
+  cursor: pointer;
+  height: 32px;
+  min-width: 100px;
 `;
 
 const WriteButton = styled.button`
-  background-color: #3C9C68;
-  color: #fff;
-  border: none;
   padding: 6px 12px;
   border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  min-width: 80px;
+  font-size: 14px;
+  border: none;
+  background: ${({ disabled }) => (disabled ? '#a6d5bd' : '#3C9C68')};
+  color: #fff;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  box-shadow: none;
+  outline: none;
   height: 32px;
 
   &:hover {
-    background-color: #36b05b;
+    background-color: ${({ disabled }) => (disabled ? '#a6d5bd' : '#36b05b')};
   }
 `;
 
@@ -319,15 +309,19 @@ export default function AllReview({
           <AllText>All </AllText>
           <CountText>{total}</CountText>
         </Stat>
+
         <Controls>
-          <select
+          <OrderSelect
             aria-label="정렬"
             value={order}
-            onChange={(e) => { setPage(1); setOrder(e.target.value === 'asc' ? 'asc' : 'desc'); }}
+            onChange={(e) => {
+              setPage(1);
+              setOrder(e.target.value === 'asc' ? 'asc' : 'desc');
+            }}
           >
             <option value="desc">최신순</option>
             <option value="asc">오래된순</option>
-          </select>
+          </OrderSelect>
 
           <WriteButton
             type="button"
@@ -343,6 +337,7 @@ export default function AllReview({
           </WriteButton>
         </Controls>
       </SubBar>
+
 
       {loading ? (
         <>
