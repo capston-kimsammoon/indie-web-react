@@ -22,6 +22,7 @@ const SubBar = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-top: 16px;
 `;
 
 const Stat = styled.span`
@@ -42,6 +43,7 @@ const Controls = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 16px;
 `;
 
 const OrderSelect = styled.select`
