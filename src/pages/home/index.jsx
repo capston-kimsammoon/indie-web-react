@@ -276,9 +276,6 @@ const HomePage = () => {
         <>
           <SectionHeader>
             <span>모두의 디깅</span>
-            <MoreButton onClick={() => navigate('/musicmagazine')}>
-              ›
-            </MoreButton>
           </SectionHeader>
           <MusicCard
             id={musicMagazine.id}
