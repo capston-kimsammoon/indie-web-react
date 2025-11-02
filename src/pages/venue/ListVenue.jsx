@@ -167,6 +167,10 @@ function ListVenue() {
       const updated = ['전체'];
       setSelectedRegions(updated);
       syncRegionsToUrl(updated); // ✅ URL에도 반영
+       
+        // 🔥 이전 캐시 버리고 새 기준으로 다시 불러오게
+      sessionStorage.removeItem('venueListState');
+    
     } else {
       const alreadySelected = selectedRegions.includes(region);
       let updated = alreadySelected
