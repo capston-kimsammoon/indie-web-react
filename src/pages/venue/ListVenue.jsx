@@ -4,13 +4,26 @@ import Header from '../../components/layout/Header';
 import VenueItem from './components/VenueItem';
 import RegionSelectButton from './components/RegionSelectButton';
 import RegionSelectSheet from './components/RegionSelectSheet';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom'; // ⬅️ useSearchParams 추가
 import { fetchVenueList } from '../../api/venueApi';
 
 function ListVenue() {
   const navigate = useNavigate();
+
+  // ✅ URL 쿼리 제어용
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // ✅ URL 쿼리에서 초기 지역값 복원 (예: ?regions=경기,부산)
+  const initialRegionsFromUrlRaw = searchParams.get('regions');
+  const initialRegionsFromUrl = initialRegionsFromUrlRaw
+    ? initialRegionsFromUrlRaw
+        .split(',')
+        .map((r) => r.trim())
+        .filter((r) => r !== '')
+    : ['전체'];
+
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedRegions, setSelectedRegions] = useState(['전체']);
+  const [selectedRegions, setSelectedRegions] = useState(initialRegionsFromUrl);
   const [venues, setVenues] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -23,6 +36,8 @@ function ListVenue() {
     const saved = sessionStorage.getItem('venueListState');
     if (saved) {
       const { scrollY, selectedRegions, venues, page } = JSON.parse(saved);
+
+      // 🟢 기존 sessionStorage 복원 로직 유지
       setSelectedRegions(selectedRegions || ['전체']);
       setVenues(venues || []);
       setPage(page || 1);
@@ -114,7 +129,7 @@ function ListVenue() {
     setPage(1);
     setHasMore(true);
     loadVenues(1);
-  }, [selectedRegions]);
+  }, [selectedRegions, loadVenues]);
 
   // 무한 스크롤 센티넬
   useEffect(() => {
@@ -134,9 +149,24 @@ function ListVenue() {
     return () => observer.disconnect();
   }, [page, hasMore, loading, loadVenues]);
 
+  // ✅ URL에 지역 필터 반영하는 함수
+  const syncRegionsToUrl = (regionsArr) => {
+    if (!regionsArr || regionsArr.length === 0 || (regionsArr.length === 1 && regionsArr[0] === '전체')) {
+      // 전체만 선택된 경우 쿼리 깔끔하게 비워줌
+      setSearchParams({});
+    } else {
+      // ex) ['경기','부산'] -> ?regions=경기,부산
+      setSearchParams({
+        regions: regionsArr.join(','),
+      });
+    }
+  };
+
   const handleSelectRegion = (region) => {
     if (region === '전체') {
-      setSelectedRegions(['전체']);
+      const updated = ['전체'];
+      setSelectedRegions(updated);
+      syncRegionsToUrl(updated); // ✅ URL에도 반영
     } else {
       const alreadySelected = selectedRegions.includes(region);
       let updated = alreadySelected
@@ -145,6 +175,7 @@ function ListVenue() {
 
       if (updated.length === 0) updated = ['전체'];
       setSelectedRegions(updated);
+      syncRegionsToUrl(updated); // ✅ URL에도 반영
     }
   };
 
