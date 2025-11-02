@@ -275,7 +275,7 @@ const HomePage = () => {
         {musicMagazine && (
         <>
           <SectionHeader>
-            <span>음악 매거진</span>
+            <span>모두의 디깅</span>
             <MoreButton onClick={() => navigate('/musicmagazine')}>
               ›
             </MoreButton>
