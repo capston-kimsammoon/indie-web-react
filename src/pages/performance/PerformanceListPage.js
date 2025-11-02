@@ -190,24 +190,28 @@ export default function PerformanceListPage() {
           )}
         </ScrollableContent>
 
-       {isSortModalOpen && (
-  <ModalBackground onClick={() => setIsSortModalOpen(false)}>
-    <SortModal
-      selected={sortOption}
-      onSelect={handleSelectSort}
-      {/* ✅ 기존 setSortOption 대신 handleSelectSort */}
-      onClose={() => setIsSortModalOpen(false)}
-    />
-  </ModalBackground>
-)}
+        {isSortModalOpen && (
+          <ModalBackground onClick={() => setIsSortModalOpen(false)}>
+            {/* ✅ 기존 setSortOption 대신 handleSelectSort */}
+            <SortModal
+              selected={sortOption}
+              onSelect={handleSelectSort}
+              onClose={() => setIsSortModalOpen(false)}
+            />
+          </ModalBackground>
+        )}
 
         {isRegionSheetOpen && (
-          <RegionSelectSheet
-            selectedRegions={selectedRegions}
-            onSelectRegion={handleSelectRegion} {/* ✅ 기존 handleSelectRegion 유지하지만 내부 로직이 URL도 반영하도록 변경됨 */}
-            onClose={() => setIsRegionSheetOpen(false)}
-          />
+          <>
+            {/* ✅ 기존 handleSelectRegion 유지하지만 내부 로직이 URL도 반영하도록 변경됨 */}
+            <RegionSelectSheet
+              selectedRegions={selectedRegions}
+              onSelectRegion={handleSelectRegion}
+              onClose={() => setIsRegionSheetOpen(false)}
+            />
+          </>
         )}
+
       </Container>
     </>
   );
@@ -224,7 +228,7 @@ const Container = styled.div`
 `;
 
 const ScrollableContent = styled.div`
-  height: 100vh
+  height: 100vh;
   height: 100dvh; 
   padding-bottom: 68px;
   overflow-y: auto;
