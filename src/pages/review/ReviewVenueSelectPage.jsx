@@ -8,7 +8,8 @@ import Header from '../../components/layout/Header';
 const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
   box-sizing: border-box;
   height: 100dvh;
 `;
