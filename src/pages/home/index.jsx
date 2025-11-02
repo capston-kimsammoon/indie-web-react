@@ -292,7 +292,7 @@ const HomePage = () => {
           </>
         )}
       
-        <DivideSectionBack style={{ marginTop: "-24px", marginBottom: "32px" }} />
+        <DivideSectionBack style={{ marginTop: "-20px;", marginBottom: "32px" }} />
 
         <FullWidthSection>
           <SectionTitle>키워드별 공연</SectionTitle>
@@ -357,7 +357,7 @@ const FullWidthSectionBack = styled.section`
 
 const DivideSectionBack = styled.section`
   background-color: #F7F7F8;
-  margin-top: -24px;
+  margin-top: -20px;
   margin-left: -16px;
   margin-right: -16px;
   margin-bottom: 32px;
