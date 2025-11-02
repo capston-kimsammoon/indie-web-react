@@ -36,74 +36,32 @@ const normalizeMusicMagazineCard = (m) => ({
   createdAt: m?.created_at ?? m?.createdAt ?? null,
 });
 
-/** ✅ 블록 표준화 (노래 매거진 전용 확장: semititle, artistId 포함) */
+/** ✅ 블록 표준화 - magazineApi와 동일하게 단순화 */
 const normalizeMusicBlocks = (blocks) => {
   const arr = safeArray({ data: blocks });
-
+  
   return arr
-    .map((b, idx) => {
-      const type = (b?.type || '').toLowerCase();
-
-      const base = {
-        id: b?.id ?? null,
-        order: b?.order ?? b?.display_order ?? idx,
-        type,
-        semititle: b?.semititle ?? null,
-        artistId: b?.artist_id ?? b?.artistId ?? null,
-        caption: b?.caption ?? null,
-        meta: b?.meta ?? null,
-        text: b?.text ?? null,
-        imageUrl:
-          b?.imageUrl ??
-          b?.image_url ??
-          b?.url ??
-          b?.src ??
-          null,
-      };
-
-      switch (type) {
-        case 'text':
-        case 'quote':
-        case 'divider':
-          return {
-            ...base,
-            value:
-              b?.text ??
-              b?.content ??
-              b?.value ??
-              b?.body ??
-              '',
-          };
-
-        case 'image':
-        case 'embed':
-          return {
-            ...base,
-            value:
-              base.imageUrl ??
-              b?.value ??
-              '',
-          };
-
-        case 'cta':
-          return {
-            ...base,
-            value: b?.value ?? '',
-          };
-
-        default:
-          return {
-            ...base,
-            type: 'text',
-            value:
-              b?.text ??
-              b?.content ??
-              b?.value ??
-              b?.body ??
-              '',
-          };
-      }
-    })
+    .map((b) => ({
+      ...b,
+      id: b?.id ?? null,
+      type: b?.type ?? 'text',
+      order: b?.order ?? b?.display_order ?? 0,
+      
+      // 텍스트 관련
+      semititle: b?.semititle ?? null,
+      value: b?.value ?? b?.text ?? b?.content ?? b?.body ?? '',
+      
+      // 이미지 관련
+      imageUrl: b?.imageUrl ?? b?.image_url ?? b?.url ?? b?.src ?? null,
+      caption: b?.caption ?? null,
+      align: b?.align ?? b?.meta?.align ?? 'center',
+      
+      // CTA 관련 (아티스트)
+      artistId: b?.artist_id ?? b?.artistId ?? null,
+      
+      // 기타
+      meta: b?.meta ?? null,
+    }))
     .sort((a, b) => (a?.order ?? 0) - (b?.order ?? 0));
 };
 
@@ -130,7 +88,7 @@ const extractFirstImageUrl = (blocks = []) => {
 
 /**
  * 🎵 노래 매거진 목록
- * GET /music-magazine
+ * GET /musicmagazine
  * params: { limit?, page?, size? }
  */
 export const fetchMusicMagazineList = async ({ limit, page, size } = {}) => {
@@ -140,9 +98,16 @@ export const fetchMusicMagazineList = async ({ limit, page, size } = {}) => {
     if (page) params.append('page', page);
     if (size) params.append('size', size);
 
-    // ✅ 백엔드 경로 정확히 맞춤
+    console.log('🔍 음악 매거진 API 요청:', `${baseUrl}/musicmagazine?${params}`);
+    
     const { data } = await axios.get(`${baseUrl}/musicmagazine`, { params });
+    
+    console.log('🔍 음악 매거진 API 원본 응답:', data);
+    
     const list = safeArray(data).map(normalizeMusicMagazineCard);
+    
+    console.log('🔍 표준화된 목록:', list);
+    
     return Array.isArray(list) ? list : [];
   } catch (error) {
     console.error('📛 노래 매거진 목록 조회 실패:', error?.response?.data || error.message);
@@ -152,12 +117,15 @@ export const fetchMusicMagazineList = async ({ limit, page, size } = {}) => {
 
 /**
  * 🎵 노래 매거진 상세 (블록 포함)
- * GET /music-magazine/{id}
+ * GET /musicmagazine/{id}
  */
 export const fetchMusicMagazineDetail = async (id) => {
   try {
-    // ✅ 백엔드 경로 정확히 맞춤
+    console.log('🔍 음악 매거진 상세 요청:', `${baseUrl}/musicmagazine/${id}`);
+    
     const { data } = await axios.get(`${baseUrl}/musicmagazine/${id}`);
+
+    console.log('🔍 음악 매거진 상세 원본 응답:', data);
 
     const rawBlocks =
       data?.blocks ??
@@ -166,6 +134,8 @@ export const fetchMusicMagazineDetail = async (id) => {
       [];
 
     const normalizedBlocks = normalizeMusicBlocks(rawBlocks);
+    
+    console.log('🔍 표준화된 블록:', normalizedBlocks);
 
     const coverImageUrl =
       data?.coverImageUrl ??
