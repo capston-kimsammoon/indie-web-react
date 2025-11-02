@@ -29,7 +29,7 @@ import ReviewVenueSelectPage from './pages/review/ReviewVenueSelectPage';
 import AllReview from './pages/review/AllReview';
 import AnnouncePage from './pages/announce/AnnouncePage';
 import ClientPage from './pages/client/ClientPage';
-import DetailMusicmag from './pages/musicmagazine/DetailMusicmag'
+import DetailMusicmag from './pages/musicmag/DetailMusicmag'
 
 const routes = [
   // ✅ 홈 화면: 주소창에 /home 없이 / 로 표시
