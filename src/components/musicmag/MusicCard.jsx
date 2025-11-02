@@ -1,65 +1,48 @@
-// src/components/musicmag/MusicCard.jsx
-import React, { useRef, useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
-const MusicCard = ({ id, title, text, imageUrl, onClick }) => {
-  const titleRef = useRef(null);
-  const [contentMaxLines, setContentMaxLines] = useState(3);
-
-  useEffect(() => {
-    if (!titleRef.current) return;
-
-    const titleElement = titleRef.current;
-    const lineHeight = parseFloat(window.getComputedStyle(titleElement).lineHeight);
-    const titleHeight = titleElement.offsetHeight;
-    const titleLines = Math.round(titleHeight / lineHeight);
-
-    setContentMaxLines(titleLines === 1 ? 4 : 3);
-  }, [title]);
-
+export default function MusicCard({ id, title, text, coverImageUrl, onClick }) {
   return (
     <Card onClick={onClick}>
-      {imageUrl && (
+      {coverImageUrl && (
         <ThumbWrap>
-          <Thumb src={imageUrl} alt={title} />
+          <Thumb src={coverImageUrl} alt={title} />
         </ThumbWrap>
       )}
       <TextBox>
-        <Title ref={titleRef}>{title}</Title>
-        <Content $maxLines={contentMaxLines}>{text}</Content>
+        <Title>{title}</Title>
+        <Content>{text}</Content>
       </TextBox>
     </Card>
   );
-};
-
-export default MusicCard;
+}
 
 const Card = styled.div`
   width: 100%;
   border: none;
   background: transparent;
   cursor: pointer;
-
   display: grid;
-  grid-template-columns: var(--thumb-w) 1fr;
+  grid-template-columns: 136px 1fr;
   align-items: stretch;
   margin-bottom: 56px;
 
-  --thumb-w: 136px;
-  --thumb-h: 102px;
-
   @media (max-width: 360px) {
-    --thumb-w: 108px;
-    --thumb-h: 76px;
+    grid-template-columns: 108px 1fr;
   }
 `;
 
 const ThumbWrap = styled.div`
-  width: var(--thumb-w);
-  height: var(--thumb-h);
+  width: 136px;
+  height: 102px;
   border-radius: 5px;
   overflow: hidden;
   background: #f2f2f2;
+
+  @media (max-width: 360px) {
+    width: 108px;
+    height: 76px;
+  }
 `;
 
 const Thumb = styled.img`
@@ -70,20 +53,22 @@ const Thumb = styled.img`
 `;
 
 const TextBox = styled.div`
-  height: var(--thumb-h);
+  height: 102px;
   overflow: hidden;
   min-width: 0;
   margin-left: 12px;
   position: relative;
+
+  @media (max-width: 360px) {
+    height: 76px;
+  }
 `;
 
 const Title = styled.h3`
   font-size: 16px;
   font-weight: 600;
-  color: #2f2f2f;
+  color: #2F2F2F;
   margin: 0;
-  line-height: 1.4;
-
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -94,13 +79,11 @@ const Title = styled.h3`
 const Content = styled.p`
   font-size: 14px;
   font-weight: 400;
-  color: #4b4b4b;
+  color: #4B4B4B;
   margin: 0;
-  padding-top: 6px;
-  line-height: 1.2;
-
+  padding-top: 8px;
   display: -webkit-box;
-  -webkit-line-clamp: ${({ $maxLines }) => $maxLines};
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 `;
