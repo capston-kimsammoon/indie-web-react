@@ -117,7 +117,26 @@ function CalendarPage() {
 
   // ✅ 컴포넌트 "처음" 들어올 때: 저장된 상태가 있으면 그걸로 복원
   useEffect(() => {
+    // ⭐ 이번 진입이 "뒤로/앞으로"인지 확인
+    const navEntry = window.performance.getEntriesByType('navigation')[0];
+    const isRestoring = navEntry?.type === 'back_forward';
+
     const saved = sessionStorage.getItem('calendarPageState');
+
+    // 🔴 홈/다른 페이지에서 "새로" 들어온 경우 → 무조건 초기값
+    if (!isRestoring) {
+      if (saved) {
+        sessionStorage.removeItem('calendarPageState');
+      }
+      const today = new Date();
+      const dateStr = format(today, 'yyyy-MM-dd');
+      loadDailyConcerts(dateStr, ['전체']);
+      loadMonthlyConcertDates(format(today, 'yyyy'), format(today, 'MM'), undefined);
+      setIsInitialLoad(false);
+      return;
+    }
+
+    // ✅ 여기부터는 "뒤로가기/앞으로가기" 로 들어온 경우
     if (saved) {
       const {
         selectedRegions: savedRegions,
@@ -147,13 +166,11 @@ function CalendarPage() {
       // ✅ 복원 끝
       setIsInitialLoad(false);
     } else {
-      // 저장된 게 없으면 지금 코드처럼 기본값으로 로드
+      // 뒤로가기로 왔는데 저장된 게 없는 희귀 케이스 → 기본값
       const today = new Date();
       const dateStr = format(today, 'yyyy-MM-dd');
       loadDailyConcerts(dateStr, ['전체']);
       loadMonthlyConcertDates(format(today, 'yyyy'), format(today, 'MM'), undefined);
-
-      // ✅ 이것도 초기 로드 끝
       setIsInitialLoad(false);
     }
   }, []); // ← 맨 처음에만
