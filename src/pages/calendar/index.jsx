@@ -24,6 +24,8 @@ function CalendarPage() {
   const [monthConcertDates, setMonthConcertDates] = useState([]);
   const [dailyConcerts, setDailyConcerts] = useState([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  // ✅ 추가: 초기 복원 끝났는지 여부
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   
   const listRef = useRef(null);
   const startY = useRef(0);
@@ -141,12 +143,18 @@ function CalendarPage() {
       const regionParam = restoredRegions.includes('전체') ? undefined : restoredRegions;
       loadDailyConcerts(dateStr, restoredRegions);
       loadMonthlyConcertDates(format(restoredMonth, 'yyyy'), format(restoredMonth, 'MM'), regionParam);
+
+      // ✅ 복원 끝
+      setIsInitialLoad(false);
     } else {
       // 저장된 게 없으면 지금 코드처럼 기본값으로 로드
       const today = new Date();
       const dateStr = format(today, 'yyyy-MM-dd');
       loadDailyConcerts(dateStr, ['전체']);
       loadMonthlyConcertDates(format(today, 'yyyy'), format(today, 'MM'), undefined);
+
+      // ✅ 이것도 초기 로드 끝
+      setIsInitialLoad(false);
     }
   }, []); // ← 맨 처음에만
 
@@ -167,11 +175,14 @@ function CalendarPage() {
 
   // ✅ 월 변경 시 API 호출 (복원된 값으로도 동작)
   useEffect(() => {
+    // ✅ 아직 복원 중이면 (isInitialLoad) 전체로 한 번 치는 거 막기
+    if (isInitialLoad) return;
+
     const year = format(currentMonth, 'yyyy');
     const month = format(currentMonth, 'MM');
     const regionParam = selectedRegions.includes('전체') ? undefined : selectedRegions;
     loadMonthlyConcertDates(year, month, regionParam);
-  }, [currentMonth, selectedRegions]);
+  }, [currentMonth, selectedRegions, isInitialLoad]);
 
   // ✅ 지역 변경 적용
   const handleSelectRegion = (region) => {
