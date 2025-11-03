@@ -1,3 +1,4 @@
+// ✅ src/pages/calendar/index.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { format, addMonths, subMonths } from 'date-fns';
 import styled from 'styled-components';
@@ -9,12 +10,11 @@ import IconGo from '../../assets/icons/icon_go_hyunjin.svg';
 import styles from './CalendarPage.module.css';
 import Header from '../../components/layout/Header';
 import Divider from '../../components/common/Divider';
-import { useNavigate, useLocation } from 'react-router-dom'; // ✅ useLocation 추가
+import { useNavigate } from 'react-router-dom';
 import { fetchMonthlyPerformanceDates, fetchPerformancesByDate } from '../../api/calendarApi';
 
 function CalendarPage() {
   const navigate = useNavigate();
-  const location = useLocation(); // ✅ useLocation 훅 사용
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -24,19 +24,16 @@ function CalendarPage() {
   const [monthConcertDates, setMonthConcertDates] = useState([]);
   const [dailyConcerts, setDailyConcerts] = useState([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
-  // ✅ 추가: 초기 로딩 여부 플래그 (지역 변경 시 불필요한 재로드 방지)
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
   
   const listRef = useRef(null);
   const startY = useRef(0);
   const currentY = useRef(0);
   const isDragging = useRef(false);
 
-  // ✅ 날짜별 공연 리스트 로드 (regions 파라미터를 추가하여 복원 로직에서 사용 가능하도록 수정)
+  // ✅ 날짜별 공연 리스트 로드
+  // 👉 regions를 파라미터로도 받을 수 있게 바꿔서 "복원"할 때도 같은 지역을 쓸 수 있게 함
   const loadDailyConcerts = async (date, regions = selectedRegions) => {
     try {
-      // 파라미터로 받은 regions를 사용하거나, 없으면 상태를 사용
       const regionParam = regions.includes('전체') ? undefined : regions;
       const data = await fetchPerformancesByDate(date, regionParam);
       console.log(`🎯 [캘린더] ${date} 공연 리스트 응답:`, data);
@@ -47,7 +44,7 @@ function CalendarPage() {
     }
   };
 
-  // ✅ 월별 공연 날짜 로드 (기존 함수 유지)
+  // ✅ 월별 공연 날짜 로드
   const loadMonthlyConcertDates = async (year, month, regionParam) => {
     try {
       const data = await fetchMonthlyPerformanceDates(year, month, regionParam);
@@ -59,12 +56,10 @@ function CalendarPage() {
     }
   };
 
-  // ✅ 날짜 클릭 핸들러 (loadDailyConcerts 호출 시 regions 전달)
   const handleDateClick = (date) => {
     setSelectedDate(date);
     const formatted = format(date, 'yyyy-MM-dd');
-    
-    // ✅ 수정: loadDailyConcerts를 호출할 때 selectedRegions 상태 전달 (지역 필터 반영)
+    // ✅ 선택된 지역을 같이 넘겨서 "뒤로가기 복원"이랑 로직이 일치하게
     loadDailyConcerts(formatted, selectedRegions);
     
     // 공연이 있는 날짜만 달력 축소 (공연 데이터 로드 후 확인)
@@ -118,85 +113,67 @@ function CalendarPage() {
     setIsCollapsed(!isCollapsed);
   };
 
-  // 1. ✅ 상태 복원, 초기화 및 초기 로드 (핵심 수정)
+  // ✅ 컴포넌트 "처음" 들어올 때: 저장된 상태가 있으면 그걸로 복원
   useEffect(() => {
-    // 1. 뒤로가기 탐색 여부 확인
-    const navigationType = window.performance.getEntriesByType("navigation")[0]?.type;
-    const isRestoring = navigationType === 'back_forward'; 
-
-    let saved = sessionStorage.getItem('calendarPageState');
-    
-    // 2. 초기화 조건: 뒤로가기가 아닌데 저장된 상태가 있다면 초기화 (새로운 진입으로 간주)
-    if (!isRestoring && saved) {
-      sessionStorage.removeItem('calendarPageState');
-      saved = null; 
-    }
-
+    const saved = sessionStorage.getItem('calendarPageState');
     if (saved) {
-      // 3. 상태 복원
-      const { selectedRegions: savedRegions, selectedDate: savedDateStr, currentMonth: savedMonthStr } = JSON.parse(saved);
+      const {
+        selectedRegions: savedRegions,
+        selectedDate: savedDateStr,
+        currentMonth: savedMonthStr,
+        isCollapsed: savedCollapsed
+      } = JSON.parse(saved);
 
+      const restoredRegions = savedRegions && savedRegions.length ? savedRegions : ['전체'];
       const restoredDate = savedDateStr ? new Date(savedDateStr) : new Date();
       const restoredMonth = savedMonthStr ? new Date(savedMonthStr) : new Date();
-      const restoredRegions = savedRegions || ['전체'];
 
+      // 상태 먼저 세팅
       setSelectedRegions(restoredRegions);
       setSelectedDate(restoredDate);
       setCurrentMonth(restoredMonth);
-      
-      // 복원된 상태로 일별 공연 로드
-      const formatted = format(restoredDate, 'yyyy-MM-dd');
+      if (typeof savedCollapsed === 'boolean') {
+        setIsCollapsed(savedCollapsed);
+      }
+
+      // 그리고 이 복원된 값들로 API도 다시 호출
+      const dateStr = format(restoredDate, 'yyyy-MM-dd');
       const regionParam = restoredRegions.includes('전체') ? undefined : restoredRegions;
-      loadDailyConcerts(formatted, restoredRegions); // 복원된 날짜와 지역으로 공연 리스트 즉시 로드
-
-      setIsInitialLoad(false); 
+      loadDailyConcerts(dateStr, restoredRegions);
+      loadMonthlyConcertDates(format(restoredMonth, 'yyyy'), format(restoredMonth, 'MM'), regionParam);
     } else {
-      // 4. 초기 로드 (저장된 상태가 없거나 초기화된 경우)
-      const initialRegions = ['전체'];
+      // 저장된 게 없으면 지금 코드처럼 기본값으로 로드
       const today = new Date();
-      const regionParam = initialRegions.includes('전체') ? undefined : initialRegions;
-
-      // 월별 및 일별 공연 로드 (초기값 기준)
-      loadMonthlyConcertDates(format(today, 'yyyy'), format(today, 'MM'), regionParam);
-      loadDailyConcerts(format(today, 'yyyy-MM-dd'), initialRegions); 
-
-      setIsInitialLoad(false); 
+      const dateStr = format(today, 'yyyy-MM-dd');
+      loadDailyConcerts(dateStr, ['전체']);
+      loadMonthlyConcertDates(format(today, 'yyyy'), format(today, 'MM'), undefined);
     }
-  }, []); 
+  }, []); // ← 맨 처음에만
 
-  // 2. ✅ 언마운트 시 상태 저장 (Date 객체를 문자열로 저장하도록 수정)
+  // ✅ 나갈 때(언마운트) 현재 상태 저장
   useEffect(() => {
     return () => {
-      // Date 객체는 문자열로 저장해야 안전하게 복원 가능
       sessionStorage.setItem(
         'calendarPageState',
         JSON.stringify({
           selectedRegions,
-          selectedDate: selectedDate.toISOString(), // Date 객체를 문자열로 저장
-          currentMonth: currentMonth.toISOString(), // Date 객체를 문자열로 저장
+          selectedDate: selectedDate.toISOString(),
+          currentMonth: currentMonth.toISOString(),
+          isCollapsed
         })
       );
     };
-  }, [selectedRegions, selectedDate, currentMonth]); // 의존성 배열에 저장할 상태 추가
+  }, [selectedRegions, selectedDate, currentMonth, isCollapsed]);
 
-  // 3. ✅ 월 변경 시 API 호출 (isInitialLoad 조건 추가하여 복원 시 재로드 방지)
+  // ✅ 월 변경 시 API 호출 (복원된 값으로도 동작)
   useEffect(() => {
-    if (isInitialLoad) return; // 복원 직후에는 실행하지 않음
-
     const year = format(currentMonth, 'yyyy');
     const month = format(currentMonth, 'MM');
     const regionParam = selectedRegions.includes('전체') ? undefined : selectedRegions;
     loadMonthlyConcertDates(year, month, regionParam);
-  }, [currentMonth, selectedRegions, isInitialLoad]); // isInitialLoad 추가
+  }, [currentMonth, selectedRegions]);
 
-  // 4. ✅ 초기 진입 시 오늘 공연 로딩 (제거 - 1번 useEffect로 통합)
-  // useEffect(() => {
-  //   const formatted = format(selectedDate, 'yyyy-MM-dd');
-  //   loadDailyConcerts(formatted);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
-
-  // ✅ 지역 변경 적용 (날짜 선택은 그대로 유지, isInitialLoad 조건 제거)
+  // ✅ 지역 변경 적용
   const handleSelectRegion = (region) => {
     let newRegions;
     
@@ -211,24 +188,12 @@ function CalendarPage() {
       newRegions = updated;
     }
     
-    setSelectedRegions(newRegions); // 지역 상태 업데이트
-
+    setSelectedRegions(newRegions);
+    
     // ✅ 날짜가 선택되어 있으면 즉시 해당 날짜 공연 다시 로드
     if (selectedDate) {
       const formatted = format(selectedDate, 'yyyy-MM-dd');
-      // 지역 파라미터를 명시적으로 전달하여 loadDailyConcerts 호출
-      const regionParam = newRegions.includes('전체') ? undefined : newRegions;
-      
-      // 즉시 API 호출
-      fetchPerformancesByDate(formatted, regionParam)
-        .then(data => {
-          console.log(`🎯 [캘린더] ${formatted} 공연 리스트 응답:`, data);
-          setDailyConcerts(data);
-        })
-        .catch(err => {
-          console.error('📛 날짜별 공연 리스트 API 호출 실패:', err);
-          setDailyConcerts([]);
-        });
+      loadDailyConcerts(formatted, newRegions); // ← 여기서도 새 지역으로
     }
   };
 
