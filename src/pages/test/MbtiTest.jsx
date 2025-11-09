@@ -554,6 +554,7 @@ export default function MbtiTest() {
 
       {stage === "result" && result && (
         // 커튼(박스) 제거: 상단 중앙에 제목만
+        //이건 그냥
         <div style={resultWrap} className="fade-up">
           <h2 className="gradTitle" style={resultTitle}>{result.title}</h2>
         </div>
