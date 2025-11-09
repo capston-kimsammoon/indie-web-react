@@ -31,7 +31,7 @@ import AnnouncePage from './pages/announce/AnnouncePage';
 import ClientPage from './pages/client/ClientPage';
 import DetailMusicmag from './pages/musicmag/DetailMusicmag'
 import MusicmagListPage from './pages/musicmag/MusicmagListPage';
-
+import MbtiTest from './pages/test/MbtiTest';
 const routes = [
   // ✅ 홈 화면: 주소창에 /home 없이 / 로 표시
   { path: '/', element: <HomePage /> },
@@ -70,6 +70,9 @@ const routes = [
   { path: '/support', element: <ClientPage /> },
   { path: '/musicmagazine/:id', element: <DetailMusicmag />},
   { path: '/musicmagazines', element: <MusicmagListPage />},
+  { path: '/test/mbti', element: <MbtiTest /> },
+
+
 ];
 
 export default routes;
