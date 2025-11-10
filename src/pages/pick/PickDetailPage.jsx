@@ -119,7 +119,7 @@ const PickDetailPage = () => {
 
   return (
     <PageWrapper>
-      <Header title="modie 추천공연" onMenuClick={() => setIsSidebarOpen(true)} />
+      <Header title="모디 Pick 공연" onMenuClick={() => setIsSidebarOpen(true)} />
       {isSidebarOpen && <Sidebar onClose={() => setIsSidebarOpen(false)} />}
 
       <ScrollableList>
