@@ -1,5 +1,22 @@
 import React, { useMemo, useState, useLayoutEffect, useEffect, useRef } from "react";
 
+import imgISTJ from "../../assets/mbti/ISTJ.png";
+import imgISFJ from "../../assets/mbti/ISFJ.png";
+import imgINFJ from "../../assets/mbti/INFJ.png";
+import imgINTJ from "../../assets/mbti/INTJ.png";
+import imgISTP from "../../assets/mbti/ISTP.png";
+import imgISFP from "../../assets/mbti/ISFP.png";
+import imgINFP from "../../assets/mbti/INFP.png";
+import imgINTP from "../../assets/mbti/INTP.png";
+import imgESTP from "../../assets/mbti/ESTP.png";
+import imgESFP from "../../assets/mbti/ESFP.png";
+import imgENFP from "../../assets/mbti/ENFP.png";
+import imgENTP from "../../assets/mbti/ENTP.png";
+import imgESTJ from "../../assets/mbti/ESTJ.png";
+import imgESFJ from "../../assets/mbti/ESFJ.png";
+import imgENFJ from "../../assets/mbti/ENFJ.png";
+import imgENTJ from "../../assets/mbti/ENTJ.png";
+
 /* ──────────────────────────────────────────────────────────────────────────────
    하단 네비(전역) 높이 자동 측정 훅
    ────────────────────────────────────────────────────────────────────────────── */
@@ -246,22 +263,41 @@ const QUESTIONS = [
 ];
 
 const RESULT_BOOK = {
-  ISTJ: { title: "현실적으로 감상하는 모더지" },
-  ISFJ: { title: "추억을 수집하는 모더지" },
-  INFJ: { title: "여운으로 잠 못 이루는 모더지" },
-  INTJ: { title: "몰입까지 계획하는 모더지" },
-  ISTP: { title: "관찰하면서 청취하는 모더지" },
-  ISFP: { title: "고요하게 감성 타는 모더지" },
-  INFP: { title: "감동으로 오열하는 모더지" },
-  INTP: { title: "논리적으로 감상하는 모더지" },
-  ESTP: { title: "본능으로 리듬을 만드는 모더지" },
-  ESFP: { title: "흥에 흠뻑 취한 모더지" },
-  ENFP: { title: "낭만을 탐험하는 모더지" },
-  ENTP: { title: "자유롭게 공연장을 누비는 모더지" },
-  ESTJ: { title: "예매부터 귀가까지 완벽한 모더지" },
-  ESFJ: { title: "감동을 나눠주는 모더지" },
-  ENFJ: { title: "분위를 조율하는 모더지" },
-  ENTJ: { title: "무대를 심사하는 모더지" },
+  ISTJ: { title: "현실적으로 감상하는 모더지", image: imgISTJ },
+  ISFJ: { title: "추억을 수집하는 모더지", image: imgISFJ },
+  INFJ: { title: "여운으로 잠 못 이루는 모더지", image: imgINFJ },
+  INTJ: { title: "몰입까지 계획하는 모더지", image: imgINTJ},
+  ISTP: { title: "관찰하면서 청취하는 모더지", image: imgISTP },
+  ISFP: { title: "고요하게 감성 타는 모더지", image: imgISFP },
+  INFP: { title: "감동으로 오열하는 모더지", image: imgINFP },
+  INTP: { title: "논리적으로 감상하는 모더지", image: imgINTP },
+  ESTP: { title: "본능으로 리듬을 만드는 모더지", image: imgESTP },
+  ESFP: { title: "흥에 흠뻑 취한 모더지", image: imgESFP },
+  ENFP: { title: "낭만을 탐험하는 모더지", image: imgENFP },
+  ENTP: { title: "자유롭게 공연장을 누비는 모더지", image: imgENTP },
+  ESTJ: { title: "예매부터 귀가까지 완벽한 모더지", image: imgESTJ },
+  ESFJ: { title: "감동을 나눠주는 모더지", image: imgESFJ },
+  ENFJ: { title: "분위기를 조율하는 모더지", image: imgENFJ },
+  ENTJ: { title: "무대를 심사하는 모더지", image: imgENTJ },
+};
+
+const MATCH_BOOK = {
+  ISTJ: { good: "ESFP", bad: "INFP" },
+  ISFJ: { good: "ESTP", bad: "ENFJ" },
+  INFJ: { good: "ENFP", bad: "ESTJ" },
+  INTJ: { good: "ENTP", bad: "ESFJ" },
+  ISTP: { good: "ESFJ", bad: "INFJ" },
+  ISFP: { good: "ESFJ", bad: "INFJ" },
+  INFP: { good: "ENTJ", bad: "ISTP" },
+  INTP: { good: "ESTJ", bad: "ISFJ" },
+  ESTP: { good: "ISFJ", bad: "ENFP" },
+  ESFP: { good: "ISTJ", bad: "INFP" },
+  ENFP: { good: "INTJ", bad: "ISTP" },
+  ENTP: { good: "INTJ", bad: "ESTJ" },
+  ESTJ: { good: "ISTP", bad: "ENFJ" },
+  ESFJ: { good: "ISFP", bad: "ENFP" },
+  ENFJ: { good: "ISFP", bad: "ESTP" },
+  ENTJ: { good: "INTP", bad: "ESFP" },
 };
 
 function computeMBTI(answers) {
@@ -317,6 +353,70 @@ export default function MbtiTest() {
     else setStage("done");
   };
 
+
+    // --- 공유 관련 헬퍼들 ---
+  const shareUrl =
+    typeof window !== "undefined" ? window.location.href : "";
+
+  // 친구에게 링크 공유하기 (모바일이면 네이티브 공유, 아니면 URL 복사)
+  const shareToFriend = async () => {
+    if (!shareUrl) return;
+    try {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share({
+          title: "나의 공연 테스트",
+          text: "내가 공연을 즐기는 유형을 알아보자!",
+          url: shareUrl,
+        });
+      } else if (
+        typeof navigator !== "undefined" &&
+        navigator.clipboard?.writeText
+      ) {
+        await navigator.clipboard.writeText(shareUrl);
+        alert("링크가 복사되었어요!");
+      } else {
+        // 아주 구형 브라우저용 fallback
+        const textarea = document.createElement("textarea");
+        textarea.value = shareUrl;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        alert("링크가 복사되었어요!");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // 작은 팝업창 열기 (트위터 공유용)
+  const openPopup = (url, name) => {
+    if (typeof window === "undefined") return;
+    const w = 560;
+    const h = 720;
+    const left = window.screenX + (window.outerWidth - w) / 2;
+    const top = window.screenY + (window.outerHeight - h) / 2;
+    window.open(
+      url,
+      name,
+      `width=${w},height=${h},left=${left},top=${top},resizable=yes`
+    );
+  };
+
+  // 트위터 공유하기
+  const shareTwitter = () => {
+    if (!shareUrl || typeof window === "undefined") return;
+    const text = encodeURIComponent(
+      "나의 공연 테스트 — 내가 공연을 즐기는 유형을 알아보자!"
+    );
+    const url = encodeURIComponent(shareUrl);
+    openPopup(
+      `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
+      "tw-share"
+    );
+  };
+
+
   // 키보드 1/2로 선택
   useEffect(() => {
     if (stage !== "quiz") return;
@@ -332,18 +432,25 @@ export default function MbtiTest() {
   const resultCode = useMemo(() => (stage === "result" ? computeMBTI(answers) : null), [stage, answers]);
   const result = resultCode ? RESULT_BOOK[resultCode] : null;
 
+  // 잘 맞는 / 잘 안 맞는 모더지 정보
+  const matchInfo = resultCode ? MATCH_BOOK[resultCode] : null;
+  const goodMatch = matchInfo?.good ? RESULT_BOOK[matchInfo.good] : null;
+  const badMatch  = matchInfo?.bad  ? RESULT_BOOK[matchInfo.bad]  : null;
+
   const wrapperStyle = {
     minHeight: "100svh",
     width: "100%",
     boxSizing: "border-box",
-    paddingTop: `calc(clamp(18px, 4vh, 40px) + env(safe-area-inset-top, 0px))`,
+    paddingTop:  stage === "result"
+      ? `calc(6px + env(safe-area-inset-top, 0px))`      // 결과창일 때는 얇게 
+      : `calc(clamp(18px, 4vh, 40px) + env(safe-area-inset-top, 0px))`,
     paddingBottom: `calc(clamp(18px, 4vh, 40px) + ${NAV_H}px + env(safe-area-inset-bottom, 0px))`,
     paddingLeft: 12,
     paddingRight: 12,
 
     background: (stage === "start" || stage === "result") ? "#ffffff" : THEME.green,
     display: "grid",
-    gridTemplateRows: "1fr auto 1fr",
+    gridTemplateRows: stage === "result" ? "auto 1fr" : "1fr auto 1fr",
     position: "relative",
     overflow: "hidden",
     fontFamily:
@@ -392,13 +499,13 @@ export default function MbtiTest() {
 
   // 결과 페이지(상단 중앙)
   const resultWrap = {
-    gridRow: 2,
+    gridRow: 1, //  맨 위 row에 배치
     justifySelf: "center",
     alignSelf: "start",
     width: "100%",
     maxWidth: "min(1100px, 96vw)",
     textAlign: "center",
-    paddingTop: "clamp(28px, 12vh, 140px)",
+    paddingTop: 0,
   };
   const resultTitle = {
     fontSize: "clamp(32px, 8vw, 56px)",
@@ -553,12 +660,118 @@ export default function MbtiTest() {
       )}
 
       {stage === "result" && result && (
-        // 커튼(박스) 제거: 상단 중앙에 제목만
-        //이건 그냥
-        <div style={resultWrap} className="fade-up">
-          <h2 className="gradTitle" style={resultTitle}>{result.title}</h2>
-        </div>
-      )}
+  <div style={resultWrap} className="fade-up">
+    {/* 메인 결과 이미지 */}
+    <div
+      style={{
+        margin: "0 auto 16px",
+        maxWidth: "min(420px, 90vw)",
+      }}
+    >
+      <img
+        src={result.image}
+        alt={result.title}
+        style={{ width: "100%", height: "auto", display: "block" }}
+      />
+    </div>
+
+    {/* 🔴 왼쪽/오른쪽 : 잘 맞는 / 잘 안 맞는 모더지 */}
+    {(goodMatch || badMatch) && (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "flex-start",
+          gap: 16,
+          marginBottom: 18,
+        }}
+      >
+        {/* 왼쪽 - 잘 맞는 모더지 */}
+        {goodMatch && (
+          <div
+            style={{
+              flex: "0 0 44%",
+              maxWidth: 190,
+              textAlign: "center",
+              transform: "scale(1.1)",  // 살짝 확대
+            }}
+          >
+            <img
+              src={goodMatch.image}
+              alt={goodMatch.title}
+              style={{ width: "100%", height: "auto", display: "block" }}
+            />
+            <p
+              style={{
+                marginTop: 10,
+                fontSize: 16,
+                fontWeight: 900,
+                color: "#444",
+              }}
+            >
+              잘 맞는 타입
+            </p>
+          </div>
+        )}
+
+        {/* 오른쪽 - 잘 안 맞는 모더지 */}
+        {badMatch && (
+          <div
+            style={{
+              flex: "0 0 44%",
+              maxWidth: 190,
+              textAlign: "center",
+              transform: "scale(1.1)",
+            }}
+          >
+            <img
+              src={badMatch.image}
+              alt={badMatch.title}
+              style={{ width: "100%", height: "auto", display: "block" }}
+            />
+            <p
+              style={{
+                marginTop: 10,
+                fontSize: 16,
+                fontWeight: 900,
+                color: "#444",
+              }}
+            >
+              잘 안 맞는 타입
+            </p>
+          </div>
+        )}
+      </div>
+    )}
+
+    {/* 🟣 사진 아래 버튼 */}
+    <button
+      className="btn"
+      style={{
+        padding: "14px 24px",
+        borderRadius: 999,
+        border: "none",
+        background: THEME.green,
+        color: "#111",
+        fontWeight: 700,
+        fontSize: 15,
+        boxShadow: "0 12px 28px rgba(0,0,0,0.22)",
+        cursor: "pointer",
+      }}
+      onClick={() => {
+        setStage("quiz");
+        setIndex(0);
+        setAnswers(Array(QUESTIONS.length).fill(null));
+      }}
+    >
+      테스트 다시 하기
+    </button>
+
+    
+      
+  </div>
+)}
+
     </div>
   );
 }
