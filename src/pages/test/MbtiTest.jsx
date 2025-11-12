@@ -606,10 +606,6 @@ const AllTypesGallery = ({ onBack, navH = 0 }) => (
                 style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
               />
             </div>
-            <div style={{ fontWeight: 900, marginTop: 8, fontSize: 14 }}>
-              {code}
-            </div>
-            <div style={{ fontSize: 12, color: "#444" }}>{data.title}</div>
           </div>
         ))}
       </div>
