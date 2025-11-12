@@ -1,7 +1,7 @@
 // src/pages/performance/PerformanceListPage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import styled from 'styled-components';
-import { useNavigate, useSearchParams } from 'react-router-dom'; // ✅ URL 쿼리 동기화를 위해 useSearchParams 추가
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../../components/layout/Header';
 import PerformanceListCard from '../../components/performance/PerformanceListCard';
 import RegionSelectButton from '../venue/components/RegionSelectButton';
@@ -11,17 +11,14 @@ import CalendarIcon from '../../assets/icons/icon_calendar.svg';
 import SortModal from '../../components/modals/SortModal';
 import { fetchPerformances } from '../../api/performanceApi';
 
-/* ===== 날짜 파싱 ===== */
 const getDateTime = (p) => {
   const iso = p.datetime || p.dateTime || p.performanceDateTime || p.start_at;
   if (iso) return new Date(iso);
-
   if (p.date && p.time) return new Date(`${p.date}T${p.time}`);
   if (p.date) return new Date(`${p.date}T00:00:00`);
   return null;
 };
 
-/* ===== 썸네일 정규화 ===== */
 const normalizePoster = (p) => {
   const thumbnail =
     p.thumbnail ||
@@ -31,19 +28,14 @@ const normalizePoster = (p) => {
     p.image_url ||
     (Array.isArray(p.images) ? p.images[0] : '') ||
     '';
-
   return { ...p, thumbnail };
 };
 
 export default function PerformanceListPage() {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams(); // ✅ URL 쿼리 읽기/쓰기용 훅 추가
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // ✅ URL 쿼리에서 초기 sortOption 불러오기 (없으면 'latest')
   const initialSortFromUrl = searchParams.get('sort') || 'latest';
-
-  // ✅ URL 쿼리에서 초기 지역 불러오기
-  // regions=서울,부산 이런 식으로 들어있다고 가정
   const initialRegionsFromUrlRaw = searchParams.get('regions');
   const initialRegionsFromUrl = initialRegionsFromUrlRaw
     ? initialRegionsFromUrlRaw.split(',').filter((r) => r.trim() !== '')
@@ -59,47 +51,43 @@ export default function PerformanceListPage() {
   const [hasMore, setHasMore] = useState(true);
   const size = 15;
 
-  // ✅ 정렬/지역 변경 시 URL 쿼리도 같이 업데이트해주는 유틸
+  /* === 스크롤 저장/복원용 추가 === */
+  const scrollerRef = useRef(null);
+  const restoringRef = useRef(false);
+  const savedAnchorRef = useRef({ anchorId: null, anchorOffset: 0 });
+  const rafSaveRef = useRef(null);
+  const STORAGE_KEY = `perf:list?${searchParams.toString()}`;
+
   const syncFiltersToUrl = (nextSortOption, nextSelectedRegions) => {
-    // nextSortOption / nextSelectedRegions 가 없으면 현재 state 값을 사용
     const sortToSet = nextSortOption ?? sortOption;
     const regionsToSet = nextSelectedRegions ?? selectedRegions;
-
     const params = {};
-
-    // sort는 항상 넣어줌
     params.sort = sortToSet;
-
-    // 지역이 ['전체']이면 regions 쿼리는 안 넣고, 특정 지역들이면 콤마로 합쳐서 넣음
     if (!(regionsToSet.length === 1 && regionsToSet[0] === '전체')) {
       params.regions = regionsToSet.join(',');
     }
-
     setSearchParams(params);
   };
 
-  // ✅ 지역 선택 로직 수정: state 갱신 + URL 반영
   const handleSelectRegion = (region) => {
     if (region === '전체') {
       const updated = ['전체'];
       setSelectedRegions(updated);
-      syncFiltersToUrl(undefined, updated); // sortOption은 그대로 두고 지역만 업데이트
+      syncFiltersToUrl(undefined, updated);
     } else {
       const alreadySelected = selectedRegions.includes(region);
       let updated = alreadySelected
         ? selectedRegions.filter((r) => r !== region)
         : selectedRegions.filter((r) => r !== '전체').concat(region);
       if (updated.length === 0) updated = ['전체'];
-
       setSelectedRegions(updated);
-      syncFiltersToUrl(undefined, updated); // sortOption은 그대로 두고 지역만 업데이트
+      syncFiltersToUrl(undefined, updated);
     }
   };
 
-  // ✅ 정렬 선택 로직 수정: state 갱신 + URL 반영
   const handleSelectSort = (option) => {
     setSortOption(option);
-    syncFiltersToUrl(option, undefined); // region은 그대로 두고 sortOption만 업데이트
+    syncFiltersToUrl(option, undefined);
   };
 
   const loadPerformances = async (append = false) => {
@@ -119,22 +107,12 @@ export default function PerformanceListPage() {
           .sort((a, b) => a.__dt - b.__dt)
           .map(({ __dt, ...rest }) => rest);
       }
-
-      // ✅ 포스터 경로 보정
       list = list.map(normalizePoster);
 
-      console.log('🎯 [공연 목록] 최종 리스트:', list);
+      if (append) setPerformances((prev) => [...prev, ...list]);
+      else setPerformances(list);
 
-      if (append) {
-        setPerformances((prev) => [...prev, ...list]);
-      } else {
-        setPerformances(list);
-      }
-
-      // ✅ 다음 데이터가 더 이상 없으면 더보기 버튼 숨기기
-      if (list.length < size) setHasMore(false);
-      else setHasMore(true);
-
+      setHasMore(list.length >= size);
     } catch (err) {
       console.error('📛 공연 목록 API 호출 실패:', err?.response?.data || err.message);
       setPerformances([]);
@@ -142,9 +120,134 @@ export default function PerformanceListPage() {
   };
 
   useEffect(() => {
+    if (restoringRef.current) return;
     loadPerformances(page > 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortOption, selectedRegions, page]);
+
+  /* === 첫 가시 카드(앵커) 계산 === */
+  const getFirstVisibleAnchor = () => {
+    const sc = scrollerRef.current;
+    if (!sc) return null;
+    const items = Array.from(sc.querySelectorAll('[data-perf-id]'));
+    const scRect = sc.getBoundingClientRect();
+    for (const el of items) {
+      const rect = el.getBoundingClientRect();
+      if (rect.bottom > scRect.top) {
+        const topInScroller = rect.top - scRect.top + sc.scrollTop;
+        return {
+          anchorId: el.getAttribute('data-perf-id'),
+          anchorOffset: sc.scrollTop - topInScroller,
+        };
+      }
+    }
+    return null;
+  };
+
+  /* === 스크롤 상태 저장 === */
+  const saveStateToSession = () => {
+    const sc = scrollerRef.current;
+    if (!sc) return;
+    const anchor = getFirstVisibleAnchor();
+    sessionStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        scrollTop: sc.scrollTop,
+        page,
+        anchorId: anchor?.anchorId ?? null,
+        anchorOffset: anchor?.anchorOffset ?? 0,
+        ts: Date.now(),
+      }),
+    );
+  };
+  const handleScrollSave = () => {
+    if (rafSaveRef.current) return;
+    rafSaveRef.current = requestAnimationFrame(() => {
+      rafSaveRef.current = null;
+      saveStateToSession();
+    });
+  };
+
+  /* === 최초 마운트: 저장된 page만큼 순차 로드 후 정확 위치 복구 === */
+  useLayoutEffect(() => {
+    const saved = sessionStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+    try {
+      const { scrollTop = 0, page: savedPage = 1, anchorId = null, anchorOffset = 0 } = JSON.parse(saved);
+      restoringRef.current = true;
+      savedAnchorRef.current = { anchorId, anchorOffset };
+
+      (async () => {
+        setPerformances([]);
+        let lastPageLen = size;
+
+        for (let i = 1; i <= savedPage; i++) {
+          const sortMapping = { latest: 'created_at', popular: 'likes', date: 'date' };
+          const sortParam = sortMapping[sortOption] || 'created_at';
+          const regionParam = selectedRegions.includes('전체') ? undefined : selectedRegions;
+          const data = await fetchPerformances({ region: regionParam, sort: sortParam, page: i, size });
+          let list = Array.isArray(data) ? data : [];
+          if (sortOption === 'date') {
+            const startOfToday = new Date();
+            startOfToday.setHours(0, 0, 0, 0);
+            list = list
+              .map((p) => ({ ...p, __dt: getDateTime(p) }))
+              .filter((p) => p.__dt && p.__dt >= startOfToday)
+              .sort((a, b) => a.__dt - b.__dt)
+              .map(({ __dt, ...rest }) => rest);
+          }
+          list = list.map(normalizePoster);
+          lastPageLen = list.length;
+
+          setPerformances((prev) => (i === 1 ? list : [...prev, ...list]));
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((r) => requestAnimationFrame(r));
+        }
+
+        const sc = scrollerRef.current;
+        if (sc) {
+          const { anchorId: AID, anchorOffset: AO } = savedAnchorRef.current;
+          if (AID) {
+            const sel = `[data-perf-id="${CSS.escape(String(AID))}"]`;
+            const el = sc.querySelector(sel);
+            if (el) {
+              const rect = el.getBoundingClientRect();
+              const scRect = sc.getBoundingClientRect();
+              const topInScroller = rect.top - scRect.top + sc.scrollTop;
+              sc.scrollTop = Math.max(0, topInScroller + AO);
+            } else {
+              sc.scrollTop = Math.max(0, Math.min(scrollTop, sc.scrollHeight - sc.clientHeight));
+            }
+          } else {
+            sc.scrollTop = Math.max(0, Math.min(scrollTop, sc.scrollHeight - sc.clientHeight));
+          }
+        }
+
+        setPage(savedPage);
+        setHasMore(lastPageLen >= size);
+        restoringRef.current = false;
+      })();
+    } catch {
+      /* ignore */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 쿼리 변경 시엔 새로운 STORAGE_KEY가 되므로 최초만 시도
+
+  /* === 언마운트/탭 전환 시 저장 === */
+  useEffect(() => {
+    const onHide = () => saveStateToSession();
+    const onVis = () => { if (document.visibilityState === 'hidden') saveStateToSession(); };
+    window.addEventListener('pagehide', onHide);
+    window.addEventListener('beforeunload', onHide);
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      saveStateToSession();
+      window.removeEventListener('pagehide', onHide);
+      window.removeEventListener('beforeunload', onHide);
+      document.removeEventListener('visibilitychange', onVis);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [STORAGE_KEY, page]);
 
   return (
     <>
@@ -169,18 +272,24 @@ export default function PerformanceListPage() {
           <CalendarIconButton onClick={() => navigate('/calendar')} />
         </FilterBar>
 
-        <ScrollableContent>
+        {/* ref + onScroll 만 추가 */}
+        <ScrollableContent ref={scrollerRef} onScroll={handleScrollSave}>
           {performances.length > 0 ? (
             <>
-              {performances.map((p) => (
-                <PerformanceListCard
-                  key={p.id}
-                  performance={p}
-                  onClick={() => navigate(`/performance/${p.id}`)}
-                />
+              {performances.map((p, i) => (
+                <div key={p.id ?? `${p.title}-${p.date}-${i}`} data-perf-id={p.id ?? `${p.title}-${p.date}-${i}`}>
+                  <PerformanceListCard
+                    performance={p}
+                    onClick={() => { saveStateToSession(); navigate(`/performance/${p.id}`); }}
+                  />
+                </div>
               ))}
               {hasMore && (
-                <MoreButton onClick={() => setPage((prev) => prev + 1)}>
+                <MoreButton onClick={() => setPage((prev) => {
+                  const next = prev + 1;
+                  queueMicrotask(saveStateToSession);
+                  return next;
+                })}>
                   더보기
                 </MoreButton>
               )}
@@ -192,7 +301,6 @@ export default function PerformanceListPage() {
 
         {isSortModalOpen && (
           <ModalBackground onClick={() => setIsSortModalOpen(false)}>
-            {/* ✅ 기존 setSortOption 대신 handleSelectSort */}
             <SortModal
               selected={sortOption}
               onSelect={handleSelectSort}
@@ -202,16 +310,12 @@ export default function PerformanceListPage() {
         )}
 
         {isRegionSheetOpen && (
-          <>
-            {/* ✅ 기존 handleSelectRegion 유지하지만 내부 로직이 URL도 반영하도록 변경됨 */}
-            <RegionSelectSheet
-              selectedRegions={selectedRegions}
-              onSelectRegion={handleSelectRegion}
-              onClose={() => setIsRegionSheetOpen(false)}
-            />
-          </>
+          <RegionSelectSheet
+            selectedRegions={selectedRegions}
+            onSelectRegion={handleSelectRegion}
+            onClose={() => setIsRegionSheetOpen(false)}
+          />
         )}
-
       </Container>
     </>
   );
@@ -232,13 +336,9 @@ const ScrollableContent = styled.div`
   height: 100dvh; 
   padding-bottom: 68px;
   overflow-y: auto;
-  
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  &::-webkit-scrollbar { display: none; }
   -ms-overflow-style: none;
   scrollbar-width: none;
-
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
 `;
@@ -253,9 +353,7 @@ const FilterGroup = styled.div`
   margin: 16px 0;
   display: flex;
   gap: 16px;
-  button {
-    margin: 0 !important;
-  }
+  button { margin: 0 !important; }
 `;
 
 const CalendarIconButton = styled.button`
@@ -264,53 +362,38 @@ const CalendarIconButton = styled.button`
   background-color: rgba(60, 156, 103, 0.2);
   border-radius: 50%;
   border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   cursor: pointer;
   &::after {
     content: '';
     background-image: url(${CalendarIcon});
     background-size: 100% 100%;
-    width: 1rem;
-    height: 1rem;
+    width: 1rem; height: 1rem;
   }
 `;
 
 const ModalBackground = styled.div`
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
+  position: fixed; inset: 0;
+  background-color: rgba(0,0,0,0.3);
+  z-index: 1000; display: flex; justify-content: center; align-items: flex-end;
 `;
 
 const MoreButton = styled.button`
-  width: 100%;
-  height: 48px;
-  margin-bottom: 16px;
+  width: 100%; height: 48px; margin-bottom: 16px;
   background-color: ${({ theme }) => theme.colors.bgWhite};
   color: ${({ theme }) => theme.colors.darkGray};
   border: 1px solid ${({ theme }) => theme.colors.outlineGray};
   border-radius: 8px;
   font-size: ${({ theme }) => theme.fontSizes.base};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
-  cursor: pointer;
-  transition: all 0.2s ease;
-  &:hover {
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  }
+  cursor: pointer; transition: all .2s ease;
+  &:hover { box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
 `;
 
 const EmptyMessage = styled.div`
-  margin-top: 16px;
-  padding: 16px 16px;
+  margin-top: 16px; padding: 16px 16px;
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   color: ${({ theme }) => theme.colors.darkGray};
-  display: flex;
-  justify-content: center; 
-  align-items: center;  
+  display: flex; justify-content: center; align-items: center;
 `;
