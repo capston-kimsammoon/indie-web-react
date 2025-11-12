@@ -678,6 +678,7 @@ export default function MbtiTest() {
                 <div
                 style={{
                     margin: "0 auto 16px",
+                    marginTop: -30,
                     maxWidth: "min(420px, 90vw)",
                 }}
                 >
