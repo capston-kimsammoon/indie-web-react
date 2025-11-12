@@ -852,7 +852,7 @@ const AllTypesGallery = ({ onBack, navH = 0 }) => (
 <div
   style={{
     display: "flex",
-    flexDirection: "column",
+    justifyContent: "center",
     alignItems: "center",
     gap: 12,
     marginTop: 12,
