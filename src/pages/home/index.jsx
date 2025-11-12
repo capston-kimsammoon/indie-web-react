@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import modieHeaderLogo from '../../assets/icons/modie_header.png';
 import Header from '../../components/layout/Header';
 
-import BannerMBTI from './Banner_MBTI.png';
 import PickCard from '../../components/performance/Pick/PickCard';
 import MusicCard from '../../components/musicmag/MusicCard';
 import MoodSection from '../../components/performance/mood/MoodSection';
@@ -238,13 +237,7 @@ const HomePage = () => {
           }}
         />
 
-        <Banner onClick={() => navigate('/test/mbti')}>
-          <img src={BannerMBTI} alt="모더지 공연 MBTI 테스트" />
-        </Banner>
-
-        <SurveyButton 
-          style={{ marginBottom: "40px" }}
-          onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSeJvWeIGEMKfXN1-7vMDrZ3f43aREMs_GBN5Xl5QJF2mtlP7A/viewform?usp=dialog', '_blank')}>
+        <SurveyButton onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSeJvWeIGEMKfXN1-7vMDrZ3f43aREMs_GBN5Xl5QJF2mtlP7A/viewform?usp=dialog', '_blank')}>
           ▶  만족도 조사 설문 부탁드립니다 ! 추첨으로 커피 기프티콘 증정  ◀
         </SurveyButton>
 
@@ -381,31 +374,8 @@ const SectionTitle = styled.div`
   flex: 1;
 `;
 
-const Banner = styled.div`
-  height: 48px;
-  background-color: #FFF5E1;
-  color: ${({ theme }) => theme.colors.darkblack};
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  font-weight: ${({ theme }) => theme.fontWeights.medium};
-  padding: 12px 16px;
-  text-align: center;
-  cursor: pointer;
-  margin: 32px -16px 8px -16px; 
-  overflow: hidden;
-  display: flex;         
-  align-items: center;     
-  justify-content: center;
-
-  img {
-    height: 170%;
-    width: auto;
-    object-fit: cover;
-    object-position: center;
-  }
-`;
-
 const SurveyButton = styled.div`
-  padding: 0 0; 
+  padding: 16px 0; 
   font-size: ${({ theme }) => theme.fontSizes.xs}; 
   font-weight: ${({ theme }) => theme.fontWeights.regular}; 
   color: ${({ theme }) => theme.colors.lightGray}; 
