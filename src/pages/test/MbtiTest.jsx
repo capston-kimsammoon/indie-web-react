@@ -461,7 +461,7 @@ export default function MbtiTest() {
     paddingLeft: 12,
     paddingRight: 12,
     marginLeft: -16,
-    marginTop:-40,
+    marginTop: stage === "result" ? -60: -40,
 
     background: (stage === "start" || stage === "quiz" || stage === "done") ? THEME.green : "#ffffff",
     display: "grid",
