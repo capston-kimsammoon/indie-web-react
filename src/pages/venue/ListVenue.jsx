@@ -13,7 +13,7 @@ function ListVenue() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedRegions, setSelectedRegions] = useState(['전체']);
   const [venues, setVenues] = useState([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1);            // 다음에 로드할 페이지 번호
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const size = 20;
@@ -21,16 +21,37 @@ function ListVenue() {
   const sentinelRef = useRef(null);
   const scrollerRef = useRef(null);
 
-  // 초기 로딩/복원 상태
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-
-  // rAF 쓰로틀 저장
   const rafSaveRef = useRef(null);
   const STORAGE_KEY = 'venueListState';
 
-  // 상태 저장
+  // 앵커 복원용
+  const restoringRef = useRef(false);
+  const savedAnchorRef = useRef({ anchorId: null, anchorOffset: 0 });
+
+  // 현재 스크롤에서 첫 가시 아이템의 id/상대 오프셋 계산
+  const getFirstVisibleAnchor = () => {
+    const sc = scrollerRef.current;
+    if (!sc) return null;
+    const items = Array.from(sc.querySelectorAll('[data-venue-id]'));
+    const scRect = sc.getBoundingClientRect();
+    for (const el of items) {
+      const rect = el.getBoundingClientRect();
+      if (rect.bottom > scRect.top) {
+        const topInScroller = rect.top - scRect.top + sc.scrollTop;
+        return {
+          anchorId: el.getAttribute('data-venue-id'),
+          anchorOffset: sc.scrollTop - topInScroller,
+        };
+      }
+    }
+    return null;
+  };
+
+  // 상태 저장 (앵커 포함)
   const saveState = useCallback(() => {
     const sc = scrollerRef.current;
+    const anchor = getFirstVisibleAnchor();
     sessionStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({
@@ -38,6 +59,8 @@ function ListVenue() {
         selectedRegions,
         venues,
         page,
+        anchorId: anchor?.anchorId ?? null,
+        anchorOffset: anchor?.anchorOffset ?? 0,
         ts: Date.now(),
       }),
     );
@@ -51,28 +74,49 @@ function ListVenue() {
     });
   };
 
-  // 1) 최초 마운트: 상태 복원 or 1페이지 로드
+  // 최초: 세션 복원 or 1페이지 로드
   useLayoutEffect(() => {
     const saved = sessionStorage.getItem(STORAGE_KEY);
     if (saved) {
-      try {
-        const { scrollTop = 0, selectedRegions: sr = ['전체'], venues: vs = [], page: pg = 1 } = JSON.parse(saved);
-        setSelectedRegions(sr);
-        setVenues(vs);
-        setPage(pg);
-        // DOM 그려진 뒤 컨테이너 스크롤 복원
-        requestAnimationFrame(() => {
-          const sc = scrollerRef.current;
-          if (sc) sc.scrollTop = scrollTop;
-        });
-      } catch {
-        // 복원 실패 시 초기 로드로 폴백
-        (async () => {
-          await loadVenues(1);
-        })();
-      } finally {
-        setIsInitialLoad(false);
-      }
+      (async () => {
+        try {
+          const { scrollTop = 0, selectedRegions: sr = ['전체'], venues: vs = [], page: pg = 1, anchorId = null, anchorOffset = 0 } = JSON.parse(saved);
+          setSelectedRegions(sr);
+          setVenues(vs);
+          setPage(pg);
+          restoringRef.current = true;
+          savedAnchorRef.current = { anchorId, anchorOffset };
+
+          requestAnimationFrame(() => {
+            const sc = scrollerRef.current;
+            if (!sc) return;
+            if (anchorId) {
+              const el = sc.querySelector(`[data-venue-id="${CSS.escape(String(anchorId))}"]`);
+              if (el) {
+                const rect = el.getBoundingClientRect();
+                const scRect = sc.getBoundingClientRect();
+                const topInScroller = rect.top - scRect.top + sc.scrollTop;
+                sc.scrollTop = Math.max(0, topInScroller + anchorOffset);
+              } else {
+                sc.scrollTop = Math.max(0, Math.min(scrollTop, sc.scrollHeight - sc.clientHeight));
+              }
+            } else {
+              sc.scrollTop = Math.max(0, Math.min(scrollTop, sc.scrollHeight - sc.clientHeight));
+            }
+            // 컨텐츠가 낮아서 비면 다음 페이지 미리 로드
+            if (sc.scrollHeight <= sc.clientHeight + 8 && hasMore && !loading) {
+              loadVenues(pg);
+            }
+            restoringRef.current = false;
+          });
+
+          if (!vs || vs.length === 0) {
+            await loadVenues(1);
+          }
+        } finally {
+          setIsInitialLoad(false);
+        }
+      })();
     } else {
       (async () => {
         await loadVenues(1);
@@ -82,7 +126,7 @@ function ListVenue() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 2) API 호출
+  // API 호출
   const loadVenues = useCallback(
     async (pageNum) => {
       if (loading) return;
@@ -91,17 +135,19 @@ function ListVenue() {
         const regionParam = selectedRegions.includes('전체') ? undefined : selectedRegions;
         const data = await fetchVenueList({ page: pageNum, size, region: regionParam });
 
-        const venueList = Array.isArray(data?.content)
-          ? data.content
-          : Array.isArray(data)
-          ? data
-          : [];
+        // 다양한 응답 포맷 방어
+        const raw =
+          (Array.isArray(data) && data) ||
+          data?.items ||
+          data?.content ||
+          data?.results ||
+          data?.data ||
+          [];
 
-        if (pageNum === 1) {
-          setVenues(venueList);
-        } else {
-          setVenues((prev) => [...prev, ...venueList]);
-        }
+        const venueList = Array.isArray(raw) ? raw : [];
+
+        if (pageNum === 1) setVenues(venueList);
+        else setVenues((prev) => [...prev, ...venueList]);
 
         setHasMore(venueList.length >= size);
         setPage(pageNum + 1);
@@ -115,7 +161,7 @@ function ListVenue() {
     [selectedRegions, size, loading]
   );
 
-  // 3) 지역 변경 → 첫 페이지부터 다시
+  // 지역 변경 → 처음부터
   useEffect(() => {
     if (isInitialLoad) return;
     setPage(1);
@@ -124,7 +170,7 @@ function ListVenue() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedRegions, isInitialLoad]);
 
-  // 4) 무한 스크롤 (컨테이너를 root로)
+  // 무한 스크롤 (컨테이너 root)
   useEffect(() => {
     const el = sentinelRef.current;
     const root = scrollerRef.current;
@@ -144,7 +190,7 @@ function ListVenue() {
     return () => io.disconnect();
   }, [page, hasMore, loading, loadVenues, saveState]);
 
-  // 5) 언마운트/탭 전환 시 상태 저장
+  // 언마운트/탭 전환 시 저장
   useEffect(() => {
     const onHide = () => saveState();
     const onVis = () => { if (document.visibilityState === 'hidden') saveState(); };
@@ -181,12 +227,13 @@ function ListVenue() {
         {Array.isArray(venues) && venues.length > 0 ? (
           <>
             {venues.map((venue) => (
-              <VenueItem
-                key={venue.id}
-                image={venue.image_url}
-                name={venue.name}
-                onClick={() => { saveState(); navigate(`/venue/${venue.id}`); }}
-              />
+              <div key={venue.id} data-venue-id={venue.id}>
+                <VenueItem
+                  image={venue.image_url}
+                  name={venue.name}
+                  onClick={() => { saveState(); navigate(`/venue/${venue.id}`); }}
+                />
+              </div>
             ))}
             {hasMore && <Loader ref={sentinelRef}>{loading ? '불러오는 중...' : '더 불러오는 중...'}</Loader>}
           </>
