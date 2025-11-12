@@ -16,6 +16,7 @@ import imgESTJ from "../../assets/mbti/ESTJ.png";
 import imgESFJ from "../../assets/mbti/ESFJ.png";
 import imgENFJ from "../../assets/mbti/ENFJ.png";
 import imgENTJ from "../../assets/mbti/ENTJ.png";
+import { px } from "framer-motion";
 
 /* ──────────────────────────────────────────────────────────────────────────────
    하단 네비(전역) 높이 자동 측정 훅
@@ -234,6 +235,20 @@ function useCuteFonts() {
   }, []);
 }
 
+const ScrollableContent = ({ children }) => (
+    <div style={{
+        overflowY: "auto",
+        overflowX: "hidden",
+        WebkitOverflowScrolling: "touch",
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+    }}>
+        {children}
+    </div>
+);
+
 /* ──────────────────────────────────────────────────────────────────────────────
    나의 공연 테스트 (콘텐츠는 그대로)
    ────────────────────────────────────────────────────────────────────────────── */
@@ -241,7 +256,7 @@ function useCuteFonts() {
 const THEME = {
   quizBg: "#0b1f1a",
   cardBg: "#ffffff",
-  text: "#111111",
+  text: "#1C1C1E",
   border: "#111111",
   ivory: "#FFF5E1",
   green: "#2a8a55",
@@ -314,7 +329,7 @@ function computeMBTI(answers) {
 /* 카드(글래스) */
 const Box = ({ children, style, className }) => (
   <div
-    className={`card-in glass ${className || ""}`}
+    className={` ${className || ""}`}
     style={{
       borderRadius: 28,
       boxShadow: "0 12px 36px rgba(0,0,0,0.22)",
@@ -344,7 +359,7 @@ export default function MbtiTest() {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState(Array(QUESTIONS.length).fill(null));
   const NAV_H = useBottomNavHeight();
-
+  
   const onChoose = (trait) => {
     const next = [...answers];
     next[index] = trait;
@@ -352,7 +367,6 @@ export default function MbtiTest() {
     if (index < QUESTIONS.length - 1) setIndex(index + 1);
     else setStage("done");
   };
-
 
     // --- 공유 관련 헬퍼들 ---
   const shareUrl =
@@ -416,7 +430,6 @@ export default function MbtiTest() {
     );
   };
 
-
   // 키보드 1/2로 선택
   useEffect(() => {
     if (stage !== "quiz") return;
@@ -438,24 +451,27 @@ export default function MbtiTest() {
   const badMatch  = matchInfo?.bad  ? RESULT_BOOK[matchInfo.bad]  : null;
 
   const wrapperStyle = {
+    zIndex: 999, 
+    position: "fixed",
     minHeight: "100svh",
-    width: "100%",
+    width: "calc(100% + 32px)",
     boxSizing: "border-box",
-    paddingTop:  stage === "result"
-      ? `calc(6px + env(safe-area-inset-top, 0px))`      // 결과창일 때는 얇게 
-      : `calc(clamp(18px, 4vh, 40px) + env(safe-area-inset-top, 0px))`,
+    paddingTop: stage === "result" ? -20: 60,
     paddingBottom: `calc(clamp(18px, 4vh, 40px) + ${NAV_H}px + env(safe-area-inset-bottom, 0px))`,
     paddingLeft: 12,
     paddingRight: 12,
+    marginLeft: -16,
+    marginTop:-40,
 
-    background: (stage === "start" || stage === "result") ? "#ffffff" : THEME.green,
+    background: (stage === "start" || stage === "quiz" || stage === "done") ? THEME.green : "#ffffff",
     display: "grid",
     gridTemplateRows: stage === "result" ? "auto 1fr" : "1fr auto 1fr",
     position: "relative",
-    overflow: "hidden",
+    overflowX: "hidden",          
+    overflowY: stage === "result" ? "auto" : "hidden",
     fontFamily:
       `'Jua', 'Gowun Dodum', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif`,
-    color: "#111",
+    color: "#1C1C1E",
     isolation: "isolate",
   };
 
@@ -468,12 +484,12 @@ export default function MbtiTest() {
 
   const titleStyle = {
     textWrap: "balance",
-    fontSize: "clamp(15px, 3vw, 22px)",
-    fontWeight: 800,
+    fontSize: "clamp(18px, 3vw, 22px)",
+    fontWeight: 500,
     lineHeight: 1.26,
     textAlign: "center",
     marginBottom: 6,
-    color: "#0b0b0b",
+    color: "#1C1C1E",
   };
 
   // 버튼 공통
@@ -491,7 +507,7 @@ export default function MbtiTest() {
     cursor: "pointer",
     whiteSpace: "normal",
     wordBreak: "keep-all",
-    boxShadow: "0 8px 20px rgba(0,0,0,0.14)",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.14)",
   };
 
   // 상단 진행 상태
@@ -516,36 +532,33 @@ export default function MbtiTest() {
 
   return (
     <div style={wrapperStyle}>
-      <Deco />
+    <Deco />
 
-      {stage === "start" && (
+    {stage === "start" && (
         <div style={centerCell} className="fade-up">
-          {/* 시작 카드: 아이보리 느낌 살짝 */}
-          <Box style={{ textAlign: "center", background: "rgba(255,245,225,0.92)" }}>
-            <h1 style={{ fontSize: "clamp(22px, 5vw, 34px)", fontWeight: 900, marginBottom: 8, color: "#0b0b0b" }}>
-              나의 공연 테스트
-            </h1>
-            <p style={{ color: "#333", marginBottom: 18, fontSize: 14 }}>
-              내가 공연을 즐기는 유형을 알아보자!
-            </p>
+        <Box style={{ textAlign: "center" }}>
+        <h2 style={{ fontSize: 24, fontWeight: 800, color: "#1C1C1E", marginTop: 4 }}>나의 공연 테스트</h2>
+        <p style={{ color: "#2F2F2F", marginTop: -16, marginBottom: 16, fontSize: 14 }}>
+                내가 공연을 즐기는 유형을 알아보자!
+        </p>
 
-            <button
-              className="btn"
-              style={{
+        <button
+            className="btn"
+            style={{
                 ...pill,
-                background: THEME.green,
-                color: "#111",
-                boxShadow: "0 16px 34px rgba(0,0,0,0.22)",
-                fontSize: 17,
-                padding: "18px 22px",
-              }}
-              onClick={() => setStage("quiz")}
+                background: THEME.ivory, 
+                color: "#1C1C1E",      
+                fontSize: 16,
+                padding: "16px 20px",
+            }}
+            onClick={() => setStage("quiz")}
             >
-              시작하기
-            </button>
-          </Box>
-        </div>
-      )}
+            시작하기
+        </button>
+        </Box>
+    </div>
+    )}
+
 
       {stage === "quiz" && (
         <div style={centerCell}>
@@ -600,8 +613,7 @@ export default function MbtiTest() {
                   className="btn"
                   style={{
                     ...pill,
-                    background:
-                      "linear-gradient(180deg, rgba(255,245,225,1) 0%, rgba(255,248,234,1) 100%)",
+                    background:"#3C9C68",
                     color: THEME.text,
                   }}
                   onClick={() => setIndex(Math.max(0, index - 1))}
@@ -618,16 +630,16 @@ export default function MbtiTest() {
       {stage === "done" && (
         <div style={centerCell} className="fade-up">
           <Box style={{ textAlign: "center" }}>
-            <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8, color: "#0b0b0b" }}>모든 질문 완료!</h2>
-            <p style={{ color: "#333", marginBottom: 14, fontSize: 14 }}>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: "#1C1C1E", marginTop: 4 }}>모든 질문 완료!</h2>
+            <p style={{ color: "#2F2F2F",  marginTop: -16, marginBottom: 16, fontSize: 14 }}>
               이제 나의 공연 성향 결과를 확인해보세요.
             </p>
             <button
               className="btn"
               style={{
                 ...pill,
-                background: THEME.green,
-                color: "#111",
+                background: THEME.ivory,
+                color: "#1C1C1E",
                 fontSize: 16,
                 padding: "16px 20px",
               }}
@@ -642,7 +654,7 @@ export default function MbtiTest() {
                 style={{
                   ...pill,
                   background: THEME.green,
-                  color: "#111",
+                  color: "#1C1C1E",
                   fontSize: 16,
                   padding: "16px 20px",
                 }}
@@ -660,117 +672,116 @@ export default function MbtiTest() {
       )}
 
       {stage === "result" && result && (
-  <div style={resultWrap} className="fade-up">
-    {/* 메인 결과 이미지 */}
-    <div
-      style={{
-        margin: "0 auto 16px",
-        maxWidth: "min(420px, 90vw)",
-      }}
-    >
-      <img
-        src={result.image}
-        alt={result.title}
-        style={{ width: "100%", height: "auto", display: "block" }}
-      />
-    </div>
+        <ScrollableContent>
+            <div style={resultWrap} className="fade-up">
+                {/* 메인 결과 이미지 */}
+                <div
+                style={{
+                    margin: "0 auto 16px",
+                    maxWidth: "min(420px, 90vw)",
+                }}
+                >
+                <img
+                    src={result.image}
+                    alt={result.title}
+                    style={{ width: "95%", height: "auto", display: "block", margin: "0 auto" }}
 
-    {/* 🔴 왼쪽/오른쪽 : 잘 맞는 / 잘 안 맞는 모더지 */}
-    {(goodMatch || badMatch) && (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "flex-start",
-          gap: 16,
-          marginBottom: 18,
-        }}
-      >
-        {/* 왼쪽 - 잘 맞는 모더지 */}
-        {goodMatch && (
-          <div
-            style={{
-              flex: "0 0 44%",
-              maxWidth: 190,
-              textAlign: "center",
-              transform: "scale(1.1)",  // 살짝 확대
-            }}
-          >
-            <img
-              src={goodMatch.image}
-              alt={goodMatch.title}
-              style={{ width: "100%", height: "auto", display: "block" }}
-            />
-            <p
-              style={{
-                marginTop: 10,
-                fontSize: 16,
-                fontWeight: 900,
-                color: "#444",
-              }}
-            >
-              잘 맞는 타입
-            </p>
-          </div>
-        )}
+                />
+                </div>
 
-        {/* 오른쪽 - 잘 안 맞는 모더지 */}
-        {badMatch && (
-          <div
-            style={{
-              flex: "0 0 44%",
-              maxWidth: 190,
-              textAlign: "center",
-              transform: "scale(1.1)",
-            }}
-          >
-            <img
-              src={badMatch.image}
-              alt={badMatch.title}
-              style={{ width: "100%", height: "auto", display: "block" }}
-            />
-            <p
-              style={{
-                marginTop: 10,
-                fontSize: 16,
-                fontWeight: 900,
-                color: "#444",
-              }}
+            {/* 🔴 왼쪽/오른쪽 : 잘 맞는 / 잘 안 맞는 모더지 */}
+            {(goodMatch || badMatch) && (
+            <div
+                style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "flex-start",
+                gap: 16,
+                marginBottom: 18,
+                }}
             >
-              잘 안 맞는 타입
-            </p>
-          </div>
-        )}
-      </div>
+                {/* 왼쪽 - 잘 맞는 모더지 */}
+                {goodMatch && (
+                <div
+                    style={{
+                    flex: "0 0 44%",
+                    maxWidth: 190,
+                    textAlign: "center",
+                    transform: "scale(1.1)",  // 살짝 확대
+                    }}
+                >
+                    <img
+                    src={goodMatch.image}
+                    alt={goodMatch.title}
+                    style={{ width: "100%", height: "auto", display: "block" }}
+                    />
+                    <p
+                    style={{
+                        marginTop: 10,
+                        fontSize: 16,
+                        fontWeight: 900,
+                        color: "#444",
+                    }}
+                    >
+                    잘 맞는 타입
+                    </p>
+                </div>
+                )}
+
+                {/* 오른쪽 - 잘 안 맞는 모더지 */}
+                {badMatch && (
+                <div
+                    style={{
+                    flex: "0 0 44%",
+                    maxWidth: 190,
+                    textAlign: "center",
+                    transform: "scale(1.1)",
+                    }}
+                >
+                    <img
+                    src={badMatch.image}
+                    alt={badMatch.title}
+                    style={{ width: "100%", height: "auto", display: "block" }}
+                    />
+                    <p
+                    style={{
+                        marginTop: 10,
+                        fontSize: 16,
+                        fontWeight: 900,
+                        color: "#444",
+                    }}
+                    >
+                    잘 안 맞는 타입
+                    </p>
+                </div>
+                )}
+            </div>
+            )}
+
+            {/* 🟣 사진 아래 버튼 */}
+            <button
+                className="btn"
+                style={{
+                    padding: "14px 24px",
+                    borderRadius: 999,
+                    border: "none",
+                    background: THEME.green,
+                    color: "#1C1C1E",
+                    fontWeight: 700,
+                    fontSize: 15,
+                    cursor: "pointer",
+                }}
+                onClick={() => {
+                    setStage("quiz");
+                    setIndex(0);
+                    setAnswers(Array(QUESTIONS.length).fill(null));
+                }}
+                >
+                테스트 다시 하기
+                </button>
+            </div>
+        </ScrollableContent>
     )}
-
-    {/* 🟣 사진 아래 버튼 */}
-    <button
-      className="btn"
-      style={{
-        padding: "14px 24px",
-        borderRadius: 999,
-        border: "none",
-        background: THEME.green,
-        color: "#111",
-        fontWeight: 700,
-        fontSize: 15,
-        boxShadow: "0 12px 28px rgba(0,0,0,0.22)",
-        cursor: "pointer",
-      }}
-      onClick={() => {
-        setStage("quiz");
-        setIndex(0);
-        setAnswers(Array(QUESTIONS.length).fill(null));
-      }}
-    >
-      테스트 다시 하기
-    </button>
-
-    
-      
-  </div>
-)}
 
     </div>
   );
