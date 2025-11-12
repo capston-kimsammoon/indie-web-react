@@ -452,11 +452,14 @@ export default function MbtiTest() {
 
   const wrapperStyle = {
     zIndex: 999, 
-    position: "fixed",
+    position: stage === "result" ? "relative" : "fixed",
     minHeight: "100svh",
     width: "calc(100% + 32px)",
     boxSizing: "border-box",
-    paddingTop: stage === "result" ? -20: 60,
+    paddingTop:
+    stage === "result"
+      ? "calc(env(safe-area-inset-top, 0px) + 24px)"
+      : "calc(env(safe-area-inset-top, 0px) + 60px)",
     paddingBottom: `calc(clamp(18px, 4vh, 40px) + ${NAV_H}px + env(safe-area-inset-bottom, 0px))`,
     paddingLeft: 12,
     paddingRight: 12,
@@ -678,14 +681,13 @@ export default function MbtiTest() {
                 <div
                 style={{
                     margin: "0 auto 16px",
-                    marginTop: -30,
                     maxWidth: "min(420px, 90vw)",
                 }}
                 >
                 <img
                     src={result.image}
                     alt={result.title}
-                    style={{ width: "95%", height: "auto", display: "block", margin: "0 auto" }}
+                    style={{ width: "94%", height: "auto", display: "block", margin: "0 auto" }}
 
                 />
                 </div>
