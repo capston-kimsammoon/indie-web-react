@@ -193,6 +193,14 @@ function useUiEffects() {
         background: radial-gradient(closest-side, #9be15d 0%, rgba(155,225,93,0.0) 70%);
         animation: floaty 11s ease-in-out infinite .4s;
       }
+      .no-scrollbar {
+        -ms-overflow-style: none;   /* IE/Edge */
+        scrollbar-width: none;      /* Firefox */
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;              /* Chrome/Safari */
+        width: 0; height: 0;
+      }
     `;
     const style = document.createElement("style");
     style.id = "mbti-inline-styles";
@@ -452,26 +460,26 @@ export default function MbtiTest() {
 
   const wrapperStyle = {
     zIndex: 999, 
-    position: stage === "result" ? "relative" : "fixed",
+    position: (stage === "result" || stage === "gallery") ? "relative" : "fixed",
     minHeight: "100svh",
     width: "calc(100% + 32px)",
     boxSizing: "border-box",
     paddingTop:
-    stage === "result"
+    (stage === "result" || stage === "gallery")
       ? "calc(env(safe-area-inset-top, 0px) + 24px)"
-      : "calc(env(safe-area-inset-top, 0px) + 60px)",
+      : "calc(env(safe-area-inset-top, 0px) + 24px)",
     paddingBottom: `calc(clamp(18px, 4vh, 40px) + ${NAV_H}px + env(safe-area-inset-bottom, 0px))`,
     paddingLeft: 12,
     paddingRight: 12,
     marginLeft: -16,
-    marginTop: stage === "result" ? -60: -40,
+    marginTop: (stage === "result" || stage === "gallery") ? -60 : -40,
 
     background: (stage === "start" || stage === "quiz" || stage === "done") ? THEME.green : "#ffffff",
     display: "grid",
-    gridTemplateRows: stage === "result" ? "auto 1fr" : "1fr auto 1fr",
+    gridTemplateRows: (stage === "result" || stage === "gallery") ? "auto 1fr" : "1fr auto 1fr",
     position: "relative",
     overflowX: "hidden",          
-    overflowY: stage === "result" ? "auto" : "hidden",
+    overflowY: (stage === "result" || stage === "gallery") ? "auto" : "hidden",
     fontFamily:
       `'Jua', 'Gowun Dodum', system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif`,
     color: "#1C1C1E",
@@ -532,6 +540,90 @@ export default function MbtiTest() {
     lineHeight: 1.15,
     margin: 0,
   };
+const AllTypesGallery = ({ onBack, navH = 0 }) => (
+  <div
+  className="no-scrollbar"
+    style={{
+      minHeight: "0",
+      maxHeight: `calc(100svh - ${navH}px - 12px)`,
+      overflowY: "auto",
+      overflowX: "hidden",
+    }}
+  >
+    <div
+      style={{
+        maxWidth: "min(1100px, 96vw)",
+        margin: "0 auto",
+        padding: "4px 0 20px",
+      }}
+      className="fade-up"
+    >
+      <div
+        style={{
+          position: "sticky",
+          top: 0,
+          padding: "6px 0 10px",
+          background: "linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85))",
+          backdropFilter: "blur(6px)",
+          zIndex: 1,
+        }}
+      >
+        <h2 
+          style={{
+            fontSize: "clamp(18px, 4vw, 24px)",
+            fontWeight: 900,
+            textAlign: "center",
+            margin: 0,
+          }}
+        >
+          유형 전체보기
+        </h2>
+      </div>
+
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+          gap: 12,
+        }}
+      >
+        {Object.entries(RESULT_BOOK).map(([code, data]) => (
+          <div
+            key={code}
+            className="card-in glass"
+            style={{
+              borderRadius: 16,
+              padding: 10,
+              textAlign: "center",
+              border: "1px solid rgba(0,0,0,0.08)",
+            }}
+          >
+            <div style={{ aspectRatio: "3 / 4", width: "100%" }}>
+              <img
+                src={data.image}
+                alt={data.title}
+                style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+              />
+            </div>
+            <div style={{ fontWeight: 900, marginTop: 8, fontSize: 14 }}>
+              {code}
+            </div>
+            <div style={{ fontSize: 12, color: "#444" }}>{data.title}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: 16, textAlign: "center" }}>
+        <button className="btn" style={pill} onClick={onBack}>
+          돌아가기
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+
 
   return (
     <div style={wrapperStyle}>
@@ -761,30 +853,68 @@ export default function MbtiTest() {
             </div>
             )}
 
-            {/* 🟣 사진 아래 버튼 */}
-            <button
-                className="btn"
-                style={{
-                    padding: "14px 24px",
-                    borderRadius: 999,
-                    border: "none",
-                    background: THEME.green,
-                    color: "#1C1C1E",
-                    fontWeight: 700,
-                    fontSize: 15,
-                    cursor: "pointer",
-                }}
-                onClick={() => {
-                    setStage("quiz");
-                    setIndex(0);
-                    setAnswers(Array(QUESTIONS.length).fill(null));
-                }}
-                >
-                테스트 다시 하기
-                </button>
-            </div>
+<div
+  style={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 12,
+    marginTop: 12,
+  }}
+>
+  {/* 1) 테스트 다시 하기 */}
+  <button
+    className="btn"
+    style={{
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "14px 24px",
+      borderRadius: 999,
+      border: "none",
+      background: THEME.green,
+      color: "#1C1C1E",
+      fontWeight: 700,
+      fontSize: 15,
+      cursor: "pointer",
+    }}
+    onClick={() => {
+      setStage("quiz");
+      setIndex(0);
+      setAnswers(Array(QUESTIONS.length).fill(null));
+    }}
+  >
+    테스트 다시 하기
+  </button>
+
+  {/* 2) 유형 전체보기 */}
+  <button
+    className="btn"
+    style={{
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "14px 24px",
+      borderRadius: 999,
+      border: "none",
+      background: THEME.ivory,
+      color: "#1C1C1E",
+      fontWeight: 700,
+      fontSize: 15,
+      cursor: "pointer",
+    }}
+    onClick={() => setStage("gallery")}
+  >
+    유형 전체보기
+  </button>
+</div>
+</div>
+
         </ScrollableContent>
     )}
+    {stage === "gallery" && (
+  <AllTypesGallery onBack={() => setStage("result")} />
+)}
 
     </div>
   );
